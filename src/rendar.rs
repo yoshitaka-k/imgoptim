@@ -42,7 +42,12 @@ impl eframe::App for Rendar {
                 }
 
                 // ファイルを最適化
-                self.drop_file.optimize(&self.app);
+                match self.drop_file.optimize(&self.app) {
+                    Ok(_) => {},
+                    Err(e) => {
+                        eprintln!("optimize failed: {}", e);
+                    }
+                }
             }
         });
 
@@ -64,7 +69,7 @@ impl eframe::App for Rendar {
                                 let size = metadata.len() / 1024;
                                 ui.label(format!(
                                     "{} ({} KB)",
-                                    path.path().display(),
+                                    path.path().file_name().unwrap().to_str(),
                                     size
                                 ));
 
@@ -105,7 +110,12 @@ impl eframe::App for Rendar {
                     }
 
                     // ファイルを最適化
-                    self.drop_file.optimize(&self.app);
+                    match self.drop_file.optimize(&self.app) {
+                        Ok(_) => {},
+                        Err(e) => {
+                            eprintln!("optimize failed: {}", e);
+                        }
+                    }
                 }
             });
 

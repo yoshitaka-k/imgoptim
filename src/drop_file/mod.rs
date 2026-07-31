@@ -37,10 +37,12 @@ impl DropFile {
 
     /// ファイルを最適化
     /// * `app` - アプリケーションの設定
-    pub fn optimize(&self, app: &App) {
+    pub fn optimize(&self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
         for file in self.paths.iter() {
-            file.optimize(app).unwrap();
+            file.optimize(app)?;
         }
+
+        Ok(())
     }
 
     /// ファイルの拡張子が許可されているかどうかを確認
