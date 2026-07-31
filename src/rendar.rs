@@ -69,7 +69,7 @@ impl eframe::App for Rendar {
                                 let size = metadata.len() / 1024;
                                 ui.label(format!(
                                     "{} ({} KB)",
-                                    path.path().file_name().unwrap().to_str(),
+                                    path.path().file_name().unwrap().to_str().unwrap(),
                                     size
                                 ));
 
