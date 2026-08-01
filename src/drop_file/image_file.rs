@@ -1,11 +1,8 @@
-use std::io::BufWriter;
 use std::path::PathBuf;
-use std::fs::File as FsFile;
 use getset::Getters;
-use image::codecs::jpeg::JpegEncoder;
-use image::ImageReader;
 
 use crate::app::App;
+use crate::optim::Jpeg;
 
 /// 画像ファイルを管理する構造体
 #[derive(Getters)]
@@ -24,19 +21,10 @@ impl ImageFile {
     pub fn optimize(&self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
         println!("Optimize: {}", self.path.display());
 
-        let file_image = ImageReader::open(&self.path)?.decode()?;
         let extension = self.path.extension().unwrap().to_str().unwrap();
 
         match extension {
-            "jpg" | "jpeg" => {
-                println!("Optimize: {}", self.path.display());
-
-                let out_path = self.path.with_extension(extension);
-                let file = FsFile::create(&out_path)?;
-                let mut writer = BufWriter::new(file);
-                let mut encoder = JpegEncoder::new_with_quality(&mut writer, *app.jpeg_quality());
-                encoder.encode_image(&file_image)?;
-            }
+            "jpg" | "jpeg" => Jpeg::optimize(&self.path, app)?,
             _ => {
                 return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Unsupported extension")));
             }
