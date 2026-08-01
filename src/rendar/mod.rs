@@ -2,12 +2,12 @@ mod layout;
 mod fonts;
 
 use crate::app;
-use crate::file::open_file;
+use crate::file::open_files;
 
 /// レンダーを管理する構造体
 pub struct Rendar {
     app: app::App,
-    file: open_file::OpenFile,
+    file: open_files::OpenFiles,
     is_optimizing: bool,
 }
 
@@ -20,7 +20,7 @@ impl Rendar {
         // フォントを追加
         fonts::install(&cc.egui_ctx);
 
-        let file = open_file::OpenFile::new();
+        let file = open_files::OpenFiles::new();
         Self { app, file, is_optimizing: false }
     }
 

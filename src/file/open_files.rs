@@ -7,7 +7,7 @@ use crate::file::image_file;
 
 /// ドロップされたファイルを管理する構造体
 #[derive(Getters, Setters)]
-pub struct OpenFile {
+pub struct OpenFiles {
     #[getset(get = "pub")]
     paths: Vec<image_file::ImageFile>,
 
@@ -15,9 +15,9 @@ pub struct OpenFile {
     extensions: Vec<&'static str>,
 }
 
-impl OpenFile {
-    /// 新しい OpenFile を作成
-    /// * `return` - OpenFile のインスタンス
+impl OpenFiles {
+    /// 新しい OpenFiles を作成
+    /// * `return` - OpenFiles のインスタンス
     pub fn new() -> Self {
         Self { paths: vec![], extensions: vec![] }
     }

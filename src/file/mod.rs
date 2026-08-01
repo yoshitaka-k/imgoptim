@@ -1,2 +1,2 @@
-pub mod open_file;
+pub mod open_files;
 pub mod image_file;
