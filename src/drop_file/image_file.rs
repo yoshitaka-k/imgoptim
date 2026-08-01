@@ -19,8 +19,6 @@ impl ImageFile {
 
     /// 画像を最適化
     pub fn optimize(&self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        println!("Optimize: {}", self.path.display());
-
         let extension = self.path.extension().unwrap().to_str().unwrap();
 
         match extension {
