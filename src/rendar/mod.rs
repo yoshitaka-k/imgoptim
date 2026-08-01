@@ -5,6 +5,7 @@ use crate::drop_file;
 pub struct Rendar {
     app: app::App,
     drop_file: drop_file::DropFile,
+    is_optimizing: bool,
 }
 
 impl Rendar {
@@ -14,7 +15,15 @@ impl Rendar {
     /// * `return` - Rendar のインスタンス
     pub fn new(_cc: &eframe::CreationContext, app: app::App) -> Self {
         let drop_file = drop_file::DropFile::new();
-        Self { app, drop_file }
+        Self { app, drop_file, is_optimizing: false }
+    }
+
+    /// ファイルを最適化
+    fn optimize(&self) -> Result<(), Box<dyn std::error::Error>> {
+        match self.drop_file.optimize(&self.app) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
     }
 }
 
@@ -23,6 +32,15 @@ impl eframe::App for Rendar {
     /// * `ui` - ユーザーインターフェース
     /// * `frame` - フレーム
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        if self.is_optimizing {
+            self.is_optimizing = false;
+
+            match self.optimize() {
+                Ok(_) => {},
+                Err(e) => eprintln!("optimize failed: {}", e),
+            }
+        }
+
         // スタイルを設定
         ui.ctx().global_style_mut(|style| {
             // ラベルを選択できないようにする
@@ -41,13 +59,7 @@ impl eframe::App for Rendar {
                     }
                 }
 
-                // ファイルを最適化
-                match self.drop_file.optimize(&self.app) {
-                    Ok(_) => {},
-                    Err(e) => {
-                        eprintln!("optimize failed: {}", e);
-                    }
-                }
+                self.is_optimizing = true;
             }
         });
 
@@ -107,14 +119,8 @@ impl eframe::App for Rendar {
                         for path in paths {
                             self.drop_file.add_path(path);
                         }
-                    }
 
-                    // ファイルを最適化
-                    match self.drop_file.optimize(&self.app) {
-                        Ok(_) => {},
-                        Err(e) => {
-                            eprintln!("optimize failed: {}", e);
-                        }
+                        self.is_optimizing = true;
                     }
                 }
             });

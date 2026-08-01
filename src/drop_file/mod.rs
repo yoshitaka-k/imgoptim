@@ -39,7 +39,12 @@ impl DropFile {
     /// * `app` - アプリケーションの設定
     pub fn optimize(&self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
         for file in self.paths.iter() {
-            file.optimize(app)?;
+            match file.optimize(app) {
+                Ok(_) => {},
+                Err(e) => {
+                    eprintln!("optimize failed: {}", e);
+                }
+            }
         }
 
         Ok(())
