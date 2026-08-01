@@ -35,8 +35,8 @@ impl OpenFiles {
 
     /// ファイルを最適化
     /// * `app` - アプリケーションの設定
-    pub fn optimize(&self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        for file in self.paths.iter() {
+    pub fn optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
+        for file in self.paths.iter_mut() {
             match file.optimize(app) {
                 Ok(_) => {},
                 Err(e) => {

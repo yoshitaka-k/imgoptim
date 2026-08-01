@@ -25,7 +25,7 @@ impl Rendar {
     }
 
     /// ファイルを最適化
-    fn optimize(&self) -> Result<(), Box<dyn std::error::Error>> {
+    fn optimize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         match self.file.optimize(&self.app) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
