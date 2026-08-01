@@ -1,3 +1,4 @@
+mod layout;
 mod fonts;
 
 use crate::app;
@@ -80,64 +81,11 @@ impl eframe::App for Rendar {
                 .max_width(availabel_width)
                 .auto_shrink([false, false])
                 .show(ui, |ui| {
-                    for (index, path) in self.drop_file.paths().iter().enumerate() {
-                        match path.path().metadata() {
-                            Ok(metadata) => {
-                                let size = metadata.len() / 1024;
-                                ui.label(format!(
-                                    "{} ({} KB)",
-                                    path.path().file_name().unwrap().to_str().unwrap(),
-                                    size
-                                ));
-
-                                if index < self.drop_file.paths().len() - 1 {
-                                    ui.separator();
-                                }
-                            }
-                            Err(_) => {}
-                        }
-                    }
+                    layout::list::file_list(ui, &self.drop_file);
                 });
 
-            // 左寄せ
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                if ui.button("Open").clicked() {
-                    let extensions: Vec<String> = self.app.extensions()
-                        .iter()
-                        .map(|ext| ext.to_string())
-                        .collect();
-
-                    // Macのみファイルとフォルダを同時選択できる
-                    #[cfg(target_os = "macos")]
-                    let paths = rfd::FileDialog::new()
-                        .add_filter("Images", &extensions)
-                        .pick_files_or_folders();
-
-                    // Mac以外は複数フォルダ選択のみ
-                    #[cfg(not(target_os = "macos"))]
-                    let paths = rfd::FileDialog::new()
-                        .add_filter("Images", &extensions)
-                        .pick_folders();
-
-                    // ファイルを追加
-                    if let Some(paths) = paths {
-                        for path in paths {
-                            self.drop_file.add_path(path);
-                        }
-
-                        self.is_optimizing = true;
-                    }
-                }
-            });
-
-            // 右寄せ
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::RIGHT), |ui| {
-                ui.horizontal(|ui| {
-                    if ui.button("Clear").clicked() {
-                        self.drop_file.clear();
-                    }
-                });
-            });
+            // 下部ボタンを表示
+            layout::button::bottom_button(ui, &self.app, &mut self.drop_file, &mut self.is_optimizing);
         });
     }
 }
