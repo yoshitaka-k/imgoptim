@@ -1,3 +1,5 @@
+mod fonts;
+
 use crate::app;
 use crate::drop_file;
 
@@ -13,7 +15,10 @@ impl Rendar {
     /// * `cc` - 作成コンテキスト
     /// * `app` - アプリケーション
     /// * `return` - Rendar のインスタンス
-    pub fn new(_cc: &eframe::CreationContext, app: app::App) -> Self {
+    pub fn new(cc: &eframe::CreationContext, app: app::App) -> Self {
+        // フォントを追加
+        fonts::install(&cc.egui_ctx);
+
         let drop_file = drop_file::DropFile::new();
         Self { app, drop_file, is_optimizing: false }
     }

@@ -1,0 +1,16 @@
+#[path = "build/mod.rs"]
+pub(crate) mod build;
+
+use std::{env, path::Path};
+
+/// メイン関数
+fn main() {
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let manifest_path = Path::new(&manifest_dir);
+    let out_dir = env::var("OUT_DIR").unwrap();
+
+    // フォントのディレクトリを取得
+    let fonts_dir = manifest_path.join("assets/fonts");
+    println!("cargo:rerun-if-changed={}", fonts_dir.display());
+    build::fonts::generate_fonts_generated(&fonts_dir, &out_dir);
+}
