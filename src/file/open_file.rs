@@ -1,25 +1,23 @@
-mod image_file;
-
 use std::fs;
 use std::path::PathBuf;
 use getset::{Getters, Setters};
 
 use crate::app::App;
-use crate::drop_file::image_file::ImageFile;
+use crate::file::image_file;
 
 /// ドロップされたファイルを管理する構造体
 #[derive(Getters, Setters)]
-pub struct DropFile {
+pub struct OpenFile {
     #[getset(get = "pub")]
-    paths: Vec<ImageFile>,
+    paths: Vec<image_file::ImageFile>,
 
     #[getset(set = "pub")]
     extensions: Vec<&'static str>,
 }
 
-impl DropFile {
-    /// 新しい DropFile を作成
-    /// * `return` - DropFile のインスタンス
+impl OpenFile {
+    /// 新しい OpenFile を作成
+    /// * `return` - OpenFile のインスタンス
     pub fn new() -> Self {
         Self { paths: vec![], extensions: vec![] }
     }
@@ -71,7 +69,7 @@ impl DropFile {
         let metadata = path.metadata().expect("metadata call failed");
         if metadata.is_file() {
             if self.is_allowed_extension(&path) {
-                self.paths.push(ImageFile::new(path));
+                self.paths.push(image_file::ImageFile::new(path));
             }
         } else if metadata.is_dir() {
             for entry in fs::read_dir(path).expect("read_dir call failed") {

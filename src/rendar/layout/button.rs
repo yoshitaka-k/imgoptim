@@ -1,14 +1,14 @@
 use crate::app;
-use crate::drop_file;
+use crate::file::open_file;
 
 /// 下部ボタンを表示
 /// * `ui` - UI
 /// * `app` - アプリケーション
-/// * `drop_file` - ドロップされたファイル
+/// * `file` - ドロップされたファイル
 pub(crate) fn bottom_button(
     ui: &mut egui::Ui,
     app: &app::App,
-    drop_file: &mut drop_file::DropFile,
+    file: &mut open_file::OpenFile,
     is_optimizing: &mut bool) {
     // 左寄せ
     ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
@@ -33,7 +33,7 @@ pub(crate) fn bottom_button(
             // ファイルを追加
             if let Some(paths) = paths {
                 for path in paths {
-                    drop_file.add_path(path);
+                    file.add_path(path);
                 }
 
                 *is_optimizing = true;
@@ -45,7 +45,7 @@ pub(crate) fn bottom_button(
     ui.with_layout(egui::Layout::bottom_up(egui::Align::RIGHT), |ui| {
         ui.horizontal(|ui| {
             if ui.button("Clear").clicked() {
-                drop_file.clear();
+                file.clear();
             }
         });
     });

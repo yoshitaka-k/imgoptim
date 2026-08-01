@@ -1,10 +1,10 @@
-use crate::drop_file;
+use crate::file;
 
 /// ファイル一覧を表示
 /// * `ui` - UI
-/// * `drop_file` - ドロップされたファイル
-pub(crate) fn file_list(ui: &mut egui::Ui, drop_file: &drop_file::DropFile) {
-    for (index, path) in drop_file.paths().iter().enumerate() {
+/// * `file` - ドロップされたファイル
+pub(crate) fn file_list(ui: &mut egui::Ui, file: &file::open_file::OpenFile) {
+    for (index, path) in file.paths().iter().enumerate() {
         match path.path().metadata() {
             Ok(metadata) => {
                 let size = metadata.len() / 1024;
@@ -14,7 +14,7 @@ pub(crate) fn file_list(ui: &mut egui::Ui, drop_file: &drop_file::DropFile) {
                     size
                 ));
 
-                if index < drop_file.paths().len() - 1 {
+                if index < file.paths().len() - 1 {
                     ui.separator();
                 }
             }
