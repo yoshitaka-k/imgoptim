@@ -1,12 +1,13 @@
 use std::fs;
 use std::path::PathBuf;
 use getset::{Getters, Setters};
+use rayon::prelude::*;
 
 use crate::app::App;
 use crate::file::image_file;
 
 /// ドロップされたファイルを管理する構造体
-#[derive(Getters, Setters)]
+#[derive(Clone, Getters, Setters)]
 pub struct OpenFiles {
     #[getset(get = "pub")]
     paths: Vec<image_file::ImageFile>,
@@ -36,16 +37,26 @@ impl OpenFiles {
     /// ファイルを最適化
     /// * `app` - アプリケーションの設定
     pub fn optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        for file in self.paths.iter_mut() {
-            match file.optimize(app) {
-                Ok(_) => {},
-                Err(e) => {
-                    eprintln!("optimize failed: {}", e);
-                }
+        // 最適化を実行
+        // rayon を使用して並列実行
+        self.paths.par_iter_mut().for_each(|file| {
+            if let Err(e) = file.optimize(app) {
+                eprintln!("optimize failed: {}", e);
             }
-        }
+        });
 
         Ok(())
+    }
+
+    /// 最適化結果を既存の一覧へ反映
+    /// * `results` - 最適化済みのファイル一覧
+    pub fn apply_results(&mut self, results: OpenFiles) {
+        for result in results.paths {
+            // 既存のファイル一覧からパスが一致するファイルを検索
+            if let Some(file) = self.paths.iter_mut().find(|f| f.path() == result.path()) {
+                *file = result;
+            }
+        }
     }
 
     /// ファイルの拡張子が許可されているかどうかを確認

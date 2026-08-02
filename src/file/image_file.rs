@@ -6,7 +6,7 @@ use crate::optim::Jpeg;
 use crate::file::extension;
 
 /// 画像ファイルを管理する構造体
-#[derive(Getters)]
+#[derive(Clone, Getters)]
 pub struct ImageFile {
     #[getset(get= "pub")]
     path: PathBuf,

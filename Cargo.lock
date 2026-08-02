@@ -1987,6 +1987,7 @@ dependencies = [
  "getset",
  "image",
  "log",
+ "rayon",
  "rfd",
 ]
 

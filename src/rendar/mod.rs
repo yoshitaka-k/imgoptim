@@ -2,6 +2,8 @@ mod layout;
 mod fonts;
 mod event;
 
+use std::sync::mpsc;
+
 use crate::app;
 use crate::file::open_files;
 
@@ -12,6 +14,11 @@ pub struct Rendar {
 
     open_dialog: bool,
     is_optimizing: bool,
+
+    // 結果を送信するチャネル
+    result_tx: mpsc::Sender<open_files::OpenFiles>,
+    // 結果を受信するチャネル
+    result_rx: mpsc::Receiver<open_files::OpenFiles>,
 }
 
 impl Rendar {
@@ -26,25 +33,41 @@ impl Rendar {
         let mut files = open_files::OpenFiles::new();
         files.set_extensions(app.extensions_to_string());
 
+        // 結果を送受信するチャネルを作成
+        let (result_tx, result_rx) = mpsc::channel();
+
         Self {
             app,
             files,
             open_dialog: false,
             is_optimizing: false,
+            result_tx,
+            result_rx,
         }
     }
 
     /// ファイルを最適化
-    fn optimize(&mut self) {
+    fn optimize(&mut self, ctx: &egui::Context) {
         if !self.is_optimizing {
             return;
         }
 
         self.is_optimizing = false;
 
-        if let Err(e) = self.files.optimize(&self.app) {
-            eprintln!("optimize failed: {}", e);
-        }
+        // 最適化を実行するスレッドの準備
+        let app = self.app.clone();
+        let mut files = self.files.clone();
+        let tx = self.result_tx.clone();
+        let ctx = ctx.clone();
+
+        // 最適化を実行するスレッドを作成
+        std::thread::spawn(move || {
+            let _ = files.optimize(&app);
+            let _ = tx.send(files);
+
+            // 再描画を要求
+            ctx.request_repaint();
+        });
     }
 }
 
@@ -53,8 +76,13 @@ impl eframe::App for Rendar {
     /// * `ui` - ユーザーインターフェース
     /// * `frame` - フレーム
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        // 最適化結果をファイル単位で反映
+        while let Ok(results) = self.result_rx.try_recv() {
+            self.files.apply_results(results);
+        }
+
         // 前フレームで予約された最適化を実行
-        self.optimize();
+        self.optimize(&ui.ctx());
 
         // スタイルを設定
         ui.ctx().global_style_mut(|style| {
