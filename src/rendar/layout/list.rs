@@ -17,28 +17,25 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &open_files::OpenFiles) {
                         ));
                     }
                     image_file::OptimizeStatus::Optimizing => {
-                        ui.label(format!(
-                            "⏳ {} ({} KB)",
-                            path.file_name(),
-                            path.size() / 1024,
-                        ));
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("⏳").color(egui::Color32::YELLOW));
+                            ui.label(path.file_name());
+                            ui.label(format!("({} KB)", path.size() / 1024));
+                        });
                     }
                     image_file::OptimizeStatus::Optimized => {
-                        ui.label(format!(
-                            "✅ {} ({} KB -> {} KB) {}%",
-                            path.file_name(),
-                            path.size() / 1024,
-                            path.new_size() / 1024,
-                            path.percent()
-                        ));
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("✅").color(egui::Color32::GREEN));
+                            ui.label(path.file_name());
+                            ui.label(format!("({} KB -> {} KB) {}%", path.size() / 1024, path.new_size() / 1024, path.percent()));
+                        });
                     }
                     image_file::OptimizeStatus::Error(e) => {
-                        ui.label(format!(
-                            "❌ {} ({} KB) {}",
-                            path.file_name(),
-                            path.size() / 1024,
-                            e,
-                        ));
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("❌").color(egui::Color32::RED));
+                            ui.label(path.file_name());
+                            ui.label(format!("({} KB) {}", path.size() / 1024, e));
+                        });
                     }
                 }
 
