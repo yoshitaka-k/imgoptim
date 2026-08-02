@@ -63,9 +63,6 @@ impl ImageFile {
                 let metadata = self.path.metadata().unwrap();
                 self.new_size = metadata.len();
 
-                println!("size: {}", self.size);
-                println!("new_size: {}", self.new_size);
-
                 if self.size > 0 && self.size >= self.new_size {
                     let percent = (self.size - self.new_size) as f32 / self.size as f32 * 100.0;
                     self.percent = (percent * 100.0).ceil() / 100.0;
