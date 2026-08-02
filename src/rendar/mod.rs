@@ -1,5 +1,6 @@
 mod layout;
 mod fonts;
+mod event;
 
 use crate::app;
 use crate::file::open_files;
@@ -8,6 +9,8 @@ use crate::file::open_files;
 pub struct Rendar {
     app: app::App,
     files: open_files::OpenFiles,
+
+    open_dialog: bool,
     is_optimizing: bool,
 }
 
@@ -23,14 +26,24 @@ impl Rendar {
         let mut files = open_files::OpenFiles::new();
         files.set_extensions(app.extensions_to_string());
 
-        Self { app, files, is_optimizing: false }
+        Self {
+            app,
+            files,
+            open_dialog: false,
+            is_optimizing: false,
+        }
     }
 
     /// ファイルを最適化
-    fn optimize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        match self.files.optimize(&self.app) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
+    fn optimize(&mut self) {
+        if !self.is_optimizing {
+            return;
+        }
+
+        self.is_optimizing = false;
+
+        if let Err(e) = self.files.optimize(&self.app) {
+            eprintln!("optimize failed: {}", e);
         }
     }
 }
@@ -40,14 +53,8 @@ impl eframe::App for Rendar {
     /// * `ui` - ユーザーインターフェース
     /// * `frame` - フレーム
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        if self.is_optimizing {
-            self.is_optimizing = false;
-
-            match self.optimize() {
-                Ok(_) => {},
-                Err(e) => eprintln!("optimize failed: {}", e),
-            }
-        }
+        // 前フレームで予約された最適化を実行
+        self.optimize();
 
         // スタイルを設定
         ui.ctx().global_style_mut(|style| {
@@ -55,20 +62,23 @@ impl eframe::App for Rendar {
             style.interaction.selectable_labels = false;
         });
 
-        // ドラッグ&ドロップされたファイルを追加
+        // ファイルダイアログをリスト描画前に開く
+        if self.open_dialog {
+            self.open_dialog = false;
+            event::open_button_clicked(
+                &self.app.extensions_to_string(),
+                &mut self.files,
+                &mut self.is_optimizing,
+            );
+        }
+
+        // ドラッグ&ドロップされたファイルを処理
         ui.ctx().input(|input| {
             let files = input.raw.dropped_files.clone();
-            if files.len() > 0 {
-                for file in files {
-                    if let Some(path) = file.path {
-                        self.files.add_path(path);
-                    }
-                }
-
-                self.is_optimizing = true;
-            }
+            event::drop_files(&files, &mut self.files, &mut self.is_optimizing);
         });
 
+        // 中央パネルを表示
         egui::CentralPanel::default().show_inside(ui, |ui| {
             let availabel_width = ui.available_size().x;
 
@@ -84,8 +94,8 @@ impl eframe::App for Rendar {
                     layout::list::file_list(ui, &self.files);
                 });
 
-            // 下部ボタンを表示
-            layout::button::bottom_button(ui, &self.app, &mut self.files, &mut self.is_optimizing);
+            // 下部ボタンを表示（見た目の位置はそのまま）
+            layout::button::bottom_button(ui, &mut self.files, &mut self.open_dialog);
         });
     }
 }
