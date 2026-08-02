@@ -14,7 +14,7 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &open_files::OpenFiles) {
                         path.file_name(),
                         path.size() / 1024,
                         path.new_size() / 1024,
-                        path.percentage()
+                        path.percent()
                     ));
                 } else {
                     ui.label(format!(

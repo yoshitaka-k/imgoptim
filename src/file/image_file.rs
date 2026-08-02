@@ -27,7 +27,7 @@ pub struct ImageFile {
     new_size: u64,
 
     #[getset(get = "pub")]
-    percentage: f32,
+    percent: f32,
 }
 
 impl ImageFile {
@@ -44,7 +44,7 @@ impl ImageFile {
             is_optimized: false,
             size: 0,
             new_size: 0,
-            percentage: 0.0,
+            percent: 0.0,
         }
     }
 
@@ -65,8 +65,15 @@ impl ImageFile {
                 let metadata = self.path.metadata().unwrap();
                 self.new_size = metadata.len();
 
-                let percentage = (self.size - self.new_size) as f32 / self.size as f32 * 100.0;
-                self.percentage = (percentage * 100.0).ceil() / 100.0;
+                println!("size: {}", self.size);
+                println!("new_size: {}", self.new_size);
+
+                if self.size > 0 && self.size >= self.new_size {
+                    let percent = (self.size - self.new_size) as f32 / self.size as f32 * 100.0;
+                    self.percent = (percent * 100.0).ceil() / 100.0;
+                } else {
+                    self.percent = 0.0;
+                }
             }
             _ => {
                 return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Unsupported extension")));
