@@ -1,11 +1,14 @@
 mod layout;
 mod fonts;
-mod event;
 
 use std::sync::mpsc;
 
 use crate::app;
 use crate::file::open_files;
+use crate::event::{
+    button_clicked,
+    drop_files,
+};
 
 /// レンダーを管理する構造体
 pub struct Rendar {
@@ -116,7 +119,7 @@ impl eframe::App for Rendar {
         // ファイルダイアログをリスト描画前に開く
         if self.open_dialog {
             self.open_dialog = false;
-            event::open_button_clicked(
+            button_clicked::open_button_clicked(
                 &self.app.extensions_to_string(),
                 &mut self.files,
                 &mut self.is_optimizing,
@@ -126,7 +129,7 @@ impl eframe::App for Rendar {
         // ドラッグ&ドロップされたファイルを処理
         ui.ctx().input(|input| {
             let files = input.raw.dropped_files.clone();
-            event::drop_files(&files, &mut self.files, &mut self.is_optimizing);
+            drop_files::drop_files(&files, &mut self.files, &mut self.is_optimizing);
         });
 
         // 中央パネルを表示
