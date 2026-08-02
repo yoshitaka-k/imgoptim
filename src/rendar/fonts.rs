@@ -1,5 +1,4 @@
 use std::sync::Arc;
-
 use egui::{FontData, FontDefinitions, FontFamily};
 
 mod generated {
@@ -7,6 +6,7 @@ mod generated {
 }
 
 /// egui に assets/fonts のフォントを登録する
+/// * `ctx` - コンテキスト
 pub fn install(ctx: &egui::Context) {
     let mut fonts = FontDefinitions::default();
 
@@ -24,4 +24,16 @@ pub fn install(ctx: &egui::Context) {
     }
 
     ctx.set_fonts(fonts);
+}
+
+/// フォントカラーを設定する
+/// * `text` - テキスト
+/// * `color` - カラー
+/// * `return` - テキスト
+pub fn text_color(text: &str, color: egui::Color32, size: Option<f32>) -> egui::RichText {
+    let mut rich_text = egui::RichText::new(text).color(color);
+    if let Some(size) = size {
+        rich_text = rich_text.size(size);
+    }
+    rich_text
 }
