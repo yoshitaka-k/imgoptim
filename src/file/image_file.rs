@@ -36,13 +36,14 @@ impl ImageFile {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         let ext = path.extension().unwrap();
         let extension = extension::Extension::from_str(ext);
+        let size = path.metadata().unwrap().len();
 
         Self {
             path,
             file_name,
             extension: extension,
             is_optimized: false,
-            size: 0,
+            size: size,
             new_size: 0,
             percent: 0.0,
         }
@@ -53,9 +54,6 @@ impl ImageFile {
         if self.is_optimized {
             return Ok(());
         }
-
-        let metadata = self.path.metadata().unwrap();
-        self.size = metadata.len();
 
         match self.extension {
             extension::Extension::Jpeg => {

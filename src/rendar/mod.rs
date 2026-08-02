@@ -7,7 +7,7 @@ use crate::file::open_files;
 /// レンダーを管理する構造体
 pub struct Rendar {
     app: app::App,
-    file: open_files::OpenFiles,
+    files: open_files::OpenFiles,
     is_optimizing: bool,
 }
 
@@ -20,13 +20,15 @@ impl Rendar {
         // フォントを追加
         fonts::install(&cc.egui_ctx);
 
-        let file = open_files::OpenFiles::new();
-        Self { app, file, is_optimizing: false }
+        let mut files = open_files::OpenFiles::new();
+        files.set_extensions(app.extensions_to_string());
+
+        Self { app, files, is_optimizing: false }
     }
 
     /// ファイルを最適化
     fn optimize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        match self.file.optimize(&self.app) {
+        match self.files.optimize(&self.app) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
@@ -55,13 +57,11 @@ impl eframe::App for Rendar {
 
         // ドラッグ&ドロップされたファイルを追加
         ui.ctx().input(|input| {
-            self.file.set_extensions(self.app.extensions().clone());
-
             let files = input.raw.dropped_files.clone();
             if files.len() > 0 {
                 for file in files {
                     if let Some(path) = file.path {
-                        self.file.add_path(path);
+                        self.files.add_path(path);
                     }
                 }
 
@@ -81,11 +81,11 @@ impl eframe::App for Rendar {
                 .max_width(availabel_width)
                 .auto_shrink([false, false])
                 .show(ui, |ui| {
-                    layout::list::file_list(ui, &self.file);
+                    layout::list::file_list(ui, &self.files);
                 });
 
             // 下部ボタンを表示
-            layout::button::bottom_button(ui, &self.app, &mut self.file, &mut self.is_optimizing);
+            layout::button::bottom_button(ui, &self.app, &mut self.files, &mut self.is_optimizing);
         });
     }
 }

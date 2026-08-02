@@ -12,7 +12,7 @@ pub struct OpenFiles {
     paths: Vec<image_file::ImageFile>,
 
     #[getset(set = "pub")]
-    extensions: Vec<&'static str>,
+    extensions: Vec<String>,
 }
 
 impl OpenFiles {
