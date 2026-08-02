@@ -5,21 +5,10 @@ use getset::{Getters, Setters};
 use crate::app::App;
 use crate::optim::Jpeg;
 use crate::file::extension;
+use crate::file::optimize_status::OptimizeStatus;
 
 /// ImageFile の一意な ID を発行するカウンタ
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
-
-#[derive(Clone, PartialEq)]
-pub enum OptimizeStatus {
-    /// 最適化未実行
-    None,
-    /// 最適化中
-    Optimizing,
-    /// 最適化完了
-    Optimized,
-    /// 最適化エラー（メッセージ）
-    Error(String),
-}
 
 /// 画像ファイルを管理する構造体
 #[derive(Clone, PartialEq, Getters, Setters)]

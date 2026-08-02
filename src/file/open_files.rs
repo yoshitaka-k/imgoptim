@@ -5,6 +5,7 @@ use rayon::prelude::*;
 
 use crate::app::App;
 use crate::file::image_file;
+use crate::file::optimize_status::OptimizeStatus;
 
 /// ドロップされたファイルを管理する構造体
 #[derive(Clone, PartialEq, Getters, Setters)]
@@ -37,8 +38,8 @@ impl OpenFiles {
     /// 未処理ファイルを最適化中ステータスへ変更
     pub fn mark_pending_as_optimizing(&mut self) {
         for file in &mut self.paths {
-            if *file.status() == image_file::OptimizeStatus::None {
-                file.set_status(image_file::OptimizeStatus::Optimizing);
+            if *file.status() == OptimizeStatus::None {
+                file.set_status(OptimizeStatus::Optimizing);
             }
         }
     }
@@ -46,13 +47,13 @@ impl OpenFiles {
     /// 最適化中のファイルがあるかどうか
     /// * `return` - 最適化中のファイルがあるかどうか
     pub fn has_optimizing(&self) -> bool {
-        self.paths.iter().any(|f| *f.status() == image_file::OptimizeStatus::Optimizing)
+        self.paths.iter().any(|f| *f.status() == OptimizeStatus::Optimizing)
     }
 
     /// 未処理ファイルがあるかどうか
     /// * `return` - 未処理ファイルがあるかどうか
     pub fn has_pending(&self) -> bool {
-        self.paths.iter().any(|f| *f.status() == image_file::OptimizeStatus::None)
+        self.paths.iter().any(|f| *f.status() == OptimizeStatus::None)
     }
 
     /// ファイルを最適化
@@ -98,7 +99,7 @@ impl OpenFiles {
     /// * `path` - ファイルのパス
     /// * `return` - 最適化中かどうか
     fn is_optimizing(&self, path: &PathBuf) -> bool {
-        self.paths.iter().any(|f| f.path() == path && *f.status() == image_file::OptimizeStatus::Optimizing)
+        self.paths.iter().any(|f| f.path() == path && *f.status() == OptimizeStatus::Optimizing)
     }
 
     /// ファイルを検索
@@ -111,7 +112,7 @@ impl OpenFiles {
                 // 同じパスが最適化中なら、新規行をエラーで追加
                 if self.is_optimizing(&path) {
                     let mut image_file = image_file::ImageFile::new(path);
-                    image_file.set_status(image_file::OptimizeStatus::Error(
+                    image_file.set_status(OptimizeStatus::Error(
                         "同じファイルが最適化中です".to_string(),
                     ));
                     self.paths.push(image_file);
