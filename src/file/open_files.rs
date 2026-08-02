@@ -52,8 +52,8 @@ impl OpenFiles {
     /// * `results` - 最適化済みのファイル一覧
     pub fn apply_results(&mut self, results: OpenFiles) {
         for result in results.paths {
-            // 既存のファイル一覧からパスが一致するファイルを検索
-            if let Some(file) = self.paths.iter_mut().find(|f| f.path() == result.path()) {
+            // 既存のファイル一覧から ID が一致するファイルを検索
+            if let Some(file) = self.paths.iter_mut().find(|f| f.id() == result.id()) {
                 *file = result;
             }
         }

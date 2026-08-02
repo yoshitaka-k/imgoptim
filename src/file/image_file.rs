@@ -1,13 +1,32 @@
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 use getset::Getters;
 
 use crate::app::App;
 use crate::optim::Jpeg;
 use crate::file::extension;
 
+/// ImageFile の一意な ID を発行するカウンタ
+static NEXT_ID: AtomicU64 = AtomicU64::new(1);
+
+#[derive(Clone, PartialEq, Eq)]
+pub enum OptimizeStatus {
+    /// 最適化未実行
+    None,
+    /// 最適化中
+    Optimizing,
+    /// 最適化完了
+    Optimized,
+    /// 最適化エラー（メッセージ）
+    Error(String),
+}
+
 /// 画像ファイルを管理する構造体
 #[derive(Clone, Getters)]
 pub struct ImageFile {
+    #[getset(get = "pub")]
+    id: u64,
+
     #[getset(get= "pub")]
     path: PathBuf,
 
@@ -18,7 +37,7 @@ pub struct ImageFile {
     extension: extension::Extension,
 
     #[getset(get = "pub")]
-    is_optimized: bool,
+    status: OptimizeStatus,
 
     #[getset(get = "pub")]
     size: u64,
@@ -35,17 +54,19 @@ impl ImageFile {
     /// * `path` - ファイルのパス
     /// * `return` - ImageFile のインスタンス
     pub fn new(path: PathBuf) -> Self {
+        let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         let ext = path.extension().unwrap();
         let extension = extension::Extension::from_str(ext);
         let size = path.metadata().unwrap().len();
 
         Self {
+            id,
             path,
             file_name,
-            extension: extension,
-            is_optimized: false,
-            size: size,
+            extension,
+            status: OptimizeStatus::None,
+            size,
             new_size: 0,
             percent: 0.0,
         }
@@ -55,8 +76,6 @@ impl ImageFile {
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     fn jpeg_optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        self.is_optimized = true;
-
         // 最適化を実行
         Jpeg::optimize(&self.path, app)?;
 
@@ -78,19 +97,29 @@ impl ImageFile {
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     pub fn optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        if self.is_optimized {
+        if self.status == OptimizeStatus::Optimized {
             return Ok(());
         }
 
-        match self.extension {
-            extension::Extension::Jpeg => {
-                self.jpeg_optimize(app)?;
+        self.status = OptimizeStatus::Optimizing;
+
+        let result = match self.extension {
+            extension::Extension::Jpeg => self.jpeg_optimize(app),
+            _ => Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Unsupported extension",
+            )) as Box<dyn std::error::Error>),
+        };
+
+        match result {
+            Ok(()) => {
+                self.status = OptimizeStatus::Optimized;
+                Ok(())
             }
-            _ => {
-                return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Unsupported extension")));
+            Err(e) => {
+                self.status = OptimizeStatus::Error(e.to_string());
+                Err(e)
             }
         }
-
-        Ok(())
     }
 }
