@@ -7,7 +7,7 @@ use crate::app::App;
 use crate::file::image_file;
 
 /// ドロップされたファイルを管理する構造体
-#[derive(Clone, Getters, Setters)]
+#[derive(Clone, PartialEq, Getters, Setters)]
 pub struct OpenFiles {
     #[getset(get = "pub")]
     paths: Vec<image_file::ImageFile>,
@@ -32,6 +32,27 @@ impl OpenFiles {
     /// * `path` - ドロップされたファイルのパス
     pub fn add_path(&mut self, path: PathBuf) {
         self.find_file(path);
+    }
+
+    /// 未処理ファイルを最適化中ステータスへ変更
+    pub fn mark_pending_as_optimizing(&mut self) {
+        for file in &mut self.paths {
+            if *file.status() == image_file::OptimizeStatus::None {
+                file.set_status(image_file::OptimizeStatus::Optimizing);
+            }
+        }
+    }
+
+    /// 最適化中のファイルがあるかどうか
+    /// * `return` - 最適化中のファイルがあるかどうか
+    pub fn has_optimizing(&self) -> bool {
+        self.paths.iter().any(|f| *f.status() == image_file::OptimizeStatus::Optimizing)
+    }
+
+    /// 未処理ファイルがあるかどうか
+    /// * `return` - 未処理ファイルがあるかどうか
+    pub fn has_pending(&self) -> bool {
+        self.paths.iter().any(|f| *f.status() == image_file::OptimizeStatus::None)
     }
 
     /// ファイルを最適化
@@ -73,6 +94,13 @@ impl OpenFiles {
         false
     }
 
+    /// ファイルが最適化中かどうかを確認
+    /// * `path` - ファイルのパス
+    /// * `return` - 最適化中かどうか
+    fn is_optimizing(&self, path: &PathBuf) -> bool {
+        self.paths.iter().any(|f| f.path() == path && *f.status() == image_file::OptimizeStatus::Optimizing)
+    }
+
     /// ファイルを検索
     /// * `path` - ドロップされたファイルのパス
     /// * `return` - ファイルのパス
@@ -80,6 +108,16 @@ impl OpenFiles {
         let metadata = path.metadata().expect("metadata call failed");
         if metadata.is_file() {
             if self.is_allowed_extension(&path) {
+                // 同じパスが最適化中なら、新規行をエラーで追加
+                if self.is_optimizing(&path) {
+                    let mut image_file = image_file::ImageFile::new(path);
+                    image_file.set_status(image_file::OptimizeStatus::Error(
+                        "同じファイルが最適化中です".to_string(),
+                    ));
+                    self.paths.push(image_file);
+                    return;
+                }
+
                 self.paths.push(image_file::ImageFile::new(path));
             }
         } else if metadata.is_dir() {

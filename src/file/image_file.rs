@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
-use getset::Getters;
+use getset::{Getters, Setters};
 
 use crate::app::App;
 use crate::optim::Jpeg;
@@ -9,7 +9,7 @@ use crate::file::extension;
 /// ImageFile の一意な ID を発行するカウンタ
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq)]
 pub enum OptimizeStatus {
     /// 最適化未実行
     None,
@@ -22,7 +22,7 @@ pub enum OptimizeStatus {
 }
 
 /// 画像ファイルを管理する構造体
-#[derive(Clone, Getters)]
+#[derive(Clone, PartialEq, Getters, Setters)]
 pub struct ImageFile {
     #[getset(get = "pub")]
     id: u64,
@@ -36,7 +36,7 @@ pub struct ImageFile {
     #[getset(get = "pub")]
     extension: extension::Extension,
 
-    #[getset(get = "pub")]
+    #[getset(get = "pub", set = "pub")]
     status: OptimizeStatus,
 
     #[getset(get = "pub")]
@@ -97,7 +97,11 @@ impl ImageFile {
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     pub fn optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        if self.status == OptimizeStatus::Optimized {
+        // 完了済み・エラー済みは再実行しない
+        if matches!(
+            self.status,
+            OptimizeStatus::Optimized | OptimizeStatus::Error(_)
+        ) {
             return Ok(());
         }
 

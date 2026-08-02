@@ -12,7 +12,10 @@ pub struct Rendar {
     app: app::App,
     files: open_files::OpenFiles,
 
+    // ファイルダイアログを開くタイミング
     open_dialog: bool,
+
+    // 最適化中かどうか
     is_optimizing: bool,
 
     // 結果を送信するチャネル
@@ -47,12 +50,27 @@ impl Rendar {
     }
 
     /// ファイルを最適化
+    /// * `ctx` - コンテキスト
     fn optimize(&mut self, ctx: &egui::Context) {
         if !self.is_optimizing {
             return;
         }
 
+        // すでに別スレッドで最適化中なら、完了後に再開する
+        if self.files.has_optimizing() {
+            return;
+        }
+
+        // 未処理がなければ何もしない
+        if !self.files.has_pending() {
+            self.is_optimizing = false;
+            return;
+        }
+
         self.is_optimizing = false;
+
+        // UI 側一覧にも Optimizing を立ててから clone する
+        self.files.mark_pending_as_optimizing();
 
         // 最適化を実行するスレッドの準備
         let app = self.app.clone();
@@ -79,6 +97,11 @@ impl eframe::App for Rendar {
         // 最適化結果をファイル単位で反映
         while let Ok(results) = self.result_rx.try_recv() {
             self.files.apply_results(results);
+
+            // 処理中に追加された未処理があれば続ける
+            if self.files.has_pending() {
+                self.is_optimizing = true;
+            }
         }
 
         // 前フレームで予約された最適化を実行
