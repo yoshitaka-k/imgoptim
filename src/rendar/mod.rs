@@ -86,15 +86,8 @@ impl eframe::App for Rendar {
     /// * `ui` - ユーザーインターフェース
     /// * `frame` - フレーム
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        // 最適化結果をファイル単位で反映
-        while let Ok(results) = self.result_rx.try_recv() {
-            self.files.apply_results(results);
-
-            // 処理中に追加された未処理があれば続ける
-            if self.files.has_pending() {
-                self.is_optimizing = true;
-            }
-        }
+        // 最適化結果を反映
+        optimize::OptimizeJob::result(&mut self.result_rx, &mut self.files, &mut self.is_optimizing);
 
         // 前フレームで予約された最適化を実行
         self.optimize(&ui.ctx());
