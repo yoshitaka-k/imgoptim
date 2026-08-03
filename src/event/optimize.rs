@@ -25,8 +25,12 @@ impl OptimizeJob {
     pub fn run(
         &self,
         app: app::App,
-        files: open_files::OpenFiles,
+        mut files: open_files::OpenFiles,
     ) {
+        // UI 側一覧にも Optimizing を立ててから clone する
+        files.mark_pending_as_optimizing();
+
+        // クローンしておく
         let app = app.clone();
         let mut files = files.clone();
         let tx = self.result_tx.clone();
