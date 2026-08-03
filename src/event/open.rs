@@ -4,7 +4,7 @@ use crate::file::open_files;
 /// * `extensions` - 許可する拡張子
 /// * `files` - 開いているファイル
 /// * `is_optimizing` - 最適化中かどうか
-pub(crate) fn open_button_clicked(
+pub(crate) fn open_files(
     extensions: &Vec<String>,
     files: &mut open_files::OpenFiles,
     is_optimizing: &mut bool,

@@ -6,8 +6,9 @@ use std::sync::mpsc;
 use crate::app;
 use crate::file::open_files;
 use crate::event::{
-    button_clicked,
-    drop_files,
+    open,
+    drop,
+    optimize,
 };
 
 /// レンダーを管理する構造体
@@ -76,19 +77,7 @@ impl Rendar {
         self.files.mark_pending_as_optimizing();
 
         // 最適化を実行するスレッドの準備
-        let app = self.app.clone();
-        let mut files = self.files.clone();
-        let tx = self.result_tx.clone();
-        let ctx = ctx.clone();
-
-        // 最適化を実行するスレッドを作成
-        std::thread::spawn(move || {
-            let _ = files.optimize(&app);
-            let _ = tx.send(files);
-
-            // 再描画を要求
-            ctx.request_repaint();
-        });
+        optimize::OptimizeJob::run(self.app.clone(), self.files.clone(), self.result_tx.clone(), ctx);
     }
 }
 
@@ -119,7 +108,7 @@ impl eframe::App for Rendar {
         // ファイルダイアログをリスト描画前に開く
         if self.open_dialog {
             self.open_dialog = false;
-            button_clicked::open_button_clicked(
+            open::open_files(
                 &self.app.extensions_to_string(),
                 &mut self.files,
                 &mut self.is_optimizing,
@@ -129,7 +118,7 @@ impl eframe::App for Rendar {
         // ドラッグ&ドロップされたファイルを処理
         ui.ctx().input(|input| {
             let files = input.raw.dropped_files.clone();
-            drop_files::drop_files(&files, &mut self.files, &mut self.is_optimizing);
+            drop::drop_files(&files, &mut self.files, &mut self.is_optimizing);
         });
 
         // 中央パネルを表示

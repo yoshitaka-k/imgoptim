@@ -1,2 +1,3 @@
-pub(crate) mod drop_files;
-pub(crate) mod button_clicked;
+pub(crate) mod drop;
+pub(crate) mod open;
+pub(crate) mod optimize;
