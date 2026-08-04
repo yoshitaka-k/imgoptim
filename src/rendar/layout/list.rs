@@ -31,8 +31,17 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &open_files::OpenFiles) {
                         ui.horizontal(|ui| {
                             ui.label(text_color("✅", Color32::GREEN, None));
                             ui.label(path.file_name());
-                            ui.label(format!("({} KB -> {} KB)", size, path.new_size() / 1024));
-                            ui.label(text_color(&format!(" {}%", path.percent()), Color32::GREEN, Some(12.0)));
+                            ui.label(format!("({} KB -> {} KB ", size, path.new_size() / 1024));
+
+                            let spacing = ui.spacing().item_spacing.x;
+
+                            // "%"と")"とスペースを0にしてテキストを表示
+                            ui.spacing_mut().item_spacing.x = 0.0;
+                            ui.label(text_color(&format!("{}%", path.percent()), Color32::GREEN, Some(12.0)));
+                            ui.label(")");
+
+                            // スペースを元に戻す
+                            ui.spacing_mut().item_spacing.x = spacing;
                         });
                     }
                     OptimizeStatus::Error(e) => {
