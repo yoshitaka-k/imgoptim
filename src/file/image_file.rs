@@ -97,7 +97,9 @@ impl ImageFile {
         self.status = OptimizeStatus::Optimizing;
 
         let result = match self.extension {
+            // jpeg ファイルの最適化
             extension::Extension::Jpeg => self.jpeg_optimize(app),
+            // サポートしていないファイル形式
             _ => Err(Box::new(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "Unsupported extension",
