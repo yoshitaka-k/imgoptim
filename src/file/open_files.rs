@@ -22,6 +22,36 @@ impl OpenFiles {
         Self { paths: vec![], extensions: vec![] }
     }
 
+    /// ファイルの数を取得
+    /// * `return` - ファイルの数
+    pub fn len(&self) -> usize {
+        self.paths.len()
+    }
+
+    /// 未処理のファイルの数を取得
+    /// * `return` - 未処理のファイルの数
+    pub fn pending_len(&self) -> usize {
+        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::None).count()
+    }
+
+    /// 最適化中のファイルの数を取得
+    /// * `return` - 最適化中のファイルの数
+    pub fn optimizing_len(&self) -> usize {
+        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::Optimizing).count()
+    }
+
+    /// 最適化済みのファイルの数を取得
+    /// * `return` - 最適化済みのファイルの数
+    pub fn optimized_len(&self) -> usize {
+        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::Optimized).count()
+    }
+
+    /// エラーのファイルの数を取得
+    /// * `return` - エラーのファイルの数
+    pub fn error_len(&self) -> usize {
+        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Error(_))).count()
+    }
+
     /// パスをクリア
     pub fn clear(&mut self) {
         self.paths.clear();

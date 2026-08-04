@@ -3,11 +3,10 @@ mod fonts;
 
 use crate::app;
 use crate::file::open_files;
-use crate::rendar::layout::{list, bottom};
+use crate::rendar::layout::{top, list, bottom};
 use crate::event::{open, drop, optimize};
 
 const BOTTOM_BUTTON_HEIGHT: f32 = 26.0;
-const BOTTOM_SEPARATOR_GAP: f32 = 17.0;
 
 /// レンダーを管理する構造体
 pub struct Rendar {
@@ -104,9 +103,8 @@ impl eframe::App for Rendar {
 
         // 中央パネルを表示
         egui::CentralPanel::default().show_inside(ui, |ui| {
-            ui.label("File Drag & Drop");
-
-            ui.separator();
+            // 上部ボタンを表示
+            top::top_layout(ui, &mut self.files, &mut self.open_dialog);
 
             // ファイル一覧を表示
             egui::ScrollArea::both()
@@ -116,11 +114,8 @@ impl eframe::App for Rendar {
                     list::file_list(ui, &self.files);
                 });
 
-            ui.separator();
-            ui.add_space(BOTTOM_SEPARATOR_GAP);
-
             // 下部ボタンを表示
-            bottom::bottom_layout(ui, &mut self.files, &mut self.open_dialog);
+            bottom::bottom_layout(ui, &mut self.files);
         });
     }
 }
