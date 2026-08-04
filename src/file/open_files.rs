@@ -1,9 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 use getset::{Getters, Setters};
-use rayon::prelude::*;
 
-use crate::app::App;
 use crate::file::image_file;
 use crate::file::optimize_status::OptimizeStatus;
 
@@ -54,20 +52,6 @@ impl OpenFiles {
     /// * `return` - 未処理ファイルがあるかどうか
     pub fn has_pending(&self) -> bool {
         self.paths.iter().any(|f| *f.status() == OptimizeStatus::None)
-    }
-
-    /// ファイルを最適化
-    /// * `app` - アプリケーションの設定
-    pub fn optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        // 最適化を実行
-        // rayon を使用して並列実行
-        self.paths.par_iter_mut().for_each(|file| {
-            if let Err(e) = file.optimize(app) {
-                eprintln!("optimize failed: {}", e);
-            }
-        });
-
-        Ok(())
     }
 
     /// 最適化結果を既存の一覧へ反映
