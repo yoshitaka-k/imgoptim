@@ -71,13 +71,11 @@ impl OpenFiles {
     }
 
     /// 最適化結果を既存の一覧へ反映
-    /// * `results` - 最適化済みのファイル一覧
-    pub fn apply_results(&mut self, results: OpenFiles) {
-        for result in results.paths {
-            // 既存のファイル一覧から ID が一致するファイルを検索
-            if let Some(file) = self.paths.iter_mut().find(|f| f.id() == result.id()) {
-                *file = result;
-            }
+    /// * `results` - 最適化済みのファイル
+    pub fn apply_result(&mut self, result: image_file::ImageFile) {
+        // 既存のファイル一覧から ID が一致するファイルを検索
+        if let Some(file) = self.paths.iter_mut().find(|f| f.id() == result.id()) {
+            *file = result;
         }
     }
 

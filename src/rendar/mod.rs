@@ -86,7 +86,7 @@ impl eframe::App for Rendar {
             style.interaction.selectable_labels = false;
         });
 
-        // ファイルダイアログをリスト描画前に開く
+        // 開くボタンが押されてたらファイルダイアログを開く
         if self.open_dialog {
             self.open_dialog = false;
             open::open_files(

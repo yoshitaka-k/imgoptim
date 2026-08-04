@@ -1,19 +1,23 @@
 use std::sync::mpsc;
+use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
 use crate::app;
 use crate::file::open_files;
+use crate::file::image_file;
 
 pub struct OptimizeJob {
     ctx: egui::Context,
 
     /// 最適化結果を送信するチャネル
-    result_tx: mpsc::Sender<open_files::OpenFiles>,
+    result_tx: mpsc::Sender<image_file::ImageFile>,
     /// 最適化結果を受信するチャネル
-    result_rx: mpsc::Receiver<open_files::OpenFiles>,
+    result_rx: mpsc::Receiver<image_file::ImageFile>,
 }
 
 impl OptimizeJob {
     /// 新しい最適化ジョブを作成
+    /// * `ctx` - UI コンテキスト
+    /// * `return` - 最適化ジョブ
     pub fn new(ctx: egui::Context) -> Self {
         let (result_tx, result_rx) = mpsc::channel();
         Self { ctx, result_tx, result_rx }
@@ -32,17 +36,22 @@ impl OptimizeJob {
 
         // クローンしておく
         let app = app.clone();
-        let mut files = files.clone();
+        let mut files = files.paths().clone();
         let tx = self.result_tx.clone();
         let ctx = self.ctx.clone();
 
         // 最適化を実行するスレッドを作成
         std::thread::spawn(move || {
-            let _ = files.optimize(&app);
-            let _ = tx.send(files);
-
-            // 再描画を要求
-            ctx.request_repaint();
+            files.par_iter_mut().for_each(|file| {
+                // 最適化を実行
+                if let Err(e) = file.optimize(&app) {
+                    eprintln!("Error optimizing file: {}", e);
+                }
+                // 最適化結果を送信
+                let _ = tx.send(file.clone());
+                // 再描画を要求
+                ctx.request_repaint();
+            });
         });
     }
 
@@ -54,9 +63,10 @@ impl OptimizeJob {
         files: &mut open_files::OpenFiles,
         is_optimizing: &mut bool,
     ) {
-        // 最適化結果をファイル単位で反映
-        while let Ok(results) = self.result_rx.try_recv() {
-            files.apply_results(results);
+        // 最適化結果を受信
+        while let Ok(result) = self.result_rx.try_recv() {
+            // 最適化結果を反映
+            files.apply_result(result);
 
             // 処理中に追加された未処理があれば続ける
             if files.has_pending() {
