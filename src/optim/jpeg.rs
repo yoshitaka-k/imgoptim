@@ -15,8 +15,6 @@ impl Jpeg {
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        println!("Optimize: {}", path.display());
-
         let file_image = ImageReader::open(&path)?.decode()?;
         let extension = path.extension().unwrap().to_str().unwrap();
 

@@ -44,9 +44,7 @@ impl OptimizeJob {
         std::thread::spawn(move || {
             files.par_iter_mut().for_each(|file| {
                 // 最適化を実行
-                if let Err(e) = file.optimize(&app) {
-                    eprintln!("Error optimizing file: {}", e);
-                }
+                let _ = file.optimize(&app);
                 // 最適化結果を送信
                 let _ = tx.send(file.clone());
                 // 再描画を要求
