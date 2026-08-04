@@ -24,8 +24,8 @@ impl OptimizeJob {
     /// * `files` - ファイルリスト
     pub fn run(
         &self,
-        app: app::App,
-        mut files: open_files::OpenFiles,
+        app: &app::App,
+        files: &mut open_files::OpenFiles,
     ) {
         // UI 側一覧にも Optimizing を立ててから clone する
         files.mark_pending_as_optimizing();

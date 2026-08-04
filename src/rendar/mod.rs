@@ -64,11 +64,8 @@ impl Rendar {
 
         self.is_optimizing = false;
 
-        // UI 側一覧にも Optimizing を立ててから clone する
-        self.files.mark_pending_as_optimizing();
-
         // 最適化を実行するスレッドの準備
-        self.optimize_job.run(self.app.clone(), self.files.clone());
+        self.optimize_job.run(&self.app, &mut self.files);
     }
 }
 
