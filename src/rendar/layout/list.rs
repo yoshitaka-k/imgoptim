@@ -60,10 +60,4 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &open_files::OpenFiles) {
             Err(_) => {}
         }
     }
-
-    if files.paths().len() > 0 {
-        ui.separator();
-    }
-
-    ui.add_space(20.0);
 }

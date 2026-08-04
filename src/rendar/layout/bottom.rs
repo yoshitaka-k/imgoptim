@@ -4,7 +4,7 @@ use crate::file::open_files;
 /// * `ui` - UI
 /// * `files` - ドロップされたファイル
 /// * `open_dialog` - ファイルダイアログを開くタイミングをずらす
-pub(crate) fn bottom_button(
+pub(crate) fn bottom_layout(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
     open_dialog: &mut bool,
