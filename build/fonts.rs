@@ -1,26 +1,6 @@
 use std::{fs, path::Path};
 
-/// フォントのパスを取得
-/// * `path` - フォントのパス
-/// * `return` - フォントのパス
-fn include_font_path(path: &str) -> String {
-    if path.starts_with("assets/") {
-        format!("concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/{}\")", path)
-    } else {
-        panic!("font path must start with 'assets/' (was: {})", path);
-    }
-}
-
-/// 識別子として使える名前に変換
-/// 空白や記号を『 _ 』に変換して大文字にする
-/// * `font_name` - フォント名
-/// * `return` - 識別子として使える名前
-fn to_const_name(font_name: &str) -> String {
-    font_name.chars()
-             .map(|c| if c.is_ascii_alphanumeric() { c } else { '_' })
-             .collect::<String>()
-             .to_uppercase()
-}
+use crate::build::{include_assets_path, to_const_name};
 
 /// assets/fonts 内のフォントの一覧を生成
 /// * `fonts_dir` - フォントディレクトリのパス
@@ -51,7 +31,7 @@ pub(crate) fn generate_fonts_generated(fonts_dir: &Path, out_dir: &String) {
         let asset_path = format!("assets/fonts/{font_name}.ttf");
         output.push_str(&format!(
             "pub const {const_name}: &[u8] = include_bytes!({});\n",
-            include_font_path(&asset_path),
+            include_assets_path(&asset_path),
         ));
     }
 
