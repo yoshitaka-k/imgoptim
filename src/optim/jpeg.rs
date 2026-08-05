@@ -10,19 +10,22 @@ use crate::app::App;
 pub struct Jpeg;
 
 impl Jpeg {
-    /// JPEG を最適化
+    /// JPEG ファイルを最適化
     /// * `path` - 最適化する JPEG のパス
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, app: &App) -> Result<(), Box<dyn std::error::Error>> {
+        // 先にファイルを読み込んでおく
         let file_image = ImageReader::open(&path)?.decode()?;
-        let extension = path.extension().unwrap().to_str().unwrap();
 
+        // 諸々設定
+        let extension = path.extension().unwrap().to_str().unwrap();
         let out_path = path.with_extension(extension);
         let file = FsFile::create(&out_path)?;
         let mut writer = BufWriter::new(file);
         let mut encoder = JpegEncoder::new_with_quality(&mut writer, *app.jpeg_quality());
 
+        // 読み込んでおいたものを最適化して出力
         encoder.encode_image(&file_image)?;
 
         Ok(())

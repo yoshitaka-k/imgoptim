@@ -42,6 +42,7 @@ impl OptimizeJob {
 
         // 最適化を実行するスレッドを作成
         std::thread::spawn(move || {
+            // 最適化を並列実行
             files.par_iter_mut().for_each(|file| {
                 // 最適化を実行
                 let _ = file.optimize(&app);
