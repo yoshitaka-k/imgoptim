@@ -13,4 +13,9 @@ fn main() {
     let fonts_dir = manifest_path.join("assets/fonts");
     println!("cargo:rerun-if-changed={}", fonts_dir.display());
     build::fonts::generate_fonts_generated(&fonts_dir, &out_dir);
+
+    // SVGのディレクトリを取得
+    let svg_dir = manifest_path.join("assets/svg");
+    println!("cargo:rerun-if-changed={}", svg_dir.display());
+    build::svg::generate_svg_generated(&svg_dir, &out_dir);
 }

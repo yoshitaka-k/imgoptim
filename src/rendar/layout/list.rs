@@ -1,9 +1,8 @@
 use egui::Color32;
 use std::path::PathBuf;
 
-use crate::rendar::assets::fonts::text_color;
-use crate::file::open_files;
-use crate::file::optimize_status::OptimizeStatus;
+use crate::rendar::assets::{fonts::text_color, svg};
+use crate::file::{open_files, optimize_status::OptimizeStatus};
 
 enum FileListAction {
     Click { id: u64 },
@@ -44,17 +43,17 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
                         ui.label(format!("({} KB)", size));
                     }
                     OptimizeStatus::Optimizing => {
-                        ui.label(text_color("⏳", Color32::YELLOW, None));
+                        ui.add(svg::image(&svg::HOURGLASS_BOTTOM, Some(12.0), Some(Color32::YELLOW)));
                         ui.label(path.file_name());
                         ui.label(format!("({} KB)", size));
                     }
                     OptimizeStatus::Optimized => {
-                        ui.label(text_color("✅", Color32::GREEN, None));
+                        ui.add(svg::image(&svg::CHECK, Some(14.0), Some(Color32::GREEN)));
                         ui.label(path.file_name());
                         ui.label(format!("({} KB -> {} KB {}%)", size, path.new_size() / 1024, path.percent()));
                     }
                     OptimizeStatus::Error(e) => {
-                        ui.label(text_color("❌", Color32::RED, None));
+                        ui.add(svg::image(&svg::ERROR, Some(14.0), Some(Color32::RED)));
                         ui.label(path.file_name());
                         ui.label(text_color(e, Color32::RED, Some(11.0)));
                     }

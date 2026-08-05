@@ -3,7 +3,7 @@ mod assets;
 
 use crate::app;
 use crate::file::open_files;
-use crate::rendar::assets::fonts;
+use crate::rendar::assets::{fonts, svg};
 use crate::rendar::layout::{top, list, bottom};
 use crate::event::{open, drop, optimize};
 
@@ -30,8 +30,9 @@ impl Rendar {
     /// * `app` - アプリケーション
     /// * `return` - Rendar のインスタンス
     pub fn new(cc: &eframe::CreationContext, app: app::App) -> Self {
-        // フォントを追加
+        // フォントと SVG ローダーを追加
         fonts::install(&cc.egui_ctx);
+        svg::install(&cc.egui_ctx);
 
         let mut files = open_files::OpenFiles::new();
         files.set_extensions(app.extensions_to_string());

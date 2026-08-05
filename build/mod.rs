@@ -1,4 +1,5 @@
 pub(crate) mod fonts;
+pub(crate) mod svg;
 
 use std::{fs, path::Path};
 
@@ -36,11 +37,10 @@ pub(crate) fn collect_asset_stems(dir: &Path, extension: &str) -> Vec<String> {
         if path.extension().and_then(|s| s.to_str()) != Some(extension) {
             continue;
         }
-        let name = path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .expect("invalid asset filename")
-            .to_string();
+        let name = path.file_stem()
+                       .and_then(|s| s.to_str())
+                       .expect("invalid asset filename")
+                       .to_string();
         names.push(name);
     }
 
