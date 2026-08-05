@@ -43,17 +43,17 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
                         ui.label(format!("({} KB)", size));
                     }
                     OptimizeStatus::Optimizing => {
-                        ui.add(svg::image(&svg::HOURGLASS_BOTTOM, Some(12.0), Some(Color32::YELLOW)));
+                        ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(12.0).tint(Color32::YELLOW));
                         ui.label(path.file_name());
                         ui.label(format!("({} KB)", size));
                     }
                     OptimizeStatus::Optimized => {
-                        ui.add(svg::image(&svg::CHECK, Some(14.0), Some(Color32::GREEN)));
+                        ui.add(egui::Image::new(svg::CHECK).max_height(14.0).tint(Color32::GREEN));
                         ui.label(path.file_name());
                         ui.label(format!("({} KB -> {} KB {}%)", size, path.new_size() / 1024, path.percent()));
                     }
                     OptimizeStatus::Error(e) => {
-                        ui.add(svg::image(&svg::ERROR, Some(14.0), Some(Color32::RED)));
+                        ui.add(egui::Image::new(svg::ERROR).max_height(14.0).tint(Color32::RED));
                         ui.label(path.file_name());
                         ui.label(text_color(e, Color32::RED, Some(11.0)));
                     }
