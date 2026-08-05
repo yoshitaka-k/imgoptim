@@ -129,7 +129,7 @@ impl OpenFiles {
                 if self.is_optimizing(&path) {
                     let mut image_file = image_file::ImageFile::new(path);
                     image_file.set_status(OptimizeStatus::Error(
-                        "同じファイルが最適化中です".to_string(),
+                        "Already optimizing".to_string(),
                     ));
                     self.paths.push(image_file);
                     return;
