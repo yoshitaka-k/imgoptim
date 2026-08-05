@@ -55,6 +55,39 @@ impl OpenFiles {
         self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Error(_))).count()
     }
 
+    /// 総サイズを取得
+    /// * `return` - 総サイズ
+    pub fn total_size(&self) -> u64 {
+        self.paths.iter().map(|p| {
+            if *p.status() == OptimizeStatus::Optimized {
+                p.size()
+            } else {
+                &0
+            }
+        }).sum()
+    }
+
+    /// 総新サイズを取得
+    /// * `return` - 総新サイズ
+    pub fn total_new_size(&self) -> u64 {
+        self.paths.iter().map(|p| {
+            if *p.status() == OptimizeStatus::Optimized {
+                p.new_size()
+            } else {
+                &0
+            }
+        }).sum()
+    }
+
+    /// 総節約率を取得
+    /// * `return` - 総節約率
+    pub fn total_saved_rate(&self) -> f32 {
+        if self.total_new_size() == 0 {
+            return 0.00;
+        }
+        (self.total_size() - self.total_new_size()) as f32 / self.total_size() as f32 * 100.0
+    }
+
     /// パスをクリア
     pub fn clear(&mut self) {
         self.paths.clear();
