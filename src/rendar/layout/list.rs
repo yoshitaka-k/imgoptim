@@ -8,6 +8,9 @@ use crate::file::optimize_status::OptimizeStatus;
 /// * `ui` - UI
 /// * `files` - ドロップされたファイル
 pub(crate) fn file_list(ui: &mut egui::Ui, files: &open_files::OpenFiles) {
+    // 行間を詰める
+    ui.spacing_mut().item_spacing.y = 0.0;
+
     for (index, path) in files.paths().iter().enumerate() {
         match path.path().metadata() {
             Ok(_) => {
@@ -54,7 +57,7 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &open_files::OpenFiles) {
                 }
 
                 if index < files.paths().len() - 1 {
-                    ui.separator();
+                    ui.add(egui::Separator::default().spacing(4.0));
                 }
             }
             Err(_) => {}
