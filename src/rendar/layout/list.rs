@@ -1,5 +1,5 @@
-use egui::Color32;
 use std::path::PathBuf;
+use egui::Color32;
 
 use crate::rendar::assets::{fonts::text_color, svg};
 use crate::file::{open_files, optimize_status::OptimizeStatus};
