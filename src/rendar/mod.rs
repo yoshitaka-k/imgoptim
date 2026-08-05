@@ -111,7 +111,7 @@ impl eframe::App for Rendar {
                 .auto_shrink([false, false])
                 .max_height(ui.available_height() - BOTTOM_BUTTON_HEIGHT)
                 .show(ui, |ui| {
-                    list::file_list(ui, &self.files);
+                    list::file_list(ui, &mut self.files);
                 });
 
             // 下部ボタンを表示

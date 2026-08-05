@@ -25,9 +25,16 @@ pub(crate) fn bottom_layout(
 
             ui.horizontal(|ui| {
                 ui.label("Optimize");
+
+                ui.spacing_mut().item_spacing.x = 0.0;
                 ui.label(text_color(&format!("{}", len), Color32::GREEN, None));
-                ui.label("files");
+                ui.spacing_mut().item_spacing.x = spacing;
+                ui.label(" files");
+
+                ui.spacing_mut().item_spacing.x = 0.0;
                 ui.label(text_color(&format!("{}%", percent), Color32::GREEN, None));
+                ui.spacing_mut().item_spacing.x = spacing;
+                ui.label(" completed");
 
                 ui.spacing_mut().item_spacing.x = 0.0;
                 ui.label("(");

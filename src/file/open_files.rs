@@ -13,13 +13,16 @@ pub struct OpenFiles {
 
     #[getset(set = "pub")]
     extensions: Vec<String>,
+
+    #[getset(get = "pub", set = "pub")]
+    selected_id: Option<u64>,
 }
 
 impl OpenFiles {
     /// 新しい OpenFiles を作成
     /// * `return` - OpenFiles のインスタンス
     pub fn new() -> Self {
-        Self { paths: vec![], extensions: vec![] }
+        Self { paths: vec![], extensions: vec![], selected_id: None }
     }
 
     /// ファイルの数を取得
@@ -55,6 +58,7 @@ impl OpenFiles {
     /// パスをクリア
     pub fn clear(&mut self) {
         self.paths.clear();
+        self.selected_id = None;
     }
 
     /// パスを追加
