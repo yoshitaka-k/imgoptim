@@ -1,8 +1,9 @@
 mod layout;
-mod fonts;
+mod assets;
 
 use crate::app;
 use crate::file::open_files;
+use crate::rendar::assets::fonts;
 use crate::rendar::layout::{top, list, bottom};
 use crate::event::{open, drop, optimize};
 
