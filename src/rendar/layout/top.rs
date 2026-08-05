@@ -20,13 +20,13 @@ pub(crate) fn top_layout(
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 // クリアボタン
                 let clear_button = egui::Image::new(svg::CLEAR_ALL).max_height(18.0).tint(Color32::WHITE);
-                if ui.button(clear_button).clicked() {
+                if ui.button(clear_button).on_hover_text("Clear").clicked() {
                     files.clear();
                 }
 
                 // 開くボタン
                 let open_button = egui::Image::new(svg::FOLDER_OPEN).max_height(18.0).tint(Color32::WHITE);
-                if ui.button(open_button).clicked() {
+                if ui.button(open_button).on_hover_text("File Open").clicked() {
                     // ファイルダイアログを開くタイミングをずらす
                     *open_dialog = true;
                     ui.ctx().request_repaint();
