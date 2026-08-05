@@ -5,7 +5,7 @@ pub enum Extension {
     Jpeg,
     Png,
     Gif,
-    Other,
+    None,
 }
 
 impl Extension {
@@ -17,7 +17,7 @@ impl Extension {
             "jpg" | "jpeg" => Self::Jpeg,
             "png" => Self::Png,
             "gif" => Self::Gif,
-            _ => Self::Other,
+            _ => Self::None,
         }
     }
 
@@ -28,7 +28,7 @@ impl Extension {
             Self::Jpeg => "jpg",
             Self::Png => "png",
             Self::Gif => "gif",
-            Self::Other => "other",
+            Self::None => "",
         }
     }
 }
