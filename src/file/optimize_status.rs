@@ -2,7 +2,7 @@
 #[derive(Clone, PartialEq)]
 pub enum OptimizeStatus {
     /// 最適化未実行
-    None,
+    Standby,
     /// 最適化中
     Optimizing,
     /// 最適化完了

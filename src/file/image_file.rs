@@ -54,7 +54,7 @@ impl ImageFile {
             path,
             file_name,
             extension,
-            status: OptimizeStatus::None,
+            status: OptimizeStatus::Standby,
             size,
             new_size: 0,
             percent: 0.0,

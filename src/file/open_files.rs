@@ -34,7 +34,7 @@ impl OpenFiles {
     /// 未処理のファイルの数を取得
     /// * `return` - 未処理のファイルの数
     pub fn pending_len(&self) -> usize {
-        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::None).count()
+        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::Standby).count()
     }
 
     /// 最適化中のファイルの数を取得
@@ -103,7 +103,7 @@ impl OpenFiles {
     /// 未処理ファイルを最適化中ステータスへ変更
     pub fn mark_pending_as_optimizing(&mut self) {
         for file in &mut self.paths {
-            if *file.status() == OptimizeStatus::None {
+            if *file.status() == OptimizeStatus::Standby {
                 file.set_status(OptimizeStatus::Optimizing);
             }
         }
@@ -118,7 +118,7 @@ impl OpenFiles {
     /// 未処理ファイルがあるかどうか
     /// * `return` - 未処理ファイルがあるかどうか
     pub fn has_pending(&self) -> bool {
-        self.paths.iter().any(|f| *f.status() == OptimizeStatus::None)
+        self.paths.iter().any(|f| *f.status() == OptimizeStatus::Standby)
     }
 
     /// 最適化結果を既存の一覧へ反映

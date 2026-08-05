@@ -38,7 +38,7 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
 
             let response = ui.horizontal(|ui| {
                 match path.status() {
-                    OptimizeStatus::None => {
+                    OptimizeStatus::Standby => {
                         ui.label(path.file_name());
                         ui.label(format!("({} KB)", size));
                     }
