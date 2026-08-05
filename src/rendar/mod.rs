@@ -7,7 +7,7 @@ use crate::rendar::assets::{fonts, svg};
 use crate::rendar::layout::{top, list, bottom};
 use crate::event::{open, drop, optimize};
 
-const BOTTOM_BUTTON_HEIGHT: f32 = 26.0;
+const BOTTOM_BUTTON_HEIGHT: f32 = 30.0;
 
 /// レンダーを管理する構造体
 pub struct Rendar {

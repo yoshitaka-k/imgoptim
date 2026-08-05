@@ -9,7 +9,7 @@ use crate::rendar::assets::svg;
 /// * `open_dialog` - ファイルダイアログを開くタイミングをずらす
 pub(crate) fn top_layout(
     ui: &mut egui::Ui,
-    files: &mut open_files::OpenFiles,
+    _files: &mut open_files::OpenFiles,
     open_dialog: &mut bool,
 ) {
     ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
@@ -18,15 +18,11 @@ pub(crate) fn top_layout(
 
             // 開くボタンとクリアボタンを右寄せ
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                // クリアボタン
-                let clear_button = egui::Image::new(svg::CLEAR_ALL).max_height(18.0).tint(Color32::WHITE);
-                if ui.button(clear_button).on_hover_text("Clear").clicked() {
-                    files.clear();
                 }
 
                 // 開くボタン
                 let open_button = egui::Image::new(svg::FOLDER_OPEN).max_height(18.0).tint(Color32::WHITE);
-                if ui.button(open_button).on_hover_text("File Open").clicked() {
+                if ui.button(open_button).on_hover_text("Files Open").clicked() {
                     // ファイルダイアログを開くタイミングをずらす
                     *open_dialog = true;
                     ui.ctx().request_repaint();

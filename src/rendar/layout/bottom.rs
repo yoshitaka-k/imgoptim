@@ -1,7 +1,7 @@
 use egui::Color32;
 
 use crate::file::open_files;
-use crate::rendar::assets::fonts::text_color;
+use crate::rendar::assets::{fonts::text_color, svg};
 
 /// 下部ボタンを表示
 /// * `ui` - UI
@@ -44,6 +44,16 @@ pub(crate) fn bottom_layout(
             ui.spacing_mut().item_spacing.x = 0.0;
             ui.label(text_color(&format!("{:.2}%", files.total_saved_rate()), Color32::GREEN, None));
             ui.spacing_mut().item_spacing.x = spacing;
+
+
+            // 右寄せ
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                // クリアボタン
+                let clear_button = egui::Image::new(svg::CLEAR_ALL).max_height(18.0).tint(Color32::WHITE);
+                if ui.button(clear_button).on_hover_text("List Files Clear").clicked() {
+                    files.clear();
+                }
+            });
         });
     });
 }
