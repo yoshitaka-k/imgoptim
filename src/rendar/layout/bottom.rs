@@ -1,7 +1,7 @@
 use egui::Color32;
 
 use crate::file::open_files;
-use crate::rendar::fonts::text_color;
+use crate::rendar::assets::fonts::text_color;
 
 /// 下部ボタンを表示
 /// * `ui` - UI

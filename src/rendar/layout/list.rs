@@ -1,7 +1,7 @@
 use egui::Color32;
 use std::path::PathBuf;
 
-use crate::rendar::fonts::text_color;
+use crate::rendar::assets::fonts::text_color;
 use crate::file::open_files;
 use crate::file::optimize_status::OptimizeStatus;
 
