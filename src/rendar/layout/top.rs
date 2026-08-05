@@ -11,6 +11,7 @@ pub(crate) fn top_layout(
     ui: &mut egui::Ui,
     _files: &mut open_files::OpenFiles,
     open_dialog: &mut bool,
+    settings_window_open: &mut bool,
 ) {
     ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
         ui.horizontal(|ui| {
@@ -18,6 +19,12 @@ pub(crate) fn top_layout(
 
             // 開くボタンとクリアボタンを右寄せ
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                // 設定ボタン
+                let settings_button = egui::Image::new(svg::SETTINGS).max_height(18.0).tint(Color32::WHITE);
+                if ui.button(settings_button).on_hover_text("Settings").clicked() {
+                    // 設定ダイアログを開く
+                    *settings_window_open = true;
+                    ui.ctx().request_repaint();
                 }
 
                 // 開くボタン

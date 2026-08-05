@@ -1,10 +1,12 @@
 mod layout;
 mod assets;
+mod setting;
 
 use crate::app;
 use crate::file::open_files;
 use crate::rendar::assets::{fonts, svg};
 use crate::rendar::layout::{top, list, bottom};
+use crate::rendar::setting as setting_window;
 use crate::event::{open, drop, optimize};
 
 const BOTTOM_BUTTON_HEIGHT: f32 = 30.0;
@@ -16,6 +18,9 @@ pub struct Rendar {
 
     // ファイルダイアログを開くタイミング
     open_dialog: bool,
+
+    // 設定ウィンドウを開くタイミング
+    settings_window_open: bool,
 
     // 最適化中かどうか
     is_optimizing: bool,
@@ -41,6 +46,7 @@ impl Rendar {
             app,
             files,
             open_dialog: false,
+            settings_window_open: false,
             is_optimizing: false,
             optimize_job: optimize::OptimizeJob::new(cc.egui_ctx.clone()),
         }
@@ -106,7 +112,7 @@ impl eframe::App for Rendar {
         // 中央パネルを表示
         egui::CentralPanel::default().show_inside(ui, |ui| {
             // 上部ボタンを表示
-            top::top_layout(ui, &mut self.files, &mut self.open_dialog);
+            top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open);
 
             // ファイル一覧を表示
             egui::ScrollArea::both()
@@ -119,5 +125,10 @@ impl eframe::App for Rendar {
             // 下部ボタンを表示
             bottom::bottom_layout(ui, &mut self.files);
         });
+
+        // 設定ウィンドウを表示
+        if self.settings_window_open {
+            setting_window::setting_window(ui.ctx(), &mut self.app, &mut self.settings_window_open);
+        }
     }
 }
