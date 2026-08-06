@@ -14,12 +14,22 @@ const JPEG_QUALITY_MAX: u8 = 99;
 /// * `ctx` - コンテキスト
 /// * `settings_window_open` - 設定ウィンドウを開いているかどうか
 pub(crate) fn setting_window(ctx: &egui::Context, app: &mut app::App, settings_window_open: &mut bool) {
-    let options = egui::ViewportBuilder::default()
+    // 親位置を取得
+    let parent_pos = ctx.input(|input| input.viewport().outer_rect.map(|rect| rect.min));
+
+    // 設定ウィンドウのオプションを設定
+    let mut options = egui::ViewportBuilder::default()
         .with_title(WINDOW_TITLE)
         .with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
         .with_maximize_button(false)
         .with_resizable(false);
 
+    // 親位置があったら指定、なかったらデフォルト位置
+    if let Some(pos) = parent_pos {
+        options = options.with_position(pos);
+    }
+
+    // 設定ウィンドウを表示
     ctx.show_viewport_immediate(
         egui::ViewportId::from_hash_of("setting_window"),
         options, |ctx, _class| {
@@ -28,6 +38,7 @@ pub(crate) fn setting_window(ctx: &egui::Context, app: &mut app::App, settings_w
 
                 ui.separator();
 
+                // JPEG のスライダーを表示
                 ui.horizontal(|ui| {
                     ui.add_space(10.0);
                     ui.label("JPEG Quality:");
