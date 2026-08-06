@@ -123,7 +123,7 @@ impl eframe::App for Rendar {
                 });
 
             // 下部ボタンを表示
-            bottom::bottom_layout(ui, &mut self.files);
+            bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);
         });
 
         // 設定ウィンドウを表示

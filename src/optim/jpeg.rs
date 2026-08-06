@@ -1,4 +1,6 @@
 use std::path::PathBuf;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use image::ImageReader;
 use image::codecs::jpeg::JpegEncoder;
 
@@ -11,16 +13,29 @@ impl Jpeg {
     /// JPEG ファイルを最適化
     /// * `path` - 最適化する JPEG のパス
     /// * `app` - アプリケーションの設定
+    /// * `running` - 最適化中かどうか
     /// * `return` - 最適化の結果
-    pub fn optimize(path: &PathBuf, app: &App) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn optimize(path: &PathBuf, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
         // 先にファイルを読み込んでおく
         let file_image = ImageReader::open(&path)?.decode()?;
 
+        // 最適化中止された場合は処理を中断
+        if !running.load(Ordering::Relaxed) {
+            return Ok(());
+        }
+
+        // メモリ上にバッファを作成して最適化
         let mut buffer = Vec::new();
         {
             let mut encoder = JpegEncoder::new_with_quality(&mut buffer, *app.jpeg_quality());
             encoder.encode_image(&file_image)?;
         }
+
+        // 最適化中止された場合は処理を中断
+        if !running.load(Ordering::Relaxed) {
+            return Ok(());
+        }
+
         std::fs::write(path, &buffer)?;
 
         Ok(())

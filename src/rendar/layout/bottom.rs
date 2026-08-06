@@ -1,6 +1,7 @@
 use egui::Color32;
 
 use crate::file::open_files;
+use crate::event::optimize;
 use crate::rendar::assets::{fonts::text_color, svg};
 
 /// 下部ボタンを表示
@@ -9,6 +10,7 @@ use crate::rendar::assets::{fonts::text_color, svg};
 pub(crate) fn bottom_layout(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
+    optimize_job: &mut optimize::OptimizeJob,
 ) {
     ui.separator();
 
@@ -49,7 +51,10 @@ pub(crate) fn bottom_layout(
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 // クリアボタン
                 let clear_button = egui::Image::new(svg::CLEAR_ALL).max_height(18.0).tint(Color32::WHITE);
-                if ui.button(clear_button).on_hover_text("List Files Clear").clicked() {
+                if ui.button(clear_button).on_hover_text("Cancel and Clear").clicked() {
+                    // 最適化を停止（キャンセル）
+                    optimize_job.stop_running();
+                    // ファイル一覧をクリア
                     files.clear();
                 }
             });

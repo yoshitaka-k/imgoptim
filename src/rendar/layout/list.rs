@@ -57,6 +57,10 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
                         ui.label(path.file_name());
                         ui.label(text_color(e, Color32::RED, Some(11.0)));
                     }
+                    OptimizeStatus::Canceled => {
+                        ui.label(path.file_name());
+                        ui.label(format!("({} KB)", size));
+                    }
                 }
             }).response.interact(egui::Sense::click());
 

@@ -9,4 +9,6 @@ pub enum OptimizeStatus {
     Optimized,
     /// 最適化エラー（メッセージ）
     Error(String),
+    /// 最適化キャンセル
+    Canceled,
 }

@@ -1,5 +1,6 @@
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering, AtomicBool};
 use getset::{Getters, Setters};
 
 use crate::app::App;
@@ -64,9 +65,9 @@ impl ImageFile {
     /// jpeg ファイルの最適化処理とファイルサイズの更新
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    fn jpeg_optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
+    fn jpeg_optimize(&mut self, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
         // 最適化を実行
-        Jpeg::optimize(&self.path, app)?;
+        Jpeg::optimize(&self.path, app, running)?;
 
         // 最適化後のファイル情報
         let metadata = self.path.metadata().unwrap();
@@ -85,7 +86,7 @@ impl ImageFile {
     /// 画像を最適化
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    pub fn optimize(&mut self, app: &App) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn optimize(&mut self, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
         // 完了済み・エラー済みは再実行しない
         if matches!(
             self.status,
@@ -94,11 +95,13 @@ impl ImageFile {
             return Ok(());
         }
 
+        // 最適化中にする
         self.status = OptimizeStatus::Optimizing;
 
+        // 最適化を実行
         let result = match self.extension {
             // jpeg ファイルの最適化
-            extension::Extension::Jpeg => self.jpeg_optimize(app),
+            extension::Extension::Jpeg => self.jpeg_optimize(app, Arc::clone(&running)),
             // サポートしていないファイル形式
             _ => Err(Box::new(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -108,6 +111,12 @@ impl ImageFile {
 
         match result {
             Ok(()) => {
+                // 最適化中止された場合は処理を中断
+                if !running.load(Ordering::Relaxed) {
+                    self.status = OptimizeStatus::Canceled;
+                    return Ok(());
+                }
+
                 self.status = OptimizeStatus::Optimized;
                 Ok(())
             }
