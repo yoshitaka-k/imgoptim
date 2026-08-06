@@ -6,6 +6,34 @@ description = "Image Optimization"
 authors = ["yoshitaka-k"]
 license = "Apache-2.0"
 
+[package.metadata.bundle]
+identifier = "jp.ktgwya.imgoptim"
+name = "Img Optim"
+icon = ["assets/icon.png"]
+category = "Utility"
+short_description = "Image Optimization"
+linux_use_terminal = false
+deb_depends = [
+    "libgtk-3-0",
+    "libxcb-render0",
+    "libxcb-shape0",
+    "libxcb-xfixes0",
+    "libxkbcommon0",
+    "libvulkan1",
+    "libssl3",
+]
+
+[package.metadata.winresource]
+ProductName = "Img Optim"
+FileDescription = "Image Optimization"
+OriginalFilename = "Img Optim.exe"
+
+[build-dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+winresource = "0.1.31"
+image = "0.25.10"
+ico = "0.5"
+
 [dependencies]
 egui = "0.34.3"
 egui_extras = { version = "0.34.3", features = ["all_loaders"] }
@@ -16,4 +44,4 @@ getset = "0.1.7"
 image = "0.25.10"
 rfd = "0.17.2"
 rayon = "1.12.0"
-serde = "1.0.229"
+serde = { version = "1.0.229", features = ["derive"] }
