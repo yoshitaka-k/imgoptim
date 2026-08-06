@@ -22,6 +22,7 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
 
     for (index, path) in clone_files.paths().iter().enumerate() {
         let size = path.size() / 1024;
+        let new_size = path.new_size() / 1024;
 
         let is_selected = *files.selected_id() == Some(*path.id());
         let fill_color = if is_selected {
@@ -40,17 +41,17 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
                 match path.status() {
                     OptimizeStatus::Standby => {
                         ui.label(path.file_name());
-                        ui.label(format!("({} KB)", size));
+                        ui.label(format!("({}KB)", size));
                     }
                     OptimizeStatus::Optimizing => {
                         ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(12.0).tint(Color32::YELLOW));
                         ui.label(path.file_name());
-                        ui.label(format!("({} KB)", size));
+                        ui.label(format!("({}KB)", size));
                     }
                     OptimizeStatus::Optimized => {
                         ui.add(egui::Image::new(svg::CHECK).max_height(14.0).tint(Color32::GREEN));
                         ui.label(path.file_name());
-                        ui.label(format!("({} KB -> {} KB {}%)", size, path.new_size() / 1024, path.percent()));
+                        ui.label(format!("({}KB -> {}KB | {:+.2}%)", size, new_size, path.percent()));
                     }
                     OptimizeStatus::Error(e) => {
                         ui.add(egui::Image::new(svg::ERROR).max_height(14.0).tint(Color32::RED));
@@ -59,7 +60,7 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
                     }
                     OptimizeStatus::Canceled => {
                         ui.label(path.file_name());
-                        ui.label(format!("({} KB)", size));
+                        ui.label(format!("({}KB)", size));
                     }
                 }
             }).response.interact(egui::Sense::click());

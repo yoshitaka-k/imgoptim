@@ -85,7 +85,13 @@ impl OpenFiles {
         if self.total_new_size() == 0 {
             return 0.00;
         }
-        (self.total_size() - self.total_new_size()) as f32 / self.total_size() as f32 * 100.0
+
+        // 最適化後のファイズによってパーセントを計算
+        if self.total_size() >= self.total_new_size() {
+            (self.total_size() - self.total_new_size()) as f32 / self.total_size() as f32 * 100.0 * -1.0
+        } else {
+            (self.total_new_size() - self.total_size()) as f32 / self.total_size() as f32 * 100.0 * 1.0
+        }
     }
 
     /// パスをクリア

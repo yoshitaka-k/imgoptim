@@ -1989,6 +1989,7 @@ dependencies = [
  "log",
  "rayon",
  "rfd",
+ "serde",
 ]
 
 [[package]]

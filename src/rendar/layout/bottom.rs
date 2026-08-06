@@ -44,7 +44,7 @@ pub(crate) fn bottom_layout(
 
             ui.label("Avg saved rate:");
             ui.spacing_mut().item_spacing.x = 0.0;
-            ui.label(text_color(&format!("{:.2}%", files.total_saved_rate()), Color32::GREEN, None));
+            ui.label(text_color(&format!("{:+.2}%", files.total_saved_rate()), Color32::GREEN, None));
             ui.spacing_mut().item_spacing.x = spacing;
 
             // 右寄せ

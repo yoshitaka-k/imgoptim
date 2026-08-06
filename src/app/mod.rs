@@ -1,25 +1,30 @@
-use getset::Getters;
+use getset::{Getters, MutGetters};
+use serde::{Deserialize, Serialize};
 
 /// アプリケーションを管理する構造体
-#[derive(Clone,Getters)]
+#[derive(Clone, Getters, MutGetters)]
+#[derive(Serialize, Deserialize)]
 pub struct App {
     #[getset(get = "pub")]
+    #[serde(skip, default = "default_extensions")]
     extensions: Vec<&'static str>,
 
-    #[getset(get = "pub")]
+    #[getset(get = "pub", get_mut = "pub")]
     jpeg_quality: u8,
+}
+
+/// デフォルトの拡張子
+/// * `return` - デフォルトの拡張子
+fn default_extensions() -> Vec<&'static str> {
+    vec!["jpg", "jpeg"]
 }
 
 impl App {
     /// 新しい App を作成
     /// * `return` - App のインスタンス
     pub fn new() -> Self {
-        let extensions = vec![
-            "jpg", "jpeg", "png", "gif", "bmp",
-        ];
-
         Self {
-            extensions: extensions,
+            extensions: default_extensions(),
             jpeg_quality: 80,
         }
     }

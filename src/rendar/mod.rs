@@ -39,7 +39,14 @@ impl Rendar {
         fonts::install(&cc.egui_ctx);
         svg::install(&cc.egui_ctx);
 
+        // 前回保存した App があれば復元（なければ引数の app を使う）
+        let app = cc.storage
+            .and_then(|storage| eframe::get_value(storage, eframe::APP_KEY))
+            .unwrap_or(app);
+
+        // 開くファイルのインスタンスを作成
         let mut files = open_files::OpenFiles::new();
+        // 拡張子を設定
         files.set_extensions(app.extensions_to_string());
 
         Self {
@@ -77,6 +84,12 @@ impl Rendar {
 }
 
 impl eframe::App for Rendar {
+    /// 終了前に App の状態を保存
+    /// * `storage` - ストレージ
+    fn save(&mut self, storage: &mut dyn eframe::Storage) {
+        eframe::set_value(storage, eframe::APP_KEY, &self.app);
+    }
+
     /// ユーザーインターフェースを描画
     /// * `ui` - ユーザーインターフェース
     /// * `frame` - フレーム
