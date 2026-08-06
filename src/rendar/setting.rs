@@ -33,7 +33,7 @@ pub(crate) fn setting_window(ctx: &egui::Context, app: &mut app::App, settings_w
                     ui.label("JPEG Quality:");
                     ui.scope(|ui| {
                         ui.spacing_mut().slider_width = 310.0;
-                        let slider = ui.add(egui::Slider::new(app.jpeg_quality_mut(), JPEG_QUALITY_MIN..=JPEG_QUALITY_MAX));
+                        ui.add(egui::Slider::new(app.jpeg_quality_mut(), JPEG_QUALITY_MIN..=JPEG_QUALITY_MAX));
                     });
                 });
             });
