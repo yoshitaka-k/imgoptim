@@ -45,7 +45,6 @@ pub(crate) fn bottom_layout(
             ui.label(text_color(&format!("{:.2}%", files.total_saved_rate()), Color32::GREEN, None));
             ui.spacing_mut().item_spacing.x = spacing;
 
-
             // 右寄せ
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 // クリアボタン
