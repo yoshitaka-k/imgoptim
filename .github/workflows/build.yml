@@ -1,0 +1,78 @@
+name: Rust Windows Build
+
+on:
+  push:
+    # 「v1.0」や「v0.1.0-alpha」なタグがプッシュされたら動く
+    tags:
+      - 'v*'
+  # GitHubの画面から手動でいつでも走らせられるように
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build for ${{ matrix.job.target }}
+    runs-on: ${{ matrix.job.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          # Windows (Ubuntu上でクロスコンパイル)
+          - { os: ubuntu-latest, target: x86_64-pc-windows-gnu, artifact-name: windows }
+          # Linux (Ubuntu上でネイティブビルド)
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, artifact-name: linux }
+          # macOS (macOS環境でネイティブビルド)
+          - { os: macos-latest,  target: x86_64-apple-darwin, artifact-name: macos }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.job.target }}
+
+    - name: Install cargo-bundle
+      run: cargo install cargo-bundle --locked
+
+    # Windowsの時だけMinGWをインストール
+    - name: Install MinGW (Only for Windows cross-build)
+      if: matrix.job.target == 'x86_64-pc-windows-gnu'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-mingw-w64-x86-64
+
+    # Install system dependencies for Linux build
+    - name: Install Linux dependencies
+      if: matrix.job.target == 'x86_64-unknown-linux-gnu'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libasound2-dev
+
+    - name: Build and bundle
+      run: |
+        case "${{ matrix.job.target }}" in
+          x86_64-pc-windows-gnu)
+            cargo bundle --release --target x86_64-pc-windows-gnu -f exe
+            # cargo-bundle 0.11.0 が .exe を二重付けするため修正
+            for f in target/x86_64-pc-windows-gnu/release/bundle/exe/*.exe.exe; do
+              mv "$f" "${f%.exe}"
+            done
+            ;;
+          x86_64-unknown-linux-gnu)
+            cargo bundle --release --target x86_64-unknown-linux-gnu -f deb
+            ;;
+          x86_64-apple-darwin)
+            cargo bundle --release --target x86_64-apple-darwin -f osx
+            ;;
+        esac
+
+    # 出来上がったバイナリを整理して成果物としてアップ
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        # 名前を「⚪︎⚪︎⚪︎⚪︎-v1.0.0-windows」な感じに揃える
+        name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.job.artifact-name }}
+        path: |
+          target/${{ matrix.job.target }}/release/bundle/**/*
+        if-no-files-found: error
