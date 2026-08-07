@@ -33,11 +33,12 @@ pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles) {
 
         egui::Frame::new()
             .fill(fill_color)
+            .corner_radius(1.0)
             .show(ui, |ui|
         {
-            ui.set_min_width(width);
-
             let response = ui.horizontal(|ui| {
+                ui.set_min_width(width);
+
                 match path.status() {
                     OptimizeStatus::Standby => {
                         ui.label(path.file_name());
