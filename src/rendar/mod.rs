@@ -127,12 +127,18 @@ impl eframe::App for Rendar {
             // 上部ボタンを表示
             top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open);
 
+            let row_height = list::row_height(ui);
+            let total_rows = self.files.paths().len();
+
             // ファイル一覧を表示
-            egui::ScrollArea::both()
-                .auto_shrink([false, false])
+            egui::ScrollArea::vertical()
+                // コンテナが小さい時に縮小させない
+                .auto_shrink([false; 2])
+                // スクロールビューの高さを指定
                 .max_height(ui.available_height() - BOTTOM_BUTTON_HEIGHT)
-                .show(ui, |ui| {
-                    list::file_list(ui, &mut self.files);
+                // コンテナ内の表示
+                .show_rows(ui, row_height, total_rows, |ui, row_range| {
+                    list::file_list(ui, &mut self.files, row_range, row_height);
                 });
 
             // 下部ボタンを表示
