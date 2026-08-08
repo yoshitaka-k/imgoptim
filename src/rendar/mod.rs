@@ -11,6 +11,10 @@ use crate::event::{open, drop, optimize};
 
 const BOTTOM_BUTTON_HEIGHT: f32 = 30.0;
 
+const DARK_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 200, 200);
+const LIGHT_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(130, 130, 130);
+
+
 /// レンダーを管理する構造体
 pub struct Rendar {
     app: app::App,
@@ -104,6 +108,8 @@ impl eframe::App for Rendar {
         ui.ctx().global_style_mut(|style| {
             // ラベルを選択できないようにする
             style.interaction.selectable_labels = false;
+            // style.visuals.override_text_color = Some(egui::Color32::WHITE);
+
         });
 
         // 開くボタンが押されてたらファイルダイアログを開く
