@@ -26,6 +26,9 @@ pub struct Rendar {
     // 設定ウィンドウを開くタイミング
     settings_window_open: bool,
 
+    // 設定ウィンドウの表示位置
+    settings_window_pos: Option<egui::Pos2>,
+
     // 最適化中かどうか
     is_optimizing: bool,
 
@@ -58,6 +61,7 @@ impl Rendar {
             files,
             open_dialog: false,
             settings_window_open: false,
+            settings_window_pos: None,
             is_optimizing: false,
             optimize_job: optimize::OptimizeJob::new(cc.egui_ctx.clone()),
         }
@@ -131,7 +135,7 @@ impl eframe::App for Rendar {
         // 中央パネルを表示
         egui::CentralPanel::default().show_inside(ui, |ui| {
             // 上部ボタンを表示
-            top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open);
+            top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
 
             let row_height = list::row_height(ui);
             let total_rows = self.files.paths().len();
@@ -153,7 +157,7 @@ impl eframe::App for Rendar {
 
         // 設定ウィンドウを表示
         if self.settings_window_open {
-            setting_window::setting_window(ui.ctx(), &mut self.app, &mut self.settings_window_open);
+            setting_window::setting_window(ui.ctx(), &mut self.app, &mut self.settings_window_open, &mut self.settings_window_pos);
         }
     }
 }

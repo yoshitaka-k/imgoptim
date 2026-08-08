@@ -11,6 +11,7 @@ pub(crate) fn top_layout(
     _files: &mut open_files::OpenFiles,
     open_dialog: &mut bool,
     settings_window_open: &mut bool,
+    settings_window_pos: &mut Option<egui::Pos2>,
 ) {
     ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
         ui.horizontal(|ui| {
@@ -30,6 +31,12 @@ pub(crate) fn top_layout(
                 if ui.button(settings_button).on_hover_text("Settings").clicked() {
                     // 設定ダイアログを開く
                     *settings_window_open = true;
+
+                    // 設定ダイアログの表示位置を設定
+                    *settings_window_pos = ui.ctx().input(|input| {
+                        input.viewport().outer_rect.map(|rect| rect.min)
+                    });
+
                     ui.ctx().request_repaint();
                 }
 
@@ -38,6 +45,7 @@ pub(crate) fn top_layout(
                 if ui.button(open_button).on_hover_text("Files Open").clicked() {
                     // ファイルダイアログを開くタイミングをずらす
                     *open_dialog = true;
+
                     ui.ctx().request_repaint();
                 }
             });

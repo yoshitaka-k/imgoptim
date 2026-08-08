@@ -13,10 +13,13 @@ const JPEG_QUALITY_MAX: u8 = 99;
 /// 設定ウィンドウを表示
 /// * `ctx` - コンテキスト
 /// * `settings_window_open` - 設定ウィンドウを開いているかどうか
-pub(crate) fn setting_window(ctx: &egui::Context, app: &mut app::App, settings_window_open: &mut bool) {
-    // 親位置を取得
-    let parent_pos = ctx.input(|input| input.viewport().outer_rect.map(|rect| rect.min));
-
+/// * `window_pos` - ウィンドウの表示位置
+pub(crate) fn setting_window(
+    ctx: &egui::Context,
+    app: &mut app::App,
+    settings_window_open: &mut bool,
+    window_pos: &mut Option<egui::Pos2>,
+) {
     // 設定ウィンドウのオプションを設定
     let mut options = egui::ViewportBuilder::default()
         .with_title(WINDOW_TITLE)
@@ -24,8 +27,9 @@ pub(crate) fn setting_window(ctx: &egui::Context, app: &mut app::App, settings_w
         .with_maximize_button(false)
         .with_resizable(false);
 
-    // 親位置があったら指定、なかったらデフォルト位置
-    if let Some(pos) = parent_pos {
+    // ウィンドウの表示位置を指定
+    // take()で、取り出して None にする
+    if let Some(pos) = window_pos.take() {
         options = options.with_position(pos);
     }
 
