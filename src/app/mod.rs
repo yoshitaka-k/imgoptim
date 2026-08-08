@@ -1,5 +1,15 @@
+pub mod png;
+
 use getset::{Getters, MutGetters};
 use serde::{Deserialize, Serialize};
+use image::codecs::png::{CompressionType, FilterType};
+
+use crate::app::png::{PngCompression, PngFilter};
+
+const DEFAULT_JPEG_QUALITY: u8 = 80;
+const DEFAULT_PNG_QUALITY: u8 = 80;
+const DEFAULT_PNG_COMPRESSION_TYPE: PngCompression = PngCompression::Default;
+const DEFAULT_PNG_FILTER: PngFilter = PngFilter::Adaptive;
 
 /// アプリケーションを管理する構造体
 #[derive(Clone, Getters, MutGetters)]
@@ -11,12 +21,21 @@ pub struct App {
 
     #[getset(get = "pub", get_mut = "pub")]
     jpeg_quality: u8,
+
+    #[getset(get = "pub", get_mut = "pub")]
+    png_quality: u8,
+
+    #[getset(get = "pub", get_mut = "pub")]
+    png_compression_type: PngCompression,
+
+    #[getset(get = "pub", get_mut = "pub")]
+    png_filter_type: PngFilter,
 }
 
 /// デフォルトの拡張子
 /// * `return` - デフォルトの拡張子
 fn default_extensions() -> Vec<&'static str> {
-    vec!["jpg", "jpeg"]
+    vec!["jpg", "jpeg", "png"]
 }
 
 impl App {
@@ -25,7 +44,10 @@ impl App {
     pub fn new() -> Self {
         Self {
             extensions: default_extensions(),
-            jpeg_quality: 80,
+            jpeg_quality: DEFAULT_JPEG_QUALITY,
+            png_quality: DEFAULT_PNG_QUALITY,
+            png_compression_type: DEFAULT_PNG_COMPRESSION_TYPE,
+            png_filter_type: DEFAULT_PNG_FILTER,
         }
     }
 
@@ -33,5 +55,30 @@ impl App {
     /// * `return` - 拡張子のベクタ
     pub fn extensions_to_string(&self) -> Vec<String> {
         self.extensions.iter().map(|ext| ext.to_string()).collect()
+    }
+
+    /// PNG 圧縮タイプを image の圧縮タイプに変換
+    /// * `return` - 圧縮タイプ
+    pub fn png_compression(&self) -> CompressionType {
+        match *self.png_compression_type() {
+            PngCompression::Default => CompressionType::Default,
+            PngCompression::Fast => CompressionType::Fast,
+            PngCompression::Best => CompressionType::Best,
+            PngCompression::Uncompressed => CompressionType::Uncompressed,
+            PngCompression::Level(level) => CompressionType::Level(level),
+        }
+    }
+
+    /// PNG フィルターを image のフィルターに変換
+    /// * `return` - フィルター
+    pub fn png_filter(&self) -> FilterType {
+        match *self.png_filter_type() {
+            PngFilter::NoFilter => FilterType::NoFilter,
+            PngFilter::Sub => FilterType::Sub,
+            PngFilter::Up => FilterType::Up,
+            PngFilter::Avg => FilterType::Avg,
+            PngFilter::Paeth => FilterType::Paeth,
+            PngFilter::Adaptive => FilterType::Adaptive,
+        }
     }
 }
