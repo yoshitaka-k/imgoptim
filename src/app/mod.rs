@@ -2,14 +2,13 @@ pub mod png;
 
 use getset::{Getters, MutGetters};
 use serde::{Deserialize, Serialize};
-use image::codecs::png::{CompressionType, FilterType};
+use oxipng::Options;
 
-use crate::app::png::{PngCompression, PngFilter};
+use crate::app::png::PngCompression;
 
 const DEFAULT_JPEG_QUALITY: u8 = 80;
 const DEFAULT_PNG_QUALITY: u8 = 80;
-const DEFAULT_PNG_COMPRESSION_TYPE: PngCompression = PngCompression::Default;
-const DEFAULT_PNG_FILTER: PngFilter = PngFilter::Adaptive;
+const DEFAULT_PNG_COMPRESSION_TYPE: PngCompression = PngCompression::Best;
 
 /// アプリケーションを管理する構造体
 #[derive(Clone, Getters, MutGetters)]
@@ -27,9 +26,6 @@ pub struct App {
 
     #[getset(get = "pub", get_mut = "pub")]
     png_compression_type: PngCompression,
-
-    #[getset(get = "pub", get_mut = "pub")]
-    png_filter_type: PngFilter,
 }
 
 /// デフォルトの拡張子
@@ -47,7 +43,6 @@ impl App {
             jpeg_quality: DEFAULT_JPEG_QUALITY,
             png_quality: DEFAULT_PNG_QUALITY,
             png_compression_type: DEFAULT_PNG_COMPRESSION_TYPE,
-            png_filter_type: DEFAULT_PNG_FILTER,
         }
     }
 
@@ -57,28 +52,16 @@ impl App {
         self.extensions.iter().map(|ext| ext.to_string()).collect()
     }
 
-    /// PNG 圧縮タイプを image の圧縮タイプに変換
-    /// * `return` - 圧縮タイプ
-    pub fn png_compression(&self) -> CompressionType {
+    /// PNG 最適化オプションを oxipng の Options に変換
+    /// * `return` - 最適化オプション
+    pub fn png_options(&self) -> Options {
         match *self.png_compression_type() {
-            PngCompression::Default => CompressionType::Default,
-            PngCompression::Fast => CompressionType::Fast,
-            PngCompression::Best => CompressionType::Best,
-            PngCompression::Uncompressed => CompressionType::Uncompressed,
-            PngCompression::Level(level) => CompressionType::Level(level),
-        }
-    }
-
-    /// PNG フィルターを image のフィルターに変換
-    /// * `return` - フィルター
-    pub fn png_filter(&self) -> FilterType {
-        match *self.png_filter_type() {
-            PngFilter::NoFilter => FilterType::NoFilter,
-            PngFilter::Sub => FilterType::Sub,
-            PngFilter::Up => FilterType::Up,
-            PngFilter::Avg => FilterType::Avg,
-            PngFilter::Paeth => FilterType::Paeth,
-            PngFilter::Adaptive => FilterType::Adaptive,
+            PngCompression::Uncompressed => Options::from_preset(0),
+            PngCompression::Fast => Options::from_preset(1),
+            PngCompression::Default => Options::from_preset(2),
+            PngCompression::Best => Options::from_preset(4),
+            PngCompression::Max => Options::from_preset(6),
+            PngCompression::Level(level) => Options::from_preset(level.min(6)),
         }
     }
 }

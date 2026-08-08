@@ -1,8 +1,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use image::{ImageReader, ImageEncoder, ExtendedColorType};
-use image::codecs::png::PngEncoder;
+use oxipng::{optimize_from_memory, StripChunks};
 
 use crate::app::App;
 
@@ -17,22 +16,17 @@ impl Png {
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
         // 先にファイルを読み込んでおく
-        let file_image = ImageReader::open(&path)?.decode()?;
+        let input = std::fs::read(path)?;
 
         // 最適化中止された場合は処理を中断
         if !running.load(Ordering::Relaxed) {
             return Ok(());
         }
 
-        // メモリ上にバッファを作成して最適化
-        let mut buffer = Vec::new();
-        {
-            // 画像を RGBA8 に変換
-            let data = file_image.to_rgba8();
-            // PNG エンコーダーを作成
-            let encoder = PngEncoder::new_with_quality(&mut buffer, app.png_compression(), app.png_filter());
-            encoder.write_image(&data.as_raw(), data.width(), data.height(), ExtendedColorType::Rgba8)?;
-        }
+        // oxipng でロスレス最適化（パレット維持・ビット深度削減・再圧縮）
+        let mut options = app.png_options();
+        options.strip = StripChunks::Safe;
+        let output = optimize_from_memory(&input, &options)?;
 
         // 最適化中止された場合は処理を中断
         if !running.load(Ordering::Relaxed) {
@@ -40,7 +34,7 @@ impl Png {
         }
 
         // ファイルを上書き保存
-        std::fs::write(path, buffer)?;
+        std::fs::write(path, output)?;
 
         Ok(())
     }
