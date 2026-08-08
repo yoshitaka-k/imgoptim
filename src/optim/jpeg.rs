@@ -28,7 +28,8 @@ impl Jpeg {
         let mut buffer = Vec::new();
         {
             // JPEG エンコーダーを作成
-            let mut encoder = JpegEncoder::new_with_quality(&mut buffer, *app.jpeg_quality());
+            let quality = *app.jpeg_quality();
+            let mut encoder = JpegEncoder::new_with_quality(&mut buffer, quality);
             encoder.encode_image(&file_image)?;
         }
 
