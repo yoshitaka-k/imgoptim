@@ -43,10 +43,25 @@ pub(crate) fn setting_window(ctx: &egui::Context, app: &mut app::App, settings_w
                     ui.add_space(10.0);
                     ui.label("JPEG Quality:");
                     ui.scope(|ui| {
-                        ui.spacing_mut().slider_width = 310.0;
+                        ui.spacing_mut().slider_width = 300.0;
                         ui.add(egui::Slider::new(app.jpeg_quality_mut(), JPEG_QUALITY_MIN..=JPEG_QUALITY_MAX));
                     });
                 });
+
+                ui.separator();
+
+                // PNG の圧縮タイプを表示
+                ui.horizontal(|ui| {
+                    ui.add_space(10.0);
+                    ui.label("PNG Preset:");
+                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Min, app::png::PngCompression::Min.to_string());
+                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Fast, app::png::PngCompression::Fast.to_string());
+                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Default, app::png::PngCompression::Default.to_string());
+                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Best, app::png::PngCompression::Best.to_string());
+                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Max, app::png::PngCompression::Max.to_string());
+                });
+
+                ui.separator();
             });
 
             // ウィンドウの閉じるボタンが押されたら閉じる

@@ -55,13 +55,6 @@ impl App {
     /// PNG 最適化オプションを oxipng の Options に変換
     /// * `return` - 最適化オプション
     pub fn png_options(&self) -> Options {
-        match *self.png_compression_type() {
-            PngCompression::Uncompressed => Options::from_preset(0),
-            PngCompression::Fast => Options::from_preset(1),
-            PngCompression::Default => Options::from_preset(2),
-            PngCompression::Best => Options::from_preset(4),
-            PngCompression::Max => Options::from_preset(6),
-            PngCompression::Level(level) => Options::from_preset(level.min(6)),
-        }
+        self.png_compression_type().to_options()
     }
 }
