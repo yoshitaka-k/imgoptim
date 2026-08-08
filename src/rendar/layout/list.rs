@@ -26,7 +26,12 @@ pub(crate) fn row_height(ui: &egui::Ui) -> f32 {
 /// * `files` - ドロップされたファイル
 /// * `row_range` - 表示する行の範囲
 /// * `row_height` - show_rows に渡したのと同じ値
-pub(crate) fn file_list(ui: &mut egui::Ui, files: &mut open_files::OpenFiles, row_range: Range<usize>, row_height: f32) {
+pub(crate) fn file_list(
+    ui: &mut egui::Ui,
+    files: &mut open_files::OpenFiles,
+    row_range: Range<usize>,
+    row_height: f32
+) {
     let width = ui.available_width();
     let mut pending_action: Vec<FileListAction> = Vec::new();
     let clone_files = files.clone();
