@@ -1,3 +1,7 @@
+// リリースビルド時に Windows でコンソールウィンドウを隠す
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![warn(clippy::all, rust_2018_idioms)]
+
 use imgoptim::Rendar;
 use imgoptim::App;
 
