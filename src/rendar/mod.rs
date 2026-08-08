@@ -41,7 +41,7 @@ impl Rendar {
     /// * `cc` - 作成コンテキスト
     /// * `app` - アプリケーション
     /// * `return` - Rendar のインスタンス
-    pub fn new(cc: &eframe::CreationContext, app: app::App) -> Self {
+    pub fn new(cc: &eframe::CreationContext<'_>, app: app::App) -> Self {
         // フォントと SVG ローダーを追加
         fonts::install(&cc.egui_ctx);
         svg::install(&cc.egui_ctx);
