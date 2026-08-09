@@ -9,8 +9,6 @@ use crate::rendar::layout::{top, list, bottom};
 use crate::rendar::setting as setting_window;
 use crate::event::{open, drop, optimize};
 
-const BOTTOM_BUTTON_HEIGHT: f32 = 30.0;
-
 const DARK_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 200, 200);
 const LIGHT_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(130, 130, 130);
 
@@ -132,11 +130,18 @@ impl eframe::App for Rendar {
             drop::drop_files(&files, &mut self.files, &mut self.is_optimizing);
         });
 
+        // 上部ボタンを表示
+        egui::Panel::top("top_taskbar").show_inside(ui, |ui| {
+            top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
+        });
+
+        // 状態とかボタンを表示するタスクバーを表示
+        egui::Panel::bottom("bottom_taskbar").show_inside(ui, |ui| {
+            bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);
+        });
+
         // 中央パネルを表示
         egui::CentralPanel::default().show_inside(ui, |ui| {
-            // 上部ボタンを表示
-            top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
-
             let row_height = list::row_height(ui);
             let total_rows = self.files.paths().len();
 
@@ -146,7 +151,7 @@ impl eframe::App for Rendar {
                 // コンテナが小さい時に縮小させない
                 .auto_shrink([false; 2])
                 // スクロールビューの高さを指定
-                .max_height(ui.available_height() - BOTTOM_BUTTON_HEIGHT)
+                .max_height(ui.available_height())
                 // コンテナ内の表示
                 .show_rows(ui, row_height, total_rows, |ui, row_range| {
                     // ファイル一覧を表示
@@ -157,9 +162,6 @@ impl eframe::App for Rendar {
             if ui.input(|i| i.pointer.primary_clicked()) && !row_clicked {
                 self.files.set_selected_id(None);
             }
-
-            // 下部ボタンを表示
-            bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);
         });
 
         // 設定ウィンドウを表示

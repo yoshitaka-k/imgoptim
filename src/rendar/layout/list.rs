@@ -33,9 +33,9 @@ pub(crate) fn file_list(
     row_range: Range<usize>,
     row_height: f32
 ) -> bool {
-    let width = ui.available_width();
     let mut pending_action: Vec<FileListAction> = Vec::new();
     let mut row_clicked = false;
+    let width = ui.available_width();
     let clone_files = files.clone();
     let total = clone_files.paths().len();
     let row_spacing = ui.spacing().item_spacing.y;
