@@ -3,13 +3,7 @@ use egui::{Color32, Sense};
 
 use crate::file::{open_files, optimize_status::OptimizeStatus};
 use crate::rendar::assets;
-use crate::rendar::assets::fonts::text_color;
-use crate::rendar::assets::svg;
-
-pub(crate) const HOURGLASS_ICON_SIZE: f32 = 12.0;
-pub(crate) const CHECK_ICON_SIZE: f32 = 14.0;
-pub(crate) const ERROR_ICON_SIZE: f32 = 14.0;
-pub(crate) const SEPARATOR_HEIGHT: f32 = 4.0;
+use crate::rendar::assets::{constants, fonts::text_color, svg};
 
 enum FileListAction {
     Click { id: u64 },
@@ -20,7 +14,7 @@ enum FileListAction {
 /// * `ui` - UI
 /// * `return` - 行高
 pub(crate) fn row_height(ui: &egui::Ui) -> f32 {
-    ui.text_style_height(&egui::TextStyle::Body).max(CHECK_ICON_SIZE) + SEPARATOR_HEIGHT
+    ui.text_style_height(&egui::TextStyle::Body).max(constants::CHECK_ICON_SIZE) + constants::SEPARATOR_HEIGHT
 }
 
 /// ファイル一覧を表示
@@ -87,17 +81,17 @@ pub(crate) fn file_list(
                     ui.label(format!("({}KB)", size));
                 }
                 OptimizeStatus::Optimizing => {
-                    ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(HOURGLASS_ICON_SIZE).tint(optimizing_color));
+                    ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(constants::HOURGLASS_ICON_SIZE).tint(optimizing_color));
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
                 }
                 OptimizeStatus::Optimized => {
-                    ui.add(egui::Image::new(svg::CHECK).max_height(CHECK_ICON_SIZE).tint(optimized_color));
+                    ui.add(egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color));
                     ui.label(path.file_name());
                     ui.label(format!("({}KB -> {}KB | {:+.2}%)", size, new_size, path.percent()));
                 }
                 OptimizeStatus::Error(e) => {
-                    ui.add(egui::Image::new(svg::ERROR).max_height(ERROR_ICON_SIZE).tint(error_color));
+                    ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color));
                     ui.label(path.file_name());
                     ui.label(text_color(e, error_color, Some(11.0)));
                 }
