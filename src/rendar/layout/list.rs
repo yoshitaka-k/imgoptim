@@ -78,7 +78,7 @@ pub(crate) fn file_list(
                 .max_rect(row_rect)
                 .layout(egui::Layout::left_to_right(egui::Align::Center)),
         |ui| {
-            ui.add_space(2.0);
+            ui.add_space(5.0);
 
             // 最適化ステータスに応じて表示
             match path.status() {
