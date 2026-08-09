@@ -1,6 +1,7 @@
 use crate::app;
+use crate::optim::options::PngPreset;
 
-    /// ウィンドウのタイトル
+/// ウィンドウのタイトル
 const WINDOW_TITLE: &str = "Img Optim Settings";
 
 // ウィンドウのサイズ
@@ -54,15 +55,15 @@ pub(crate) fn setting_window(
 
                 ui.separator();
 
-                // PNG の圧縮タイプを表示
+                // PNG のプリセットを表示
                 ui.horizontal(|ui| {
                     ui.add_space(10.0);
                     ui.label("PNG Preset:");
-                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Min, app::png::PngCompression::Min.to_string());
-                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Fast, app::png::PngCompression::Fast.to_string());
-                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Default, app::png::PngCompression::Default.to_string());
-                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Best, app::png::PngCompression::Best.to_string());
-                    ui.radio_value(app.png_compression_type_mut(), app::png::PngCompression::Max, app::png::PngCompression::Max.to_string());
+                    ui.radio_value(app.png_preset_mut(), PngPreset::Min, PngPreset::Min.to_string());
+                    ui.radio_value(app.png_preset_mut(), PngPreset::Fast, PngPreset::Fast.to_string());
+                    ui.radio_value(app.png_preset_mut(), PngPreset::Default, PngPreset::Default.to_string());
+                    ui.radio_value(app.png_preset_mut(), PngPreset::Best, PngPreset::Best.to_string());
+                    ui.radio_value(app.png_preset_mut(), PngPreset::Max, PngPreset::Max.to_string());
                 });
 
                 ui.separator();

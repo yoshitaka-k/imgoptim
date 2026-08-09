@@ -86,8 +86,10 @@ impl ImageFile {
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     fn jpeg_optimize(&mut self, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
+        let quality = *app.jpeg_quality();
+
         // 最適化を実行
-        Jpeg::optimize(&self.path, app, running)?;
+        Jpeg::optimize(&self.path, quality, running)?;
 
         // ファイルサイズを更新
         self.update_file_size();
@@ -99,8 +101,10 @@ impl ImageFile {
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     fn png_optimize(&mut self, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
+        let options = app.png_options();
+
         // 最適化を実行
-        Png::optimize(&self.path, app, running)?;
+        Png::optimize(&self.path, options, running)?;
 
         // ファイルサイズを更新
         self.update_file_size();

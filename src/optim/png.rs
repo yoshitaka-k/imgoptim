@@ -1,9 +1,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use oxipng::{optimize_from_memory, StripChunks};
-
-use crate::app::App;
+use oxipng::{optimize_from_memory, Options};
 
 /// PNG 最適化を行う構造体
 pub struct Png;
@@ -11,10 +9,10 @@ pub struct Png;
 impl Png {
     /// PNG ファイルを最適化
     /// * `path` - 最適化する PNG のパス
-    /// * `app` - アプリケーションの設定
+    /// * `options` - PNG 最適化オプション
     /// * `running` - 最適化中かどうか
     /// * `return` - 最適化の結果
-    pub fn optimize(path: &PathBuf, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn optimize(path: &PathBuf, options: Options, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
         // 先にファイルを読み込んでおく
         let input = std::fs::read(path)?;
 
@@ -24,8 +22,6 @@ impl Png {
         }
 
         // oxipng でロスレス最適化（パレット維持・ビット深度削減・再圧縮）
-        let mut options = app.png_options();
-        options.strip = StripChunks::Safe;
         let output = optimize_from_memory(&input, &options)?;
 
         // 最適化中止された場合は処理を中断

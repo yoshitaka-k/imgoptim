@@ -1,14 +1,11 @@
-pub mod png;
-
 use getset::{Getters, MutGetters};
 use serde::{Deserialize, Serialize};
-use oxipng::Options;
+use oxipng::{Options, StripChunks};
 
-use crate::app::png::PngCompression;
+use crate::optim::options::PngPreset;
 
 const DEFAULT_JPEG_QUALITY: u8 = 80;
-const DEFAULT_PNG_QUALITY: u8 = 80;
-const DEFAULT_PNG_COMPRESSION_TYPE: PngCompression = PngCompression::Best;
+const DEFAULT_PNG_PRESET: PngPreset = PngPreset::Best;
 
 /// アプリケーションを管理する構造体
 #[derive(Clone, Getters, MutGetters)]
@@ -22,10 +19,7 @@ pub struct App {
     jpeg_quality: u8,
 
     #[getset(get = "pub", get_mut = "pub")]
-    png_quality: u8,
-
-    #[getset(get = "pub", get_mut = "pub")]
-    png_compression_type: PngCompression,
+    png_preset: PngPreset,
 }
 
 /// デフォルトの拡張子
@@ -41,8 +35,7 @@ impl App {
         Self {
             extensions: default_extensions(),
             jpeg_quality: DEFAULT_JPEG_QUALITY,
-            png_quality: DEFAULT_PNG_QUALITY,
-            png_compression_type: DEFAULT_PNG_COMPRESSION_TYPE,
+            png_preset: DEFAULT_PNG_PRESET,
         }
     }
 
@@ -52,9 +45,11 @@ impl App {
         self.extensions.iter().map(|ext| ext.to_string()).collect()
     }
 
-    /// PNG 最適化オプションを oxipng の Options に変換
+    /// PNG 最適化オプションを作成
     /// * `return` - 最適化オプション
     pub fn png_options(&self) -> Options {
-        self.png_compression_type().to_options()
+        let mut options = self.png_preset().to_options();
+        options.strip = StripChunks::Safe;
+        options
     }
 }

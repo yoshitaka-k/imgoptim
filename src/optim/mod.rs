@@ -1,3 +1,4 @@
+pub(crate) mod options;
 mod jpeg;
 mod png;
 pub use jpeg::Jpeg;
