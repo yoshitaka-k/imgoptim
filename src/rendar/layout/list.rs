@@ -5,7 +5,9 @@ use crate::file::{open_files, optimize_status::OptimizeStatus};
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
 
+/// ファイル一覧のアクション
 enum FileListAction {
+    Hover { id: u64 },
     Click { id: u64 },
     DoubleClick { path: PathBuf },
 }
@@ -48,7 +50,10 @@ pub(crate) fn file_list(
 
         // 高さがズレると赤くチラつくので予めサイズ確保
         // 行のクリックイベントを受け取るために Sense::click() を指定
-        let (row_rect, response) = ui.allocate_exact_size(egui::vec2(width, row_height), Sense::click());
+        let (row_rect, response) = ui.allocate_exact_size(
+            egui::vec2(width, row_height),
+            Sense::click(),
+        );
 
         // 最適化中アイコンの色
         let optimizing_color = assets::optimizing_color(ui);
@@ -111,6 +116,11 @@ pub(crate) fn file_list(
             );
         }
 
+        // ホバーアクションを処理予約
+        if response.hovered() {
+            pending_action.push(FileListAction::Hover { id: *path.id() });
+        }
+
         // クリックアクションを処理予約
         if response.clicked() {
             pending_action.push(FileListAction::Click { id: *path.id() });
@@ -128,6 +138,9 @@ pub(crate) fn file_list(
     // クリックアクションを処理
     for action in pending_action {
         match action {
+            FileListAction::Hover { id: _id } => {
+                // ホバー
+            }
             FileListAction::Click { id } => {
                 files.set_selected_id(Some(id));
             }
