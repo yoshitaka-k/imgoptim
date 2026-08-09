@@ -12,7 +12,6 @@ use crate::event::{open, drop, optimize};
 const DARK_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 200, 200);
 const LIGHT_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(130, 130, 130);
 
-
 /// レンダーを管理する構造体
 pub struct Rendar {
     app: app::App,
@@ -131,13 +130,18 @@ impl eframe::App for Rendar {
         });
 
         // 上部ボタンを表示
-        egui::Panel::top("top_taskbar").show_inside(ui, |ui| {
+        egui::Panel::top("top_taskbar")
+        .show_inside(ui, |ui| {
+            ui.add_space(2.0);
             top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
+            ui.add_space(1.0);
         });
 
         // 状態とかボタンを表示するタスクバーを表示
         egui::Panel::bottom("bottom_taskbar").show_inside(ui, |ui| {
+            ui.add_space(2.0);
             bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);
+            ui.add_space(1.0);
         });
 
         // 中央パネルを表示
