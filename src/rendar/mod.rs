@@ -149,6 +149,7 @@ impl eframe::App for Rendar {
                 .max_height(ui.available_height() - BOTTOM_BUTTON_HEIGHT)
                 // コンテナ内の表示
                 .show_rows(ui, row_height, total_rows, |ui, row_range| {
+                    // ファイル一覧を表示
                     list::file_list(ui, &mut self.files, row_range, row_height)
                 }).inner;
 
