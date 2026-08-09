@@ -8,8 +8,12 @@ const WINDOW_TITLE: &str = "Img Optim Settings";
 const WINDOW_WIDTH: f32 = 480.0;
 const WINDOW_HEIGHT: f32 = 160.0;
 
+// JPEG の品質の最小値と最大値
 const JPEG_QUALITY_MIN: u8 = 50;
 const JPEG_QUALITY_MAX: u8 = 99;
+
+// 左のスペース
+const LEFT_SPACE: f32 = 15.0;
 
 /// 設定ウィンドウを表示
 /// * `ctx` - コンテキスト
@@ -45,7 +49,7 @@ pub(crate) fn setting_window(
 
                 // JPEG のスライダーを表示
                 ui.horizontal(|ui| {
-                    ui.add_space(10.0);
+                    ui.add_space(LEFT_SPACE);
                     ui.label("JPEG Quality:");
                     ui.scope(|ui| {
                         ui.spacing_mut().slider_width = 300.0;
@@ -57,7 +61,7 @@ pub(crate) fn setting_window(
 
                 // PNG のプリセットを表示
                 ui.horizontal(|ui| {
-                    ui.add_space(10.0);
+                    ui.add_space(LEFT_SPACE);
                     ui.label("PNG Preset:");
                     ui.radio_value(app.png_preset_mut(), PngPreset::Min, PngPreset::Min.to_string());
                     ui.radio_value(app.png_preset_mut(), PngPreset::Fast, PngPreset::Fast.to_string());
