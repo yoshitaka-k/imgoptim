@@ -56,7 +56,11 @@ pub(crate) fn file_list(
 
         // 選択されている場合は背景を表示
         if *files.selected_id() == Some(*path.id()) {
-            ui.painter().rect_filled(row_rect, 1.0, Color32::from_rgba_unmultiplied(255, 255, 255, 50));
+            ui.painter().rect_filled(row_rect, 1.0, if ui.ctx().global_style().visuals.dark_mode {
+                Color32::from_rgba_unmultiplied(255, 255, 255, 50)
+            } else {
+                Color32::from_rgba_unmultiplied(0, 0, 0, 50)
+            });
         }
 
         // コンテンツを表示

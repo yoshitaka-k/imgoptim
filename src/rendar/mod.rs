@@ -9,6 +9,11 @@ use crate::rendar::layout::{top, list, bottom};
 use crate::rendar::setting as setting_window;
 use crate::event::{open, drop, optimize};
 
+// パネルの背景色
+const DARK_MODE_PANEL_COLOR: egui::Color32 = egui::Color32::from_rgb(30, 30, 30);
+const LIGHT_MODE_PANEL_COLOR: egui::Color32 = egui::Color32::from_rgb(220, 220, 220);
+
+// ボタンのアイコン色
 const DARK_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 200, 200);
 const LIGHT_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(130, 130, 130);
 
@@ -109,7 +114,6 @@ impl eframe::App for Rendar {
         ui.ctx().global_style_mut(|style| {
             // ラベルを選択できないようにする
             style.interaction.selectable_labels = false;
-            // style.visuals.override_text_color = Some(egui::Color32::WHITE);
 
         });
 
@@ -129,19 +133,27 @@ impl eframe::App for Rendar {
             drop::drop_files(&files, &mut self.files, &mut self.is_optimizing);
         });
 
+        let panel_style = egui::Frame::default()
+            .fill(if ui.ctx().global_style().visuals.dark_mode {
+                DARK_MODE_PANEL_COLOR
+            } else {
+                LIGHT_MODE_PANEL_COLOR
+            })
+            .inner_margin(egui::Margin {
+                left: 10,
+                right: 10,
+                top: 2,
+                bottom: 3,
+            });
+
         // 上部ボタンを表示
-        egui::Panel::top("top_taskbar")
-        .show_inside(ui, |ui| {
-            ui.add_space(2.0);
+        egui::Panel::top("top_taskbar").frame(panel_style).show_inside(ui, |ui| {
             top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
-            ui.add_space(1.0);
         });
 
         // 状態とかボタンを表示するタスクバーを表示
-        egui::Panel::bottom("bottom_taskbar").show_inside(ui, |ui| {
-            ui.add_space(2.0);
+        egui::Panel::bottom("bottom_taskbar").frame(panel_style).show_inside(ui, |ui| {
             bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);
-            ui.add_space(1.0);
         });
 
         // 中央パネルを表示
