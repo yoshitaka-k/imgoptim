@@ -62,6 +62,15 @@ pub(crate) fn file_list(
         // エラーアイコンの色
         let error_color = assets::error_color(ui);
 
+        // 交互に背景色
+        if index % 2 == 0 {
+            ui.painter().rect_filled(row_rect, 1.0, if ui.ctx().global_style().visuals.dark_mode {
+                Color32::from_rgba_unmultiplied(255, 255, 255, 5)
+            } else {
+                Color32::from_rgba_unmultiplied(0, 0, 0, 10)
+            });
+        }
+
         // 選択されている場合は背景を表示
         if *files.selected_id() == Some(*path.id()) {
             ui.painter().rect_filled(row_rect, 1.0, if ui.ctx().global_style().visuals.dark_mode {
