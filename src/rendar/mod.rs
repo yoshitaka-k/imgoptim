@@ -141,15 +141,21 @@ impl eframe::App for Rendar {
             let total_rows = self.files.paths().len();
 
             // ファイル一覧を表示
-            egui::ScrollArea::vertical()
+            // リスト行をクリックしたら選択状態を保持
+            let row_clicked = egui::ScrollArea::vertical()
                 // コンテナが小さい時に縮小させない
                 .auto_shrink([false; 2])
                 // スクロールビューの高さを指定
                 .max_height(ui.available_height() - BOTTOM_BUTTON_HEIGHT)
                 // コンテナ内の表示
                 .show_rows(ui, row_height, total_rows, |ui, row_range| {
-                    list::file_list(ui, &mut self.files, row_range, row_height);
-                });
+                    list::file_list(ui, &mut self.files, row_range, row_height)
+                }).inner;
+
+            // リスト行以外をクリックしたら選択解除
+            if ui.input(|i| i.pointer.primary_clicked()) && !row_clicked {
+                self.files.set_selected_id(None);
+            }
 
             // 下部ボタンを表示
             bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);

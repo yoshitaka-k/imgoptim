@@ -26,14 +26,16 @@ pub(crate) fn row_height(ui: &egui::Ui) -> f32 {
 /// * `files` - ドロップされたファイル
 /// * `row_range` - 表示する行の範囲
 /// * `row_height` - show_rows に渡したのと同じ値
+/// * `return` - いずれかの行がクリックされたかどうか
 pub(crate) fn file_list(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
     row_range: Range<usize>,
     row_height: f32
-) {
+) -> bool {
     let width = ui.available_width();
     let mut pending_action: Vec<FileListAction> = Vec::new();
+    let mut row_clicked = false;
     let clone_files = files.clone();
     let total = clone_files.paths().len();
     let row_spacing = ui.spacing().item_spacing.y;
@@ -103,6 +105,7 @@ pub(crate) fn file_list(
         // クリックアクションを処理予約
         if response.clicked() {
             pending_action.push(FileListAction::Click { id: *path.id() });
+            row_clicked = true;
         }
 
         // ダブルクリックアクションを処理予約
@@ -130,4 +133,6 @@ pub(crate) fn file_list(
             }
         }
     }
+
+    row_clicked
 }
