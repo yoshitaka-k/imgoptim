@@ -2,7 +2,9 @@ use std::{ops::Range, path::PathBuf};
 use egui::{Color32, Sense};
 
 use crate::file::{open_files, optimize_status::OptimizeStatus};
-use crate::rendar::assets::{fonts::text_color, svg};
+use crate::rendar::assets;
+use crate::rendar::assets::fonts::text_color;
+use crate::rendar::assets::svg;
 
 pub(crate) const HOURGLASS_ICON_SIZE: f32 = 12.0;
 pub(crate) const CHECK_ICON_SIZE: f32 = 14.0;
@@ -54,6 +56,13 @@ pub(crate) fn file_list(
         // 行のクリックイベントを受け取るために Sense::click() を指定
         let (row_rect, response) = ui.allocate_exact_size(egui::vec2(width, row_height), Sense::click());
 
+        // 最適化中アイコンの色
+        let optimizing_color = assets::optimizing_color(ui);
+        // 最適化済みアイコンの色
+        let optimized_color = assets::optimized_color(ui);
+        // エラーアイコンの色
+        let error_color = assets::error_color(ui);
+
         // 選択されている場合は背景を表示
         if *files.selected_id() == Some(*path.id()) {
             ui.painter().rect_filled(row_rect, 1.0, if ui.ctx().global_style().visuals.dark_mode {
@@ -69,6 +78,8 @@ pub(crate) fn file_list(
                 .max_rect(row_rect)
                 .layout(egui::Layout::left_to_right(egui::Align::Center)),
         |ui| {
+            ui.add_space(2.0);
+
             // 最適化ステータスに応じて表示
             match path.status() {
                 OptimizeStatus::Standby => {
@@ -76,19 +87,19 @@ pub(crate) fn file_list(
                     ui.label(format!("({}KB)", size));
                 }
                 OptimizeStatus::Optimizing => {
-                    ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(HOURGLASS_ICON_SIZE).tint(Color32::YELLOW));
+                    ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(HOURGLASS_ICON_SIZE).tint(optimizing_color));
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
                 }
                 OptimizeStatus::Optimized => {
-                    ui.add(egui::Image::new(svg::CHECK).max_height(CHECK_ICON_SIZE).tint(Color32::GREEN));
+                    ui.add(egui::Image::new(svg::CHECK).max_height(CHECK_ICON_SIZE).tint(optimized_color));
                     ui.label(path.file_name());
                     ui.label(format!("({}KB -> {}KB | {:+.2}%)", size, new_size, path.percent()));
                 }
                 OptimizeStatus::Error(e) => {
-                    ui.add(egui::Image::new(svg::ERROR).max_height(ERROR_ICON_SIZE).tint(Color32::RED));
+                    ui.add(egui::Image::new(svg::ERROR).max_height(ERROR_ICON_SIZE).tint(error_color));
                     ui.label(path.file_name());
-                    ui.label(text_color(e, Color32::RED, Some(11.0)));
+                    ui.label(text_color(e, error_color, Some(11.0)));
                 }
                 OptimizeStatus::Canceled => {
                     ui.label(path.file_name());

@@ -1,6 +1,6 @@
 use crate::file::open_files;
+use crate::rendar::assets;
 use crate::rendar::assets::svg;
-use crate::rendar::{DARK_MODE_BUTTON_COLOR, LIGHT_MODE_BUTTON_COLOR};
 
 /// 上部ボタンを表示
 /// * `ui` - UI
@@ -17,11 +17,7 @@ pub(crate) fn top_layout(
         ui.label("File Drag & Drop");
 
         // ボタンの色を設定
-        let button_color = if ui.ctx().global_style().visuals.dark_mode {
-            DARK_MODE_BUTTON_COLOR
-        } else {
-            LIGHT_MODE_BUTTON_COLOR
-        };
+        let button_color = assets::button_icon_color(ui);
 
         // 開くボタンとクリアボタンを右寄せ
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {

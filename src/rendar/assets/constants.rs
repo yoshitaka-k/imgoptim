@@ -1,0 +1,18 @@
+// パネルの背景色
+pub(crate) const DARK_MODE_PANEL_COLOR: egui::Color32 = egui::Color32::from_rgb(35, 35, 35);
+pub(crate) const LIGHT_MODE_PANEL_COLOR: egui::Color32 = egui::Color32::from_rgb(225, 225, 225);
+
+// ボタンのアイコン色
+pub(crate) const DARK_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 200, 200);
+pub(crate) const LIGHT_MODE_BUTTON_COLOR: egui::Color32 = egui::Color32::from_rgb(130, 130, 130);
+
+// リストアイコンの色
+// 最適化中
+pub(crate) const DARK_MODE_OPTIMIZING_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 210, 0);
+pub(crate) const LIGHT_MODE_OPTIMIZING_COLOR: egui::Color32 = egui::Color32::from_rgb(190, 190, 0);
+// 最適化済み
+pub(crate) const DARK_MODE_OPTIMIZED_COLOR: egui::Color32 = egui::Color32::from_rgb(0, 210, 0);
+pub(crate) const LIGHT_MODE_OPTIMIZED_COLOR: egui::Color32 = egui::Color32::from_rgb(0, 190, 0);
+// エラー
+pub(crate) const DARK_MODE_ERROR_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 0, 0);
+pub(crate) const LIGHT_MODE_ERROR_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 0, 0);
