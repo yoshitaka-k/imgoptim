@@ -2,11 +2,13 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![warn(clippy::all, rust_2018_idioms)]
 
+use std::env;
 use imgoptim::Rendar;
 use imgoptim::App;
 
 /// アプリケーション名
 const APP_NAME: &str = "Img Optim";
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// ウィンドウのサイズ
 const WINDOW_WIDTH: f32 = 540.0;
@@ -31,8 +33,9 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
 
+    let title = format!("{} v{}", APP_NAME, VERSION);
     eframe::run_native(
-        APP_NAME,
+        &title,
         options,
         Box::new(|cc| Ok(Box::new(Rendar::new(cc, app))))
     )
