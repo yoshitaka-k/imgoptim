@@ -22,7 +22,8 @@ pub(crate) fn generate_svg_generated(svg_dir: &Path, out_dir: &String) {
         let uri = format!("bytes://assets/svg/{short}.svg");
 
         short_names.push(short.to_string());
-        output.push_str(&format!("pub const {const_name}: egui::ImageSource<'static> = super::bytes_source(\n
+        output.push_str(&format!("#[allow(dead_code)]\n
+pub const {const_name}: egui::ImageSource<'static> = super::bytes_source(\n
 \"{uri}\",\n
 include_bytes!({}),\n);\n\n",
             include_assets_path(&asset_path),
