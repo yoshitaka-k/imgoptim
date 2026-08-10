@@ -14,7 +14,7 @@ pub(crate) fn top_layout(
     settings_window_pos: &mut Option<egui::Pos2>,
 ) {
     ui.horizontal(|ui| {
-        ui.label("File Drag & Drop");
+        ui.label("Files Drag & Drop");
 
         // ボタンの色を設定
         let button_color = assets::button_icon_color(ui);
