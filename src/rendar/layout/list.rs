@@ -97,6 +97,7 @@ pub(crate) fn file_list(
                 OptimizeStatus::Optimizing => {
                     // ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(constants::HOURGLASS_ICON_SIZE).tint(optimizing_color));
                     ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color));
+                    ui.add_space(3.0);
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
                 }
@@ -107,6 +108,7 @@ pub(crate) fn file_list(
                 }
                 OptimizeStatus::Error(e) => {
                     ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color));
+                    ui.add_space(2.0);
                     ui.label(path.file_name());
                     ui.label(text_color(e, error_color, Some(11.0)));
                 }
