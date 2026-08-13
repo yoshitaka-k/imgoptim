@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use std::sync::mpsc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
 use crate::app;
@@ -17,6 +17,9 @@ pub struct OptimizeJob {
 
     /// 最適化実行フラグ
     running: Arc<AtomicBool>,
+
+    /// キャンセルフラグ
+    cancel_id: Arc<AtomicU64>,
 }
 
 impl OptimizeJob {
@@ -25,7 +28,13 @@ impl OptimizeJob {
     /// * `return` - 最適化ジョブ
     pub fn new(ctx: egui::Context) -> Self {
         let (result_tx, result_rx) = mpsc::channel();
-        Self { ctx, result_tx, result_rx, running: Arc::new(AtomicBool::new(true)) }
+        Self {
+            ctx,
+            result_tx,
+            result_rx,
+            running: Arc::new(AtomicBool::new(true)),
+            cancel_id: Arc::new(AtomicU64::new(0)),
+        }
     }
 
     /// 最適化を実行

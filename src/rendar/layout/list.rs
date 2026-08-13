@@ -10,6 +10,7 @@ enum FileListAction {
     Hover { id: u64 },
     Click { id: u64 },
     DoubleClick { path: PathBuf },
+    KeyUp { key: egui::Key },
 }
 
 /// show_rows 用の高さ
@@ -37,6 +38,12 @@ pub(crate) fn file_list(
     let clone_files = files.clone();
     let total = clone_files.paths().len();
     let row_spacing = ui.spacing().item_spacing.y;
+
+    // 削除キーが押されたら処理予約
+    let key_up = ui.input(|input| input.key_released(egui::Key::Backspace));
+    if key_up {
+        pending_action.push(FileListAction::KeyUp { key: egui::Key::Backspace });
+    }
 
     // リストを表示
     for index in row_range {
@@ -163,6 +170,11 @@ pub(crate) fn file_list(
                     .status()
                 {
                     eprintln!("Error revealing file: {}", err);
+                }
+            }
+            FileListAction::KeyUp { key } => {
+                if let Some(id) = files.selected_id() {
+                    println!("KeyUp: {:?} / id: {}", key, id);
                 }
             }
         }
