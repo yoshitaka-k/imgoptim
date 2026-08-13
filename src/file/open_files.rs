@@ -137,10 +137,10 @@ impl OpenFiles {
     }
 
     /// ファイルの拡張子が許可されているかどうかを確認
-    /// * `file` - ファイルのパス
+    /// * `path` - ファイルのパス
     /// * `return` - 許可されているかどうか
-    fn is_allowed_extension(&self, file: &PathBuf) -> bool {
-        if let Some(ext) = file.extension() {
+    fn is_allowed_extension(&self, path: &PathBuf) -> bool {
+        if let Some(ext) = path.extension() {
             if let Some(ext) = ext.to_str() {
                 if self.extensions.iter().any(|e| e.eq_ignore_ascii_case(ext)) {
                     return true;
