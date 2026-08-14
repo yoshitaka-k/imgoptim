@@ -2,6 +2,7 @@ use std::{ops::Range, path::PathBuf};
 use egui::{Color32, Sense};
 
 use crate::file::{open_files, optimize_status::OptimizeStatus};
+use crate::event::optimize;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
 
@@ -29,6 +30,7 @@ pub(crate) fn row_height(ui: &egui::Ui) -> f32 {
 pub(crate) fn file_list(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
+    optimize_job: &mut optimize::OptimizeJob,
     row_range: Range<usize>,
     row_height: f32
 ) -> bool {
@@ -68,6 +70,8 @@ pub(crate) fn file_list(
         let optimized_color = assets::optimized_color(ui);
         // エラーアイコンの色
         let error_color = assets::error_color(ui);
+        // キャンセルアイコンの色
+        let canceled_color = assets::canceled_color(ui);
 
         // 交互に背景色
         if index % 2 == 0 {
@@ -120,8 +124,11 @@ pub(crate) fn file_list(
                     ui.label(text_color(e, error_color, Some(11.0)));
                 }
                 OptimizeStatus::Canceled => {
+                    ui.add(egui::Image::new(svg::CANCEL).max_height(constants::CANCEL_ICON_SIZE).tint(canceled_color));
+                    ui.add_space(2.0);
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
+                    ui.label(text_color("Canceled", canceled_color, Some(11.0)));
                 }
             }
         });
@@ -173,8 +180,14 @@ pub(crate) fn file_list(
                 }
             }
             FileListAction::KeyUp { key } => {
-                if let Some(id) = files.selected_id() {
-                    println!("KeyUp: {:?} / id: {}", key, id);
+                match key {
+                    egui::Key::Backspace => {
+                        if let Some(id) = files.selected_id() {
+                            optimize_job.cancel_id(*id);
+                            files.set_status_canceled(*id);
+                        }
+                    }
+                    _ => {}
                 }
             }
         }

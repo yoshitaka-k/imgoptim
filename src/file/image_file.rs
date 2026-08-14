@@ -1,6 +1,8 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering, AtomicBool};
+use std::sync::Mutex;
+use std::collections::HashSet;
 use getset::{Getters, Setters};
 
 use crate::app::App;
@@ -85,12 +87,12 @@ impl ImageFile {
     /// jpeg ファイルの最適化処理とファイルサイズの更新
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    fn jpeg_optimize(&mut self, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
+    fn jpeg_optimize(&mut self, app: &App, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
         // JPEG の品質を取得
         let quality = *app.jpeg_quality();
 
         // 最適化を実行
-        Jpeg::optimize(&self.path, quality, running)?;
+        Jpeg::optimize(self.id, &self.path, quality, running, canceled)?;
 
         // ファイルサイズを更新
         self.update_file_size();
@@ -101,12 +103,12 @@ impl ImageFile {
     /// png ファイルの最適化処理とファイルサイズの更新
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    fn png_optimize(&mut self, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
+    fn png_optimize(&mut self, app: &App, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
         // PNG のオプションを取得
         let options = app.png_options();
 
         // 最適化を実行
-        Png::optimize(&self.path, options, running)?;
+        Png::optimize(self.id, &self.path, options, running, canceled)?;
 
         // ファイルサイズを更新
         self.update_file_size();
@@ -114,15 +116,28 @@ impl ImageFile {
         Ok(())
     }
 
+    /// 最適化を中止したかどうかを確認
+    /// * `running` - 最適化中かどうか
+    /// * `canceled` - キャンセルされたファイル ID の集合
+    /// * `return` - 最適化を中止したかどうか
+    fn is_canceled(&self, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> bool {
+        !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&self.id)
+    }
+
     /// 画像を最適化
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    pub fn optimize(&mut self, app: &App, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn optimize(&mut self, app: &App, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
         // 完了済み・エラー済みは再実行しない
-        if matches!(
-            self.status,
+        if matches!(self.status,
             OptimizeStatus::Optimized | OptimizeStatus::Error(_)
         ) {
+            return Ok(());
+        }
+
+        // 最適化を中止したかどうかを確認
+        if self.is_canceled(Arc::clone(&running), Arc::clone(&canceled)) {
+            self.status = OptimizeStatus::Canceled;
             return Ok(());
         }
 
@@ -132,10 +147,10 @@ impl ImageFile {
         // 最適化を実行
         let result = match self.extension {
             // jpeg ファイルの最適化
-            extension::Extension::Jpeg => self.jpeg_optimize(app, Arc::clone(&running)),
+            extension::Extension::Jpeg => self.jpeg_optimize(app, Arc::clone(&running), Arc::clone(&canceled)),
 
             // png ファイルの最適化
-            extension::Extension::Png => self.png_optimize(app, Arc::clone(&running)),
+            extension::Extension::Png => self.png_optimize(app, Arc::clone(&running), Arc::clone(&canceled)),
 
             // サポートしていないファイル形式
             _ => Err(Box::new(std::io::Error::new(
@@ -147,7 +162,7 @@ impl ImageFile {
         match result {
             Ok(()) => {
                 // 最適化中止された場合は処理を中断
-                if !running.load(Ordering::Relaxed) {
+                if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&self.id) {
                     self.status = OptimizeStatus::Canceled;
                     return Ok(());
                 }

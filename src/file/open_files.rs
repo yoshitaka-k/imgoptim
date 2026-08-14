@@ -25,6 +25,14 @@ impl OpenFiles {
         Self { paths: vec![], extensions: vec![], selected_id: None }
     }
 
+    /// キャンセルされたファイルのステータスを更新
+    /// * `id` - キャンセルされたファイルの ID
+    pub fn set_status_canceled(&mut self, id: u64) {
+        if let Some(file) = self.paths.iter_mut().find(|f| *f.id() == id) {
+            file.set_status(OptimizeStatus::Canceled);
+        }
+    }
+
     /// ファイルの数を取得
     /// * `return` - ファイルの数
     pub fn len(&self) -> usize {

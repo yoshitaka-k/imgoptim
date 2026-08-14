@@ -163,7 +163,7 @@ impl eframe::App for Rendar {
                 // コンテナ内の表示
                 .show_rows(ui, row_height, total_rows, |ui, row_range| {
                     // ファイル一覧を表示
-                    list::file_list(ui, &mut self.files, row_range, row_height)
+                    list::file_list(ui, &mut self.files, &mut self.optimize_job, row_range, row_height)
                 }).inner;
 
             // リスト行以外をクリックしたら選択解除

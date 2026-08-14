@@ -3,6 +3,8 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use image::ImageReader;
 use image::codecs::jpeg::JpegEncoder;
+use std::collections::HashSet;
+use std::sync::Mutex;
 
 /// JPEG 最適化を行う構造体
 pub struct Jpeg;
@@ -13,12 +15,12 @@ impl Jpeg {
     /// * `quality` - JPEG 最適化オプション
     /// * `running` - 最適化中かどうか
     /// * `return` - 最適化の結果
-    pub fn optimize(path: &PathBuf, quality: u8, running: Arc<AtomicBool>) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn optimize(id: u64, path: &PathBuf, quality: u8, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
         // 先にファイルを読み込んでおく
         let file_image = ImageReader::open(&path)?.decode()?;
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) {
+        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&id) {
             return Ok(());
         }
 
@@ -31,7 +33,7 @@ impl Jpeg {
         }
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) {
+        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&id) {
             return Ok(());
         }
 

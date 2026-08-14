@@ -1,6 +1,7 @@
 use std::sync::Arc;
-use std::sync::mpsc;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::{mpsc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::collections::HashSet;
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
 use crate::app;
@@ -19,7 +20,7 @@ pub struct OptimizeJob {
     running: Arc<AtomicBool>,
 
     /// キャンセルフラグ
-    cancel_id: Arc<AtomicU64>,
+    canceled: Arc<Mutex<HashSet<u64>>>,
 }
 
 impl OptimizeJob {
@@ -33,7 +34,7 @@ impl OptimizeJob {
             result_tx,
             result_rx,
             running: Arc::new(AtomicBool::new(true)),
-            cancel_id: Arc::new(AtomicU64::new(0)),
+            canceled: Arc::new(Mutex::new(HashSet::new())),
         }
     }
 
@@ -53,25 +54,22 @@ impl OptimizeJob {
         let tx = self.result_tx.clone();
         let ctx = self.ctx.clone();
         let running = Arc::clone(&self.running);
+        let canceled = Arc::clone(&self.canceled);
 
         // 最適化を実行するスレッドを作成
         std::thread::spawn(move || {
             // 最適化を並列実行
             files.par_iter_mut().for_each(|file| {
-                // 最適化中かどうかを確認
-                if !running.load(Ordering::Relaxed) {
+                // クリアボタンを押されて最適化をキャンセルされていないか確認
+                // 1件キャンセルされていないか確認
+                if Self::is_canceled(&running, &canceled, *file.id()) {
                     // キャンセル状態にする
                     file.set_status(OptimizeStatus::Canceled);
-                    // 最適化結果を送信
-                    let _ = tx.send(file.clone());
-                    // 再描画を要求
-                    ctx.request_repaint();
-
-                    return;
+                } else {
+                    // 最適化を実行（並列の各呼び出しで clone が必要）
+                    let _ = file.optimize(&app, Arc::clone(&running), Arc::clone(&canceled));
                 }
 
-                // 最適化を実行（並列の各呼び出しで clone が必要）
-                let _ = file.optimize(&app, Arc::clone(&running));
                 // 最適化結果を送信
                 let _ = tx.send(file.clone());
                 // 再描画を要求
@@ -104,5 +102,20 @@ impl OptimizeJob {
     /// 最適化をキャンセル
     pub fn stop_running(&self) {
         self.running.store(false, Ordering::Relaxed);
+    }
+
+    /// 最適化をキャンセル
+    /// * `id` - キャンセルするファイルの ID
+    pub fn cancel_id(&self, id: u64) {
+        self.canceled.lock().unwrap().insert(id);
+    }
+
+    /// 全体停止、または指定 ID が1件キャンセル済みかどうか
+    /// * `running` - 最適化実行フラグ
+    /// * `canceled` - 1件キャンセルされた ID の集合
+    /// * `id` - 確認するファイルの ID
+    /// * `return` - キャンセルされているかどうか
+    fn is_canceled(running: &AtomicBool, canceled: &Mutex<HashSet<u64>>, id: u64) -> bool {
+        !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&id)
     }
 }

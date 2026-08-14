@@ -56,3 +56,14 @@ pub(crate) fn error_color(ui: &egui::Ui) -> egui::Color32 {
         constants::LIGHT_MODE_ERROR_COLOR
     }
 }
+
+/// キャンセルアイコンの色
+/// * `ui` - UI
+/// * `return` - キャンセルアイコンの色
+pub(crate) fn canceled_color(ui: &egui::Ui) -> egui::Color32 {
+    if ui.ctx().global_style().visuals.dark_mode {
+        constants::DARK_MODE_CANCELED_COLOR
+    } else {
+        constants::LIGHT_MODE_CANCELED_COLOR
+    }
+}
