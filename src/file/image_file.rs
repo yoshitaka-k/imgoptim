@@ -6,7 +6,7 @@ use std::collections::HashSet;
 use getset::{Getters, Setters};
 
 use crate::app::App;
-use crate::optim::{Jpeg, Png};
+use crate::optim::{Jpeg, Png, OptimToken};
 use crate::file::extension;
 use crate::file::optimize_status::OptimizeStatus;
 
@@ -87,12 +87,12 @@ impl ImageFile {
     /// jpeg ファイルの最適化処理とファイルサイズの更新
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    fn jpeg_optimize(&mut self, app: &App, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
+    fn jpeg_optimize(&mut self, app: &App, token: OptimToken) -> Result<(), Box<dyn std::error::Error>> {
         // JPEG の品質を取得
         let quality = *app.jpeg_quality();
 
         // 最適化を実行
-        Jpeg::optimize(self.id, &self.path, quality, running, canceled)?;
+        Jpeg::optimize(&self.path, quality, token)?;
 
         // ファイルサイズを更新
         self.update_file_size();
@@ -103,12 +103,12 @@ impl ImageFile {
     /// png ファイルの最適化処理とファイルサイズの更新
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    fn png_optimize(&mut self, app: &App, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
+    fn png_optimize(&mut self, app: &App, token: OptimToken) -> Result<(), Box<dyn std::error::Error>> {
         // PNG のオプションを取得
         let options = app.png_options();
 
         // 最適化を実行
-        Png::optimize(self.id, &self.path, options, running, canceled)?;
+        Png::optimize(&self.path, options, token)?;
 
         // ファイルサイズを更新
         self.update_file_size();
@@ -144,13 +144,20 @@ impl ImageFile {
         // 最適化中にする
         self.status = OptimizeStatus::Optimizing;
 
+        // 最適化トークンを作成
+        let token = OptimToken {
+            id: self.id,
+            running: Arc::clone(&running),
+            canceled: Arc::clone(&canceled),
+        };
+
         // 最適化を実行
         let result = match self.extension {
             // jpeg ファイルの最適化
-            extension::Extension::Jpeg => self.jpeg_optimize(app, Arc::clone(&running), Arc::clone(&canceled)),
+            extension::Extension::Jpeg => self.jpeg_optimize(app, token.clone()),
 
             // png ファイルの最適化
-            extension::Extension::Png => self.png_optimize(app, Arc::clone(&running), Arc::clone(&canceled)),
+            extension::Extension::Png => self.png_optimize(app, token.clone()),
 
             // サポートしていないファイル形式
             _ => Err(Box::new(std::io::Error::new(
@@ -162,7 +169,7 @@ impl ImageFile {
         match result {
             Ok(()) => {
                 // 最適化中止された場合は処理を中断
-                if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&self.id) {
+                if token.is_canceled() {
                     self.status = OptimizeStatus::Canceled;
                     return Ok(());
                 }

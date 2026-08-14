@@ -1,10 +1,8 @@
 use std::path::PathBuf;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::Ordering;
 use image::ImageReader;
 use image::codecs::jpeg::JpegEncoder;
-use std::collections::HashSet;
-use std::sync::Mutex;
+use crate::optim::OptimToken;
 
 /// JPEG 最適化を行う構造体
 pub struct Jpeg;
@@ -13,14 +11,17 @@ impl Jpeg {
     /// JPEG ファイルを最適化
     /// * `path` - 最適化する JPEG のパス
     /// * `quality` - JPEG 最適化オプション
-    /// * `running` - 最適化中かどうか
+    /// * `token` - 最適化トークン
     /// * `return` - 最適化の結果
-    pub fn optimize(id: u64, path: &PathBuf, quality: u8, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn optimize(path: &PathBuf, quality: u8, token: OptimToken) -> Result<(), Box<dyn std::error::Error>> {
+        let running = &token.running;
+        let canceled = &token.canceled;
+
         // 先にファイルを読み込んでおく
         let file_image = ImageReader::open(&path)?.decode()?;
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&id) {
+        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&token.id) {
             return Ok(());
         }
 
@@ -33,7 +34,7 @@ impl Jpeg {
         }
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&id) {
+        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&token.id) {
             return Ok(());
         }
 
