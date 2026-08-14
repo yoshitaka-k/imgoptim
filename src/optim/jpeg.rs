@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use std::sync::atomic::Ordering;
 use image::ImageReader;
 use image::codecs::jpeg::JpegEncoder;
 use crate::optim::OptimToken;
@@ -14,14 +13,11 @@ impl Jpeg {
     /// * `token` - 最適化トークン
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, quality: u8, token: OptimToken) -> Result<(), Box<dyn std::error::Error>> {
-        let running = &token.running;
-        let canceled = &token.canceled;
-
         // 先にファイルを読み込んでおく
         let file_image = ImageReader::open(&path)?.decode()?;
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&token.id) {
+        if token.is_canceled() {
             return Ok(());
         }
 
@@ -34,7 +30,7 @@ impl Jpeg {
         }
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&token.id) {
+        if token.is_canceled() {
             return Ok(());
         }
 

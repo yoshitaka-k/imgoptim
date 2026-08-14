@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use std::sync::atomic::Ordering;
 use oxipng::{optimize_from_memory, Options};
 use crate::optim::OptimToken;
 
@@ -13,14 +12,11 @@ impl Png {
     /// * `token` - 最適化トークン
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, options: Options, token: OptimToken) -> Result<(), Box<dyn std::error::Error>> {
-        let running = &token.running;
-        let canceled = &token.canceled;
-
         // 先にファイルを読み込んでおく
         let input = std::fs::read(path)?;
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&token.id) {
+        if token.is_canceled() {
             return Ok(());
         }
 
@@ -28,7 +24,7 @@ impl Png {
         let output = optimize_from_memory(&input, &options)?;
 
         // 最適化中止された場合は処理を中断
-        if !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&token.id) {
+        if token.is_canceled() {
             return Ok(());
         }
 

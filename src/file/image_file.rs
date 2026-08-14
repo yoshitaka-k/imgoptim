@@ -116,14 +116,6 @@ impl ImageFile {
         Ok(())
     }
 
-    /// 最適化を中止したかどうかを確認
-    /// * `running` - 最適化中かどうか
-    /// * `canceled` - キャンセルされたファイル ID の集合
-    /// * `return` - 最適化を中止したかどうか
-    fn is_canceled(&self, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> bool {
-        !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&self.id)
-    }
-
     /// 画像を最適化
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
@@ -135,21 +127,21 @@ impl ImageFile {
             return Ok(());
         }
 
-        // 最適化を中止したかどうかを確認
-        if self.is_canceled(Arc::clone(&running), Arc::clone(&canceled)) {
-            self.status = OptimizeStatus::Canceled;
-            return Ok(());
-        }
-
-        // 最適化中にする
-        self.status = OptimizeStatus::Optimizing;
-
         // 最適化トークンを作成
         let token = OptimToken {
             id: self.id,
             running: Arc::clone(&running),
             canceled: Arc::clone(&canceled),
         };
+
+        // 最適化を中止したかどうかを確認
+        if token.is_canceled() {
+            self.status = OptimizeStatus::Canceled;
+            return Ok(());
+        }
+
+        // 最適化中にする
+        self.status = OptimizeStatus::Optimizing;
 
         // 最適化を実行
         let result = match self.extension {
