@@ -25,5 +25,5 @@ pub(crate) const LIGHT_MODE_OPTIMIZED_COLOR: egui::Color32 = egui::Color32::from
 pub(crate) const DARK_MODE_ERROR_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 0, 0);
 pub(crate) const LIGHT_MODE_ERROR_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 0, 0);
 // キャンセル
-pub(crate) const DARK_MODE_CANCELED_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 0, 0);
-pub(crate) const LIGHT_MODE_CANCELED_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 0, 0);
+pub(crate) const DARK_MODE_CANCELED_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 110, 0);
+pub(crate) const LIGHT_MODE_CANCELED_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 100, 0);
