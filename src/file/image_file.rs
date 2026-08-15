@@ -120,9 +120,9 @@ impl ImageFile {
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
     pub fn optimize(&mut self, app: &App, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
-        // 完了済み・エラー済みは再実行しない
+        // 完了済み・キャンセル済み・エラー済みは再実行しない
         if matches!(self.status,
-            OptimizeStatus::Optimized | OptimizeStatus::Error(_)
+            OptimizeStatus::Optimized | OptimizeStatus::Canceled | OptimizeStatus::Error(_)
         ) {
             return Ok(());
         }
@@ -161,7 +161,7 @@ impl ImageFile {
         match result {
             Ok(()) => {
                 // 最適化中止された場合は処理を中断
-                if token.is_canceled() {
+                if token.is_canceled() & !matches!(self.status, OptimizeStatus::Optimized) {
                     self.status = OptimizeStatus::Canceled;
                     return Ok(());
                 }

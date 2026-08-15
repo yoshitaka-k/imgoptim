@@ -182,7 +182,7 @@ pub(crate) fn file_list(
                 match key {
                     egui::Key::Backspace => {
                         if let Some(id) = files.selected_id() {
-                            optimize_job.cancel_id(*id);
+                            optimize_job.add_canceled_id(*id);
                             files.set_status_canceled(*id);
                         }
                     }

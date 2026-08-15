@@ -62,9 +62,12 @@ impl OptimizeJob {
             files.par_iter_mut().for_each(|file| {
                 // クリアボタンを押されて最適化をキャンセルされていないか確認
                 // 1件キャンセルされていないか確認
-                if Self::is_canceled(&running, &canceled, *file.id()) {
-                    // キャンセル状態にする
-                    file.set_status(OptimizeStatus::Canceled);
+                if Self::is_canceled(&running, &canceled, file) {
+                    // 最適化済みでなければキャンセル状態にする
+                    if !matches!(file.status(), OptimizeStatus::Optimized) {
+                        // キャンセル状態にする
+                        file.set_status(OptimizeStatus::Canceled);
+                    }
                 } else {
                     // 最適化を実行（並列の各呼び出しで clone が必要）
                     let _ = file.optimize(&app, Arc::clone(&running), Arc::clone(&canceled));
@@ -106,16 +109,24 @@ impl OptimizeJob {
 
     /// 最適化をキャンセル
     /// * `id` - キャンセルするファイルの ID
-    pub fn cancel_id(&self, id: u64) {
+    pub fn add_canceled_id(&self, id: u64) {
         self.canceled.lock().unwrap().insert(id);
     }
 
-    /// 全体停止、または指定 ID が1件キャンセル済みかどうか
+    /// 全体停止、または指定ファイルが1件キャンセル済みか最適化済みかどうか
     /// * `running` - 最適化実行フラグ
     /// * `canceled` - 1件キャンセルされた ID の集合
-    /// * `id` - 確認するファイルの ID
+    /// * `file` - 確認するファイル
     /// * `return` - キャンセルされているかどうか
-    fn is_canceled(running: &AtomicBool, canceled: &Mutex<HashSet<u64>>, id: u64) -> bool {
-        !running.load(Ordering::Relaxed) || canceled.lock().unwrap().contains(&id)
+    fn is_canceled(running: &AtomicBool, canceled: &Mutex<HashSet<u64>>, file: &image_file::ImageFile) -> bool {
+        // 全体停止
+        if !running.load(Ordering::Relaxed) {
+            return true;
+        }
+        // キャンセル済み
+        if canceled.lock().unwrap().contains(file.id()) {
+            return true;
+        }
+        false
     }
 }

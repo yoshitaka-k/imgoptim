@@ -39,7 +39,9 @@ impl OpenFiles {
     /// * `id` - キャンセルされたファイルの ID
     pub fn set_status_canceled(&mut self, id: u64) {
         if let Some(file) = self.paths.iter_mut().find(|f| *f.id() == id) {
-            file.set_status(OptimizeStatus::Canceled);
+            if !matches!(file.status(), OptimizeStatus::Optimized) {
+                file.set_status(OptimizeStatus::Canceled);
+            }
         }
     }
 
@@ -150,7 +152,10 @@ impl OpenFiles {
     pub fn apply_result(&mut self, result: image_file::ImageFile) {
         // 既存のファイル一覧から ID が一致するファイルを検索
         if let Some(file) = self.paths.iter_mut().find(|f| f.id() == result.id()) {
-            *file = result;
+            // 最適化済みでなければ反映
+            if !matches!(file.status(), OptimizeStatus::Optimized) {
+                *file = result;
+            }
         }
     }
 
