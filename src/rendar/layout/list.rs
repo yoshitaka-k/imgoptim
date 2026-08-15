@@ -2,7 +2,7 @@ use std::{ops::Range, path::PathBuf};
 use egui::{Color32, Sense};
 
 use crate::file::{open_files, optimize_status::OptimizeStatus};
-use crate::event::{click, optimize};
+use crate::event::{click, key_up, optimize};
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
 
@@ -11,7 +11,7 @@ enum FileListAction {
     Hover { id: u64 },
     Click { id: u64 },
     DoubleClick { path: PathBuf },
-    KeyUp { key: egui::Key },
+    KeyUp { key: egui::Key, path: PathBuf },
 }
 
 /// show_rows 用の高さ
@@ -42,9 +42,14 @@ pub(crate) fn file_list(
     let row_spacing = ui.spacing().item_spacing.y;
 
     // 削除キーが押されたら処理予約
-    let key_up = ui.input(|input| input.key_released(egui::Key::Backspace));
-    if key_up {
-        pending_action.push(FileListAction::KeyUp { key: egui::Key::Backspace });
+    if ui.input(|input| input.key_released(egui::Key::Backspace)) {
+        let path = files.selected_path().unwrap();
+        pending_action.push(FileListAction::KeyUp { key: egui::Key::Backspace, path });
+    }
+    // スペースキーが押されたら処理予約
+    if ui.input(|input| input.key_released(egui::Key::Space)) {
+        let path = files.selected_path().unwrap();
+        pending_action.push(FileListAction::KeyUp { key: egui::Key::Space, path });
     }
 
     // リストを表示
@@ -173,13 +178,16 @@ pub(crate) fn file_list(
             FileListAction::DoubleClick { path } => {
                 click::double_click(&path);
             }
-            FileListAction::KeyUp { key } => {
+            FileListAction::KeyUp { key, path } => {
                 match key {
                     egui::Key::Backspace => {
                         if let Some(id) = files.selected_id() {
                             optimize_job.cancel_id(*id);
                             files.set_status_canceled(*id);
                         }
+                    }
+                    egui::Key::Space => {
+                        key_up::space_key(&path);
                     }
                     _ => {}
                 }

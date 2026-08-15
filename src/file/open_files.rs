@@ -25,6 +25,16 @@ impl OpenFiles {
         Self { paths: vec![], extensions: vec![], selected_id: None }
     }
 
+    /// 選択されたファイルのパスを取得
+    /// * `return` - 選択されたファイルのパス
+    pub fn selected_path(&self) -> Option<PathBuf> {
+        if let Some(id) = self.selected_id() {
+            self.paths.iter().find(|p| *p.id() == *id).map(|p| p.path().clone())
+        } else {
+            None
+        }
+    }
+
     /// キャンセルされたファイルのステータスを更新
     /// * `id` - キャンセルされたファイルの ID
     pub fn set_status_canceled(&mut self, id: u64) {
