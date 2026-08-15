@@ -2,7 +2,7 @@ use std::{ops::Range, path::PathBuf};
 use egui::{Color32, Sense};
 
 use crate::file::{open_files, optimize_status::OptimizeStatus};
-use crate::event::optimize;
+use crate::event::{click, optimize};
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
 
@@ -171,13 +171,7 @@ pub(crate) fn file_list(
                 files.set_selected_id(Some(id));
             }
             FileListAction::DoubleClick { path } => {
-                // Finder でファイルを選択表示する
-                if let Err(err) = std::process::Command::new("open")
-                    .args(["-R", path.to_str().unwrap()])
-                    .status()
-                {
-                    eprintln!("Error revealing file: {}", err);
-                }
+                click::double_click(&path);
             }
             FileListAction::KeyUp { key } => {
                 match key {
