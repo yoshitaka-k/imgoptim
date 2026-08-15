@@ -42,7 +42,7 @@ pub(crate) fn setting_window(
     ctx.show_viewport_immediate(
         egui::ViewportId::from_hash_of("setting_window"),
         options, |ctx, _class| {
-            egui::CentralPanel::default().show_inside(ctx, |ui| {
+            egui::CentralPanel::default().show(ctx, |ui| {
                 ui.label("Quality Settings");
 
                 ui.separator();

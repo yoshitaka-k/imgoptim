@@ -139,17 +139,17 @@ impl eframe::App for Rendar {
             });
 
         // 上部ボタンを表示
-        egui::Panel::top("top_taskbar").frame(panel_style).show_inside(ui, |ui| {
+        egui::Panel::top("top_taskbar").frame(panel_style).show(ui, |ui| {
             top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
         });
 
         // 状態とかボタンを表示するタスクバーを表示
-        egui::Panel::bottom("bottom_taskbar").frame(panel_style).show_inside(ui, |ui| {
+        egui::Panel::bottom("bottom_taskbar").frame(panel_style).show(ui, |ui| {
             bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);
         });
 
         // 中央パネルを表示
-        egui::CentralPanel::default().show_inside(ui, |ui| {
+        egui::CentralPanel::default().show(ui, |ui| {
             let row_height = list::row_height(ui);
             let total_rows = self.files.paths().len();
 
