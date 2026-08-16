@@ -17,3 +17,19 @@ fn quicklook_command(path: &PathBuf) -> Result<(), std::io::Error> {
         .args(["-p", path.to_str().unwrap()]).spawn()?;
     Ok(())
 }
+
+/// Windows では QuickLook を使用しない
+/// * `path` - ファイルのパス
+/// * `return` - エラーが発生したかどうか
+#[cfg(target_os = "windows")]
+fn quicklook_command(path: &PathBuf) -> Result<(), std::io::Error> {
+    Ok(())
+}
+
+/// Linux では QuickLook を使用しない
+/// * `path` - ファイルのパス
+/// * `return` - エラーが発生したかどうか
+#[cfg(target_os = "linux")]
+fn quicklook_command(path: &PathBuf) -> Result<(), std::io::Error> {
+    Ok(())
+}

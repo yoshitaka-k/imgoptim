@@ -29,7 +29,7 @@ fn write_ico(png_path: &Path, ico_path: &Path) {
 
     for size in [256, 128, 64, 48, 32, 16_u32] {
         let resized = imaged.resize_exact(size, size, image::imageops::FilterType::Lanczos3);
-        let rgba = imaged.to_rgba8();
+        let rgba = resized.to_rgba8();
         let icon_image = ico::IconImage::from_rgba_data(size, size, rgba.into_raw());
         icon_dir.add_entry(ico::IconDirEntry::encode(&icon_image).expect("failed to encode ico entry"));
     }
