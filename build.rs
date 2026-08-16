@@ -19,6 +19,6 @@ fn main() {
     println!("cargo:rerun-if-changed={}", svg_dir.display());
     build::svg::generate_svg_generated(&svg_dir, &out_dir);
 
-    // Windows の実行ファイルアイコンを埋め込む
-    build::icon::embed_windows_icon(manifest_path, &out_dir);
+    // バンドル用アイコンと Windows の実行ファイルアイコンを生成する
+    build::icon::generate_icons(manifest_path, &out_dir);
 }
