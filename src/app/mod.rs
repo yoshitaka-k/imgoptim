@@ -22,10 +22,13 @@ pub struct App {
     png_preset: PngPreset,
 }
 
-/// デフォルトの拡張子
-/// * `return` - デフォルトの拡張子
+/// 読み込める拡張子
+/// image crate でサポートされている拡張子
+/// これらの拡張子は読み込めるが、全て最適化可能ではない
+/// Unsupported メッセージを出す用にも利用するため
+/// * `return` - 読み込める拡張子
 fn default_extensions() -> Vec<&'static str> {
-    vec!["jpg", "jpeg", "png"]
+    vec!["png", "jpg", "jpeg", "gif", "webp", "bmp", "tiff", "tif", "ico", "avif", "qoi", "exr", "tga", "dds", "pbm", "pgm", "ppm", "pam", "hdr", "ff"]
 }
 
 impl App {
