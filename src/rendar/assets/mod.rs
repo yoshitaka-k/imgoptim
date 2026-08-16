@@ -67,3 +67,14 @@ pub(crate) fn canceled_color(ui: &egui::Ui) -> egui::Color32 {
         constants::LIGHT_MODE_CANCELED_COLOR
     }
 }
+
+/// 丸アイコンの色
+/// * `ui` - UI
+/// * `return` - 丸アイコンの色
+pub(crate) fn circle_color(ui: &egui::Ui) -> egui::Color32 {
+    if ui.ctx().global_style().visuals.dark_mode {
+        constants::DARK_MODE_CIRCLE_COLOR
+    } else {
+        constants::LIGHT_MODE_CIRCLE_COLOR
+    }
+}

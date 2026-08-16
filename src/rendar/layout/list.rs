@@ -111,9 +111,9 @@ pub(crate) fn file_list(
                     ui.label(format!("({}KB)", size));
                 }
                 OptimizeStatus::Optimizing => {
-                    // ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(constants::HOURGLASS_ICON_SIZE).tint(optimizing_color));
-                    ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color));
-                    ui.add_space(3.0);
+                    ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(constants::HOURGLASS_ICON_SIZE).tint(optimizing_color));
+                    // ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color));
+                    ui.add_space(4.0);
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
                 }

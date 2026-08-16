@@ -1,10 +1,13 @@
 // アイコンのサイズ
-// pub(crate) const HOURGLASS_ICON_SIZE: f32 = 12.0;
+pub(crate) const HOURGLASS_ICON_SIZE: f32 = 10.0;
 pub(crate) const CHECK_ICON_SIZE: f32 = 14.0;
 pub(crate) const ERROR_ICON_SIZE: f32 = 12.0;
 pub(crate) const CANCEL_ICON_SIZE: f32 = 12.0;
 pub(crate) const SEPARATOR_HEIGHT: f32 = 4.0;
-pub(crate) const SPINNER_SIZE: f32 = 10.0;
+pub(crate) const SPINNER_SIZE: f32 = 8.0;
+
+// 丸アイコンのサイズ
+pub(crate) const CIRCLE_ICON_SIZE: f32 = 12.0;
 
 // パネルの背景色
 pub(crate) const DARK_MODE_PANEL_COLOR: egui::Color32 = egui::Color32::from_rgb(35, 35, 35);
@@ -27,3 +30,6 @@ pub(crate) const LIGHT_MODE_ERROR_COLOR: egui::Color32 = egui::Color32::from_rgb
 // キャンセル
 pub(crate) const DARK_MODE_CANCELED_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 110, 0);
 pub(crate) const LIGHT_MODE_CANCELED_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 100, 0);
+// 丸アイコン
+pub(crate) const DARK_MODE_CIRCLE_COLOR: egui::Color32 = egui::Color32::from_rgb(110, 110, 110);
+pub(crate) const LIGHT_MODE_CIRCLE_COLOR: egui::Color32 = egui::Color32::from_rgb(190, 190, 190);
