@@ -9,12 +9,15 @@ use crate::file::optimize_status::OptimizeStatus;
 /// ドロップされたファイルを管理する構造体
 #[derive(Clone, PartialEq, Getters, Setters)]
 pub struct OpenFiles {
+    /// ファイル一覧
     #[getset(get = "pub")]
     paths: Vec<image_file::ImageFile>,
 
+    /// 許可されたファイル拡張子
     #[getset(set = "pub")]
     extensions: Vec<String>,
 
+    /// 選択されたファイルの ID
     #[getset(get = "pub", set = "pub")]
     selected_id: Option<u64>,
 }

@@ -8,6 +8,7 @@ use crate::app;
 use crate::file::{open_files, image_file};
 use crate::file::optimize_status::OptimizeStatus;
 
+/// 最適化ジョブを管理する構造体
 pub struct OptimizeJob {
     ctx: egui::Context,
 

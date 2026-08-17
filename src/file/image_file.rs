@@ -16,27 +16,35 @@ static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 /// 画像ファイルを管理する構造体
 #[derive(Clone, PartialEq, Getters, Setters)]
 pub struct ImageFile {
+    /// ファイルの一意な ID
     #[getset(get = "pub")]
     id: u64,
 
+    /// ファイルのパス
     #[getset(get= "pub")]
     path: PathBuf,
 
+    /// ファイルの名前
     #[getset(get = "pub")]
     file_name: String,
 
+    /// ファイルの拡張子
     #[getset(get = "pub")]
     extension: extension::Extension,
 
+    /// ファイルの最適化ステータス
     #[getset(get = "pub", set = "pub")]
     status: OptimizeStatus,
 
+    /// ファイルのサイズ
     #[getset(get = "pub")]
     size: u64,
 
+    /// ファイルの最適化後のサイズ
     #[getset(get = "pub")]
     new_size: u64,
 
+    /// ファイルの最適化での節約率
     #[getset(get = "pub")]
     percent: f32,
 }
