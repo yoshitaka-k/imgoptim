@@ -35,20 +35,25 @@ pub(crate) fn bottom_layout(
     ui.horizontal(|ui| {
         if optimizing_len > 0 {
             // 最適化中
+            ui.add_space(3.0);
             ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color));
-            ui.add_space(6.0);
+            ui.add_space(3.0);
         } else if optimizing_len == 0 && error_len > 0 {
             // エラー
+            ui.add_space(1.0);
             ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color));
-            ui.add_space(2.0);
+            ui.add_space(1.0);
         } else if optimizing_len == 0 && optimized_len > 0 {
             // 最適化済み
             ui.add(egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color));
         } else {
             // 初期状態（最適化中も最適化済みもエラーもない）
+            ui.add_space(1.0);
             ui.add(egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color));
-            ui.add_space(2.0);
+            ui.add_space(1.0);
         }
+
+        ui.separator();
 
         // 未処理
         ui.spacing_mut().item_spacing.x = 0.0;
