@@ -55,19 +55,19 @@ impl OpenFiles {
     /// 未処理のファイルの数を取得
     /// * `return` - 未処理のファイルの数
     pub fn standby_len(&self) -> usize {
-        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::Standby).count()
+        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Standby)).count()
     }
 
     /// 最適化中のファイルの数を取得
     /// * `return` - 最適化中のファイルの数
     pub fn optimizing_len(&self) -> usize {
-        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::Optimizing).count()
+        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Optimizing)).count()
     }
 
     /// 最適化済みのファイルの数を取得
     /// * `return` - 最適化済みのファイルの数
     pub fn optimized_len(&self) -> usize {
-        self.paths.iter().filter(|p| *p.status() == OptimizeStatus::Optimized).count()
+        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Optimized)).count()
     }
 
     /// エラーのファイルの数を取得
@@ -80,7 +80,7 @@ impl OpenFiles {
     /// * `return` - 総サイズ
     pub fn total_size(&self) -> u64 {
         self.paths.iter().map(|p| {
-            if *p.status() == OptimizeStatus::Optimized {
+            if matches!(p.status(), OptimizeStatus::Optimized) {
                 p.size()
             } else {
                 &0
@@ -92,7 +92,7 @@ impl OpenFiles {
     /// * `return` - 総新サイズ
     pub fn total_new_size(&self) -> u64 {
         self.paths.iter().map(|p| {
-            if *p.status() == OptimizeStatus::Optimized {
+            if matches!(p.status(), OptimizeStatus::Optimized) {
                 p.new_size()
             } else {
                 &0
@@ -133,7 +133,7 @@ impl OpenFiles {
         let mut cnt = 0;
         for file in &mut self.paths {
             // 最適化中でなければスキップ
-            if *file.status() != OptimizeStatus::Standby {
+            if !matches!(file.status(), OptimizeStatus::Standby) {
                 continue;
             }
 
@@ -150,13 +150,13 @@ impl OpenFiles {
     /// 最適化中のファイルがあるかどうか
     /// * `return` - 最適化中のファイルがあるかどうか
     pub fn has_optimizing(&self) -> bool {
-        self.paths.iter().any(|f| *f.status() == OptimizeStatus::Optimizing)
+        self.paths.iter().any(|f| matches!(f.status(), OptimizeStatus::Optimizing))
     }
 
     /// 未処理ファイルがあるかどうか
     /// * `return` - 未処理ファイルがあるかどうか
     pub fn has_standby(&self) -> bool {
-        self.paths.iter().any(|f| *f.status() == OptimizeStatus::Standby)
+        self.paths.iter().any(|f| matches!(f.status(), OptimizeStatus::Standby))
     }
 
     /// 最適化結果を既存の一覧へ反映

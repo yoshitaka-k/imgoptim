@@ -58,7 +58,7 @@ impl OptimizeJob {
         // 最適化中のファイルを取得
         let mut files: Vec<_> = files.paths()
             .iter()
-            .filter(|file| *file.status() == OptimizeStatus::Optimizing)
+            .filter(|file| matches!(file.status(), OptimizeStatus::Optimizing))
             .cloned()
             .collect();
 
