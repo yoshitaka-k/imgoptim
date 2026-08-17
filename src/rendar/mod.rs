@@ -23,9 +23,6 @@ pub struct Rendar {
     // 設定ウィンドウの表示位置
     settings_window_pos: Option<egui::Pos2>,
 
-    // 最適化中かどうか
-    is_optimizing: bool,
-
     // 最適化ジョブ
     optimize_job: optimize::OptimizeJob,
 }
@@ -56,17 +53,12 @@ impl Rendar {
             open_dialog: false,
             settings_window_open: false,
             settings_window_pos: None,
-            is_optimizing: false,
             optimize_job: optimize::OptimizeJob::new(cc.egui_ctx.clone()),
         }
     }
 
     /// ファイルを最適化
     fn optimize(&mut self) {
-        if !self.is_optimizing {
-            return;
-        }
-
         // すでに別スレッドで最適化中なら、完了後に再開する
         if self.files.has_optimizing() {
             return;
@@ -74,11 +66,8 @@ impl Rendar {
 
         // 未処理がなければ何もしない
         if !self.files.has_pending() {
-            self.is_optimizing = false;
             return;
         }
-
-        self.is_optimizing = false;
 
         // 最適化を実行するスレッドの準備
         self.optimize_job.run(&self.app, &mut self.files);
@@ -97,7 +86,7 @@ impl eframe::App for Rendar {
     /// * `frame` - フレーム
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         // 最適化結果を反映
-        self.optimize_job.result(&mut self.files, &mut self.is_optimizing);
+        self.optimize_job.result(&mut self.files);
 
         // 前フレームで予約された最適化を実行
         self.optimize();
@@ -115,14 +104,16 @@ impl eframe::App for Rendar {
             open::open_files(
                 &self.app.extensions_to_string(),
                 &mut self.files,
-                &mut self.is_optimizing,
             );
         }
 
         // ドラッグ&ドロップされたファイルを処理
         ui.ctx().input(|input| {
             let files = input.raw.dropped_files.clone();
-            drop::drop_files(&files, &mut self.files, &mut self.is_optimizing);
+            drop::drop_files(
+                &files,
+                &mut self.files,
+            );
         });
 
         // パネルの背景色を取得

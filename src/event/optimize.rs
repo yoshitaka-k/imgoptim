@@ -83,17 +83,11 @@ impl OptimizeJob {
 
     /// 最適化結果を反映
     /// * `files` - ファイルリスト
-    /// * `is_optimizing` - 最適化中かどうか
-    pub fn result(&self, files: &mut open_files::OpenFiles, is_optimizing: &mut bool) {
+    pub fn result(&self, files: &mut open_files::OpenFiles) {
         // 最適化結果を受信
         while let Ok(result) = self.result_rx.try_recv() {
             // 最適化結果を反映
             files.apply_result(result);
-
-            // 処理中に追加された未処理があれば続ける
-            if files.has_pending() {
-                *is_optimizing = true;
-            }
         }
     }
 
