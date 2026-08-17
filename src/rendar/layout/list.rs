@@ -43,10 +43,6 @@ pub(crate) fn file_list(
     let mut pending_action: Vec<FileListAction> = Vec::new();
     let mut row_clicked = false;
 
-    // ファイル一覧をクローン
-    let clone_files = files.clone();
-    let total = clone_files.paths().len();
-
     // アイコンの色
     let circle_color = assets::circle_color(ui);
     let optimizing_color = assets::optimizing_color(ui);
@@ -65,11 +61,20 @@ pub(crate) fn file_list(
         pending_action.push(FileListAction::KeyUp { key: egui::Key::Space, path });
     }
 
+    // リスト表示の準備
+    let total = files.paths().len();
+    let selected_id = *files.selected_id();
+    let start = row_range.start;
+
+    // 表示するファイルを取得
+    let visible: Vec<_> = files.paths()
+        .get(row_range)
+        .unwrap_or(&[])
+        .to_vec();
+
     // リストを表示
-    for index in row_range {
-        let Some(path) = clone_files.paths().get(index) else {
-            break;
-        };
+    for (offset, path) in visible.iter().enumerate() {
+        let index = start + offset;
 
         // 表示するファイルサイズを計算
         let size = path.size() / 1024;
@@ -92,7 +97,7 @@ pub(crate) fn file_list(
         }
 
         // 選択されている場合は背景を表示
-        if *files.selected_id() == Some(*path.id()) {
+        if selected_id == Some(*path.id()) {
             ui.painter().rect_filled(row_rect, 1.0, if ui.ctx().global_style().visuals.dark_mode {
                 Color32::from_rgba_unmultiplied(255, 255, 255, 50)
             } else {
