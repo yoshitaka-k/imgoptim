@@ -19,7 +19,7 @@ pub(crate) fn top_layout(
     ui.horizontal(|ui| {
         ui.horizontal(|ui| {
             ui.add(egui::Image::new(svg::UPLOAD_FILE).max_height(constants::UPLOAD_FILE_ICON_SIZE).tint(button_color));
-            ui.label("Files Drag & Drop");
+            ui.label("Folders or Files to Optimize Drag & Drop");
         });
 
         // 開くボタンとクリアボタンを右寄せ
