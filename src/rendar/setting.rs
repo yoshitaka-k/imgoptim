@@ -8,11 +8,14 @@ const WINDOW_TITLE: &str = "Keiga Settings";
 
 // ウィンドウのサイズ
 const WINDOW_WIDTH: f32 = 480.0;
-const WINDOW_HEIGHT: f32 = 180.0;
+const WINDOW_HEIGHT: f32 = 240.0;
 
 // 並行処理数の最小値と最大値
-const OPTIMIZATION_NUM_MIN: u8 = 1;
-const OPTIMIZATION_NUM_MAX: u8 = 6;
+const OPTIMIZATION_NUM_MIN: u8 = 3;
+const OPTIMIZATION_NUM_MAX: u8 = 8;
+
+const PNG_OPTIMIZATION_NUM_MIN: u8 = 1;
+const PNG_OPTIMIZATION_NUM_MAX: u8 = 3;
 
 // JPEG の品質の最小値と最大値
 const JPEG_QUALITY_MIN: u8 = 50;
@@ -67,11 +70,32 @@ pub(crate) fn setting_window(
                 // 並行処理数
                 ui.horizontal(|ui| {
                     ui.add_space(LEFT_SPACE);
-                    ui.label("Concurrent files:");
+                    ui.label("Concurrent All files:");
+                    ui.add_space(10.0);
                     ui.scope(|ui| {
-                        ui.spacing_mut().slider_width = 282.0;
+                        ui.spacing_mut().slider_width = 254.0;
                         ui.add(egui::Slider::new(app.optimization_num_mut(), OPTIMIZATION_NUM_MIN..=OPTIMIZATION_NUM_MAX));
                     });
+                });
+
+                // 並行処理数
+                ui.horizontal(|ui| {
+                    ui.add_space(LEFT_SPACE);
+                    ui.label("Concurrent PNG files:");
+                    ui.scope(|ui| {
+                        ui.spacing_mut().slider_width = 254.0;
+                        ui.add(egui::Slider::new(app.png_optimization_num_mut(), PNG_OPTIMIZATION_NUM_MIN..=PNG_OPTIMIZATION_NUM_MAX));
+                    });
+                });
+
+                ui.horizontal(|ui| {
+                    ui.add_space(LEFT_SPACE * 2.0);
+                    ui.spacing_mut().item_spacing.x = 3.0;
+                    ui.add(egui::Image::new(svg::WARNING).max_height(constants::WARNING_ICON_SIZE).tint(assets::warning_color(ui)));
+                    ui.spacing_mut().item_spacing.x = spacing;
+                    ui.add(egui::Label::new(
+                        egui::RichText::new(format!("PNG is included in All. ({} / {})", app.png_optimization_num(), app.optimization_num())).weak(),
+                    ));
                 });
 
                 ui.separator();
@@ -101,6 +125,7 @@ pub(crate) fn setting_window(
                 ui.horizontal(|ui| {
                     ui.add_space(LEFT_SPACE);
                     ui.label("PNG Preset:");
+                    ui.add_space(8.0);
                     ui.radio_value(app.png_preset_mut(), PngPreset::Min, PngPreset::Min.to_string());
                     ui.radio_value(app.png_preset_mut(), PngPreset::Fast, PngPreset::Fast.to_string());
                     ui.radio_value(app.png_preset_mut(), PngPreset::Default, PngPreset::Default.to_string());

@@ -22,6 +22,9 @@ pub struct OptimizeJob {
     /// 最適化実行中のカウント
     running_count: Arc<AtomicUsize>,
 
+    /// PNG 最適化実行中のカウント
+    png_running_count: Arc<AtomicUsize>,
+
     /// キャンセルフラグ
     canceled: Arc<Mutex<HashSet<u64>>>,
 }
@@ -38,6 +41,7 @@ impl OptimizeJob {
             result_rx,
             running: Arc::new(AtomicBool::new(true)),
             running_count: Arc::new(AtomicUsize::new(0)),
+            png_running_count: Arc::new(AtomicUsize::new(0)),
             canceled: Arc::new(Mutex::new(HashSet::new())),
         }
     }
@@ -51,8 +55,11 @@ impl OptimizeJob {
 
         // 最適化実行の数が最大値に達していない場合はループを続ける
         while self.is_running_count(app) {
+            // PNG 最適化実行可能かどうか
+            let allow_png = self.is_png_running_count(app);
+
             // 待機中のファイルを1件取得、なければループを終了
-            let Some(file) = files.get_standby_file() else { break };
+            let Some(file) = files.get_standby_file(allow_png) else { break };
 
             // ステータスを最適化中にする
             file.set_status(OptimizeStatus::Optimizing);
@@ -65,11 +72,16 @@ impl OptimizeJob {
             let running = Arc::clone(&self.running);
             let canceled = Arc::clone(&self.canceled);
 
-            // カウントを増やす
+            // 最適化カウントを増やす
             self.running_count.fetch_add(1, Ordering::Relaxed);
+            let is_png = file.is_png();
+            if is_png {
+                self.png_running_count.fetch_add(1, Ordering::Relaxed);
+            }
 
             // カウントをクローンしておく
             let running_count = Arc::clone(&self.running_count);
+            let png_running_count = Arc::clone(&self.png_running_count);
 
             // 最適化を実行するスレッドを作成
             std::thread::spawn(move || {
@@ -91,6 +103,11 @@ impl OptimizeJob {
 
                 // この最適化のスレッドが終わってからカウントを減らす
                 running_count.fetch_sub(1, Ordering::Relaxed);
+
+                // PNG 最適化の場合は PNG 最適化カウントを減らす
+                if is_png {
+                    png_running_count.fetch_sub(1, Ordering::Relaxed);
+                }
 
                 // 再描画を要求
                 ctx.request_repaint();
@@ -123,6 +140,13 @@ impl OptimizeJob {
     /// * `return` - 最適化実行可能かどうか
     pub fn is_running_count(&self, app: &app::App) -> bool {
         self.running_count.load(Ordering::Relaxed) < *app.optimization_num() as usize
+    }
+
+    /// PNG 最適化実行可能かどうか
+    /// * `app` - アプリケーション
+    /// * `return` - PNG 最適化実行可能かどうか
+    pub fn is_png_running_count(&self, app: &app::App) -> bool {
+        self.png_running_count.load(Ordering::Relaxed) < *app.png_optimization_num() as usize
     }
 
     /// 最適化をキャンセル

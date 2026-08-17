@@ -7,6 +7,9 @@ use crate::optimize::options::PngPreset;
 /// 最適化数のデフォルト値
 const DEFAULT_OPTIMIZATION_NUM: u8 = 4;
 
+/// PNG 最適化数のデフォルト値
+const DEFAULT_PNG_OPTIMIZATION_NUM: u8 = 2;
+
 /// JPEG 品質のデフォルト値
 const DEFAULT_JPEG_QUALITY: u8 = 80;
 
@@ -27,6 +30,11 @@ pub struct App {
     #[serde(default = "default_optimization_num")]
     optimization_num: u8,
 
+    /// PNG 最適化数
+    #[getset(get = "pub", get_mut = "pub")]
+    #[serde(default = "default_png_optimization_num")]
+    png_optimization_num: u8,
+
     /// JPEG 品質
     #[getset(get = "pub", get_mut = "pub")]
     jpeg_quality: u8,
@@ -40,6 +48,11 @@ pub struct App {
 /// * `return` - 最適化数のデフォルト値
 fn default_optimization_num() -> u8 {
     DEFAULT_OPTIMIZATION_NUM
+}
+
+/// PNG 最適化数のデフォルト値
+fn default_png_optimization_num() -> u8 {
+    DEFAULT_PNG_OPTIMIZATION_NUM
 }
 
 /// 読み込める拡張子
@@ -56,8 +69,9 @@ impl App {
     /// * `return` - App のインスタンス
     pub fn new() -> Self {
         Self {
-            optimization_num: default_optimization_num(),
             extensions: default_extensions(),
+            optimization_num: default_optimization_num(),
+            png_optimization_num: default_png_optimization_num(),
             jpeg_quality: DEFAULT_JPEG_QUALITY,
             png_preset: DEFAULT_PNG_PRESET,
         }

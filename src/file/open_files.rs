@@ -67,8 +67,10 @@ impl OpenFiles {
 
     /// 待機中のファイルを1件取得
     /// * `return` - 待機中のファイル1件
-    pub fn get_standby_file(&mut self) -> Option<&mut image_file::ImageFile> {
-        self.paths.iter_mut().find(|f| matches!(f.status(), OptimizeStatus::Standby))
+    pub fn get_standby_file(&mut self, allow_png: bool) -> Option<&mut image_file::ImageFile> {
+        self.paths.iter_mut().find(|f| {
+            matches!(f.status(), OptimizeStatus::Standby) && (allow_png || !f.is_png())
+        })
     }
 
     /// 選択されたファイルのパスを取得

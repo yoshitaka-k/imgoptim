@@ -4,12 +4,9 @@ pub(crate) const CHECK_ICON_SIZE: f32 = 14.0;
 pub(crate) const ERROR_ICON_SIZE: f32 = 14.0;
 pub(crate) const CANCEL_ICON_SIZE: f32 = 14.0;
 pub(crate) const CIRCLE_ICON_SIZE: f32 = 12.0;
-
-// アップロードファイルアイコンのサイズ
 pub(crate) const UPLOAD_FILE_ICON_SIZE: f32 = 14.0;
-
-// 設定アイコンのサイズ
-pub(crate) const SETTINGS_ICON_SIZE: f32 = 14.0;
+pub(crate) const SETTINGS_ICON_SIZE: f32 = 13.0;
+pub(crate) const WARNING_ICON_SIZE: f32 = 13.0;
 
 // セパレータの高さ
 pub(crate) const SEPARATOR_HEIGHT: f32 = 4.0;
@@ -41,3 +38,6 @@ pub(crate) const LIGHT_MODE_CANCELED_COLOR: egui::Color32 = egui::Color32::from_
 // 丸アイコン
 pub(crate) const DARK_MODE_CIRCLE_COLOR: egui::Color32 = egui::Color32::from_rgb(140, 140, 140);
 pub(crate) const LIGHT_MODE_CIRCLE_COLOR: egui::Color32 = egui::Color32::from_rgb(90, 90, 90);
+// 警告アイコンの色
+pub(crate) const DARK_MODE_WARNING_COLOR: egui::Color32 = egui::Color32::from_rgb(160, 160, 0);
+pub(crate) const LIGHT_MODE_WARNING_COLOR: egui::Color32 = egui::Color32::from_rgb(170, 170, 80);

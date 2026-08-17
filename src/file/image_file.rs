@@ -77,6 +77,12 @@ impl ImageFile {
         }
     }
 
+    /// ファイルが PNG かどうか
+    /// * `return` - ファイルが PNG かどうか
+    pub fn is_png(&self) -> bool {
+        matches!(self.extension, extension::Extension::Png)
+    }
+
     /// ファイルサイズの更新
     fn update_file_size(&mut self) {
         // 最適化後のファイル情報
