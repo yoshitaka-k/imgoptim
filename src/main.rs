@@ -3,11 +3,11 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 use std::env;
-use imgoptim::Rendar;
-use imgoptim::App;
+use keiga::Rendar;
+use keiga::App;
 
 /// アプリケーション名
-const APP_NAME: &str = "Img Optim";
+const APP_NAME: &str = "Keiga";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// ウィンドウのサイズ

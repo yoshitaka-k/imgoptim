@@ -1,8 +1,8 @@
 [package]
-name = "imgoptim"
+name = "keiga"
 version = "0.2.22"
 edition = "2024"
-description = "Image Optimization"
+description = "Lightweight image optimizer"
 authors = ["yoshitaka-k"]
 license = "Apache-2.0"
 
@@ -15,11 +15,11 @@ codegen-units = 1
 strip = true
 
 [package.metadata.bundle]
-identifier = "jp.ktgwya.imgoptim"
-name = "Img Optim"
+identifier = "jp.ktgwya.keiga"
+name = "Keiga"
 icon = ["target/bundle-icons/*.png"]
 category = "Utility"
-short_description = "Image Optimization"
+short_description = "Lightweight image optimizer"
 linux_use_terminal = false
 deb_depends = [
     "libgtk-3-0",
@@ -32,9 +32,9 @@ deb_depends = [
 ]
 
 [package.metadata.winresource]
-ProductName = "Img Optim"
-FileDescription = "Image Optimization"
-OriginalFilename = "Img Optim.exe"
+ProductName = "Keiga"
+FileDescription = "Lightweight image optimizer"
+OriginalFilename = "Keiga.exe"
 
 [build-dependencies]
 serde = { version = "1.0.229", features = ["derive"] }

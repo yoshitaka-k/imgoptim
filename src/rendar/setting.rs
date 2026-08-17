@@ -4,7 +4,7 @@ use crate::rendar::assets;
 use crate::rendar::assets::{constants, svg};
 
 /// ウィンドウのタイトル
-const WINDOW_TITLE: &str = "Img Optim Settings";
+const WINDOW_TITLE: &str = "Keiga Settings";
 
 // ウィンドウのサイズ
 const WINDOW_WIDTH: f32 = 480.0;
