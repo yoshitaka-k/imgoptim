@@ -7,7 +7,7 @@
 ![Lines of code](https://www.aschey.tech/tokei/github/yoshitaka-k/keiga)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/yoshitaka-k/keiga)
 
-Rust で、なんか作ってみようと思って軽画（Keiga）でも作成なぅ
+Rust の勉強がてら、自分用に Image Optimization ってことで、Keiga（軽画）でも作ってみようと思って作成なぅ
 
 ## License
 [Apache-2.0](https://github.com/yoshitaka-k/keiga/blob/main/LICENSE)
