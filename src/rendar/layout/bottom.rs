@@ -4,6 +4,18 @@ use crate::optimize::OptimizeJob;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
 
+/// 左右に余白を付けてステータスアイコンを配置
+/// * `ui` - UI
+/// * `pad` - 余白
+/// * `widget` - ステータスアイコン
+/// * `return` - ステータスアイコンのレスポンス
+fn add_padded_icon(ui: &mut egui::Ui, pad: f32, widget: impl egui::Widget) -> egui::Response {
+    ui.add_space(pad);
+    let response = ui.add(widget);
+    ui.add_space(pad);
+    response
+}
+
 /// 下部ボタンを表示
 /// * `ui` - UI
 /// * `files` - ドロップされたファイル
@@ -34,29 +46,23 @@ pub(crate) fn bottom_layout(
     let circle_color = assets::circle_color(ui);
 
     ui.horizontal(|ui| {
-        if optimizing_len > 0 {
-            // 最適化中
-            ui.add_space(3.0);
-            ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color))
-                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
-            ui.add_space(3.0);
-        } else if optimizing_len == 0 && error_len > 0 {
-            // エラー
-            ui.add_space(1.0);
-            ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color))
-                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
-            ui.add_space(1.0);
-        } else if optimizing_len == 0 && optimized_len > 0 {
-            // 最適化済み
-            ui.add(egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color))
-                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
+        // 処理中アイコンを配置
+        // ホバーテキストを設定
+        let hover_text = format!(
+            "Total optimization duration: {}",
+            duration_format!(files.total_duration()),
+        );
+        // 優先度: 最適化中 > エラー > 最適化済み > 待機
+        let response = if optimizing_len > 0 {
+            add_padded_icon(ui, 3.0, egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color))
+        } else if error_len > 0 {
+            add_padded_icon(ui, 1.0, egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color))
+        } else if optimized_len > 0 {
+            add_padded_icon(ui, 0.0, egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color))
         } else {
-            // 初期状態（最適化中も最適化済みもエラーもない）
-            ui.add_space(1.0);
-            ui.add(egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color))
-                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
-            ui.add_space(1.0);
-        }
+            add_padded_icon(ui, 1.0, egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color))
+        };
+        response.on_hover_text(hover_text);
 
         ui.separator();
 
