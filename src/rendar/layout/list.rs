@@ -34,23 +34,24 @@ pub(crate) fn file_list(
     row_range: Range<usize>,
     row_height: f32
 ) -> bool {
-    let mut pending_action: Vec<FileListAction> = Vec::new();
-    let mut row_clicked = false;
+    // UIの幅と行間隔
     let width = ui.available_width();
-    let clone_files = files.clone();
-    let total = clone_files.paths().len();
     let row_spacing = ui.spacing().item_spacing.y;
     // let col_spacing = ui.spacing().item_spacing.x;
 
-    // 丸アイコンの色
+    // アクションを処理するためのベクタ
+    let mut pending_action: Vec<FileListAction> = Vec::new();
+    let mut row_clicked = false;
+
+    // ファイル一覧をクローン
+    let clone_files = files.clone();
+    let total = clone_files.paths().len();
+
+    // アイコンの色
     let circle_color = assets::circle_color(ui);
-    // 最適化中アイコンの色
     let optimizing_color = assets::optimizing_color(ui);
-    // 最適化済みアイコンの色
     let optimized_color = assets::optimized_color(ui);
-    // エラーアイコンの色
     let error_color = assets::error_color(ui);
-    // キャンセルアイコンの色
     let canceled_color = assets::canceled_color(ui);
 
     // 削除キーが押されたら処理予約
