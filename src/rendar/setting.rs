@@ -10,6 +10,10 @@ const WINDOW_TITLE: &str = "Img Optim Settings";
 const WINDOW_WIDTH: f32 = 480.0;
 const WINDOW_HEIGHT: f32 = 180.0;
 
+// 並行処理数の最小値と最大値
+const OPTIMIZATION_NUM_MIN: u8 = 1;
+const OPTIMIZATION_NUM_MAX: u8 = 6;
+
 // JPEG の品質の最小値と最大値
 const JPEG_QUALITY_MIN: u8 = 50;
 const JPEG_QUALITY_MAX: u8 = 99;
@@ -66,7 +70,7 @@ pub(crate) fn setting_window(
                     ui.label("Concurrent files:");
                     ui.scope(|ui| {
                         ui.spacing_mut().slider_width = 282.0;
-                        ui.add(egui::Slider::new(app.optimization_num_mut(), 1..=6));
+                        ui.add(egui::Slider::new(app.optimization_num_mut(), OPTIMIZATION_NUM_MIN..=OPTIMIZATION_NUM_MAX));
                     });
                 });
 

@@ -2,7 +2,6 @@ use std::fs;
 use std::path::PathBuf;
 use getset::{Getters, Setters};
 
-use crate::app::App;
 use crate::file::image_file;
 use crate::file::optimize_status::OptimizeStatus;
 
@@ -62,6 +61,12 @@ impl OpenFiles {
             selected_id: None,
             file_info: FileInfo::new(),
         }
+    }
+
+    /// 待機中のファイルを1件取得
+    /// * `return` - 待機中のファイル1件
+    pub fn get_standby_file(&mut self) -> Option<&mut image_file::ImageFile> {
+        self.paths.iter_mut().find(|f| matches!(f.status(), OptimizeStatus::Standby))
     }
 
     /// 選択されたファイルのパスを取得
@@ -194,26 +199,6 @@ impl OpenFiles {
     /// * `path` - ドロップされたファイルのパス
     pub fn add_path(&mut self, path: PathBuf) {
         self.find_file(path);
-    }
-
-    /// 未処理ファイルを最適化中ステータスへ変更
-    /// * `app` - アプリケーション
-    pub fn mark_pending_as_optimizing(&mut self, app: &App) {
-        let mut cnt = 0;
-        for file in &mut self.paths {
-            // 最適化中でなければスキップ
-            if !matches!(file.status(), OptimizeStatus::Standby) {
-                continue;
-            }
-
-            // 最適化数を超えていればスキップ
-            if cnt >= *app.optimization_num() {
-                break;
-            }
-
-            file.set_status(OptimizeStatus::Optimizing);
-            cnt += 1;
-        }
     }
 
     /// 最適化中のファイルがあるかどうか
