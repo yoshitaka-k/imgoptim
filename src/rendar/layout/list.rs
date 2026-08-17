@@ -40,6 +40,7 @@ pub(crate) fn file_list(
     let clone_files = files.clone();
     let total = clone_files.paths().len();
     let row_spacing = ui.spacing().item_spacing.y;
+    // let col_spacing = ui.spacing().item_spacing.x;
 
     // 削除キーが押されたら処理予約
     if ui.input(|input| input.key_released(egui::Key::Backspace)) {
@@ -116,8 +117,7 @@ pub(crate) fn file_list(
                     ui.label(format!("({}KB)", size));
                 }
                 OptimizeStatus::Optimizing => {
-                    ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(constants::HOURGLASS_ICON_SIZE).tint(optimizing_color));
-                    ui.add_space(4.0);
+                    ui.add(egui::Image::new(svg::AUTORENEW).max_height(constants::AUTORENEW_ICON_SIZE).tint(optimizing_color));
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
                 }
@@ -128,13 +128,11 @@ pub(crate) fn file_list(
                 }
                 OptimizeStatus::Error(e) => {
                     ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color));
-                    ui.add_space(2.0);
                     ui.label(path.file_name());
                     ui.label(text_color(e, error_color, Some(11.0)));
                 }
                 OptimizeStatus::Canceled => {
                     ui.add(egui::Image::new(svg::CANCEL).max_height(constants::CANCEL_ICON_SIZE).tint(canceled_color));
-                    ui.add_space(2.0);
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
                     ui.label(text_color("Canceled", canceled_color, Some(11.0)));

@@ -1,8 +1,8 @@
 // アイコンのサイズ
-pub(crate) const HOURGLASS_ICON_SIZE: f32 = 10.0;
+pub(crate) const AUTORENEW_ICON_SIZE: f32 = 14.0;
 pub(crate) const CHECK_ICON_SIZE: f32 = 14.0;
-pub(crate) const ERROR_ICON_SIZE: f32 = 12.0;
-pub(crate) const CANCEL_ICON_SIZE: f32 = 12.0;
+pub(crate) const ERROR_ICON_SIZE: f32 = 14.0;
+pub(crate) const CANCEL_ICON_SIZE: f32 = 14.0;
 pub(crate) const CIRCLE_ICON_SIZE: f32 = 12.0;
 
 // アップロードファイルアイコンのサイズ

@@ -60,7 +60,7 @@ impl ImageFile {
             status: OptimizeStatus::Standby,
             size,
             new_size: 0,
-            percent: 0.0,
+            percent: 0.00f32,
         }
     }
 
@@ -79,8 +79,12 @@ impl ImageFile {
                 let percent = (self.new_size - self.size) as f32 / self.size as f32 * 100.0;
                 self.percent = percent as f32 * 1.0;
             }
+
+            // 小数点第2位までの精度にする
+            let res = (self.percent * 100.0).ceil() / 100.0;
+            self.percent = res as f32;
         } else {
-            self.percent = 0.0;
+            self.percent = 0.00f32;
         }
     }
 
