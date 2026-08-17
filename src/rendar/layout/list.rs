@@ -23,6 +23,26 @@ pub(crate) fn row_height(ui: &egui::Ui) -> f32 {
     ui.text_style_height(&egui::TextStyle::Body).max(constants::CHECK_ICON_SIZE) + constants::SEPARATOR_HEIGHT
 }
 
+/// アイコンとファイル名を表示
+/// * `ui` - UI
+/// * `file_name` - ファイル名
+/// * `pad` - パディング
+/// * `widget` - アイコン
+fn add_icon_and_name(ui: &mut egui::Ui, file_name: &str, pad: f32, widget: impl egui::Widget) {
+    // アイコンの間隔
+    let icon_spacing = 4.0;
+    let spacing = ui.spacing().item_spacing.x;
+
+    ui.add_space(pad);
+    ui.spacing_mut().item_spacing.x = icon_spacing;
+    ui.add(widget);
+    ui.spacing_mut().item_spacing.x = spacing;
+    ui.add_space(pad);
+
+    ui.separator();
+    ui.label(file_name);
+}
+
 /// ファイル一覧を表示
 /// * `ui` - UI
 /// * `files` - ドロップされたファイル
@@ -121,23 +141,15 @@ pub(crate) fn file_list(
             // 最適化ステータスに応じて表示
             match path.status() {
                 OptimizeStatus::Standby => {
-                    ui.add_space(1.0);
-                    ui.add(egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color));
-                    ui.add_space(1.0);
-                    ui.separator();
-                    ui.label(path.file_name());
+                    add_icon_and_name(ui, path.file_name(), 1.0, egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color));
                     ui.label(format!("({})", size));
                 }
                 OptimizeStatus::Optimizing => {
-                    ui.add(egui::Image::new(svg::AUTORENEW).max_height(constants::AUTORENEW_ICON_SIZE).tint(optimizing_color));
-                    ui.separator();
-                    ui.label(path.file_name());
+                    add_icon_and_name(ui, path.file_name(), 0.0, egui::Image::new(svg::AUTORENEW).max_height(constants::AUTORENEW_ICON_SIZE).tint(optimizing_color));
                     ui.label(format!("({})", size));
                 }
                 OptimizeStatus::Optimized => {
-                    ui.add(egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color));
-                    ui.separator();
-                    ui.label(path.file_name());
+                    add_icon_and_name(ui, path.file_name(), 0.0, egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color));
                     ui.label(format!("({} -> {})", size, new_size));
                     ui.separator();
                     ui.label(format!("{:+.2}%", path.percent()));
@@ -145,17 +157,14 @@ pub(crate) fn file_list(
                     ui.label(format!("{}", duration));
                 }
                 OptimizeStatus::Canceled => {
-                    ui.add(egui::Image::new(svg::CANCEL).max_height(constants::CANCEL_ICON_SIZE).tint(canceled_color));
-                    ui.separator();
-                    ui.label(path.file_name());
+                    add_icon_and_name(ui, path.file_name(), 0.0, egui::Image::new(svg::CANCEL).max_height(constants::CANCEL_ICON_SIZE).tint(canceled_color));
                     ui.label(format!("({})", size));
                     ui.separator();
                     ui.label(text_color("Canceled", canceled_color, Some(11.0)));
                 }
                 OptimizeStatus::Error(e) => {
-                    ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color));
-                    ui.separator();
-                    ui.label(path.file_name());
+                    add_icon_and_name(ui, path.file_name(), 0.0, egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color));
+                    ui.label(format!("({})", size));
                     ui.separator();
                     ui.label(text_color(e, error_color, Some(11.0)));
                 }

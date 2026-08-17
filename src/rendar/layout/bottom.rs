@@ -10,9 +10,16 @@ use crate::rendar::assets::{constants, fonts::text_color, svg};
 /// * `widget` - ステータスアイコン
 /// * `return` - ステータスアイコンのレスポンス
 fn add_padded_icon(ui: &mut egui::Ui, pad: f32, widget: impl egui::Widget) -> egui::Response {
-    ui.add_space(pad);
-    let response = ui.add(widget);
-    ui.add_space(pad);
+    let spacing = ui.spacing().item_spacing.x;
+
+    ui.spacing_mut().item_spacing.x = 2.0;
+    let response = ui.scope(|ui| {
+        ui.add_space(pad);
+        ui.add(widget);
+        ui.add_space(pad);
+    }).response;
+    ui.spacing_mut().item_spacing.x = spacing;
+
     response
 }
 
