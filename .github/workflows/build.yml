@@ -76,3 +76,40 @@ jobs:
         path: |
           target/${{ matrix.job.target }}/release/bundle/**/*
         if-no-files-found: error
+
+  # Actions の成果物 zip をそのまま draft Release に載せる
+  release:
+    name: Create draft release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+    - name: Download artifact zips
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        mkdir -p dist
+        gh api "/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+          --jq '.artifacts[] | [.name, .archive_download_url] | @tsv' \
+          | while IFS=$'\t' read -r name url; do
+              echo "Downloading ${name}.zip"
+              curl -sL \
+                -H "Authorization: Bearer ${GH_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                -o "dist/${name}.zip" \
+                "$url"
+              ls -lh "dist/${name}.zip"
+            done
+        test "$(ls dist/*.zip | wc -l)" -ge 1
+        unzip -t dist/*.zip
+
+    - name: Create draft release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        generate_release_notes: true
+        files: dist/*.zip
+        fail_on_unmatched_files: true
