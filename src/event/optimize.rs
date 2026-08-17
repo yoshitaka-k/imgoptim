@@ -47,6 +47,16 @@ impl OptimizeJob {
     /// * `app` - アプリケーション
     /// * `files` - ファイルリスト
     pub fn run(&self, app: &app::App, files: &mut open_files::OpenFiles) {
+        // 未処理がなければ何もしない
+        if !files.has_standby() {
+            return;
+        }
+
+        // 前の最適化のスレッドが生きていれば待つ
+        if !self.is_running_count(app) {
+            return;
+        }
+
         // UI 側一覧にも Optimizing を立ててから clone する
         files.mark_pending_as_optimizing(app);
 
@@ -126,7 +136,7 @@ impl OptimizeJob {
 
     /// 最適化実行中かどうか
     /// * `return` - 最適化実行中かどうか
-    pub fn is_running_count_zero(&self) -> bool {
+    pub fn is_running_count(&self, _app: &app::App) -> bool {
         self.running_count.load(Ordering::Relaxed) == 0
     }
 

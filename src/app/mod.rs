@@ -11,7 +11,7 @@ const DEFAULT_OPTIMIZATION_NUM: u8 = 4;
 const DEFAULT_JPEG_QUALITY: u8 = 80;
 
 /// PNG 最適化プリセットのデフォルト値
-const DEFAULT_PNG_PRESET: PngPreset = PngPreset::Best;
+const DEFAULT_PNG_PRESET: PngPreset = PngPreset::Default;
 
 /// アプリケーションを管理する構造体
 #[derive(Clone, Getters, MutGetters)]

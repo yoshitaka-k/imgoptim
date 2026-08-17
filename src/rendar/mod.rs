@@ -57,20 +57,14 @@ impl Rendar {
         }
     }
 
-    /// ファイルを最適化
-    fn optimize(&mut self) {
-        // 未処理がなければ何もしない
-        if !self.files.has_standby() {
-            return;
-        }
-
-        // 前の最適化のスレッドが生きていれば待つ
-        if !self.optimize_job.is_running_count_zero() {
-            return;
-        }
-
-        // 最適化を実行するスレッドの準備
+    /// ファイルを最適化実行
+    fn optimize_run(&mut self) {
         self.optimize_job.run(&self.app, &mut self.files);
+    }
+
+    /// 最適化結果を反映する
+    fn optimize_result(&mut self) {
+        self.optimize_job.result(&mut self.files);
     }
 }
 
@@ -86,10 +80,10 @@ impl eframe::App for Rendar {
     /// * `frame` - フレーム
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         // 最適化結果を反映
-        self.optimize_job.result(&mut self.files);
+        self.optimize_result();
 
         // 結果を反映後、まだ未処理があれば最適化を実行
-        self.optimize();
+        self.optimize_run();
 
         // スタイルを設定
         ui.ctx().global_style_mut(|style| {
@@ -117,7 +111,7 @@ impl eframe::App for Rendar {
         });
 
         // ファイル追加時に最適化を実行
-        self.optimize();
+        self.optimize_run();
 
         // パネルの背景色を取得
         let panel_fill_color = assets::panel_fill_color(ui);
