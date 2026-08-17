@@ -155,7 +155,7 @@ impl OpenFiles {
 
     /// 未処理ファイルがあるかどうか
     /// * `return` - 未処理ファイルがあるかどうか
-    pub fn has_pending(&self) -> bool {
+    pub fn has_standby(&self) -> bool {
         self.paths.iter().any(|f| *f.status() == OptimizeStatus::Standby)
     }
 

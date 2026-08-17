@@ -65,7 +65,7 @@ impl Rendar {
         }
 
         // 未処理がなければ何もしない
-        if !self.files.has_pending() {
+        if !self.files.has_standby() {
             return;
         }
 
