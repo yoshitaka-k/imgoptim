@@ -12,6 +12,8 @@ pub(crate) fn bottom_layout(
     optimize_job: &mut optimize::OptimizeJob,
 ) {
     // 未処理、最適化中、最適化済み、エラーのファイル数
+    files.update_file_length();
+
     let standby_len = files.standby_len();
     let optimizing_len = files.optimizing_len();
     let optimized_len = files.optimized_len();

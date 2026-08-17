@@ -6,6 +6,32 @@ use crate::app::App;
 use crate::file::image_file;
 use crate::file::optimize_status::OptimizeStatus;
 
+/// ファイル情報を管理する構造体
+#[derive(Clone, PartialEq)]
+struct FileInfo {
+    standby_len: u32,
+    optimizing_len: u32,
+    optimized_len: u32,
+    canceled_len: u32,
+    error_len: u32,
+    total_size: u64,
+    total_new_size: u64,
+}
+
+impl FileInfo {
+    pub fn new() -> Self {
+        Self {
+            standby_len: 0,
+            optimizing_len: 0,
+            optimized_len: 0,
+            canceled_len: 0,
+            error_len: 0,
+            total_size: 0,
+            total_new_size: 0,
+        }
+    }
+}
+
 /// ドロップされたファイルを管理する構造体
 #[derive(Clone, PartialEq, Getters, Setters)]
 pub struct OpenFiles {
@@ -20,13 +46,22 @@ pub struct OpenFiles {
     /// 選択されたファイルの ID
     #[getset(get = "pub", set = "pub")]
     selected_id: Option<u64>,
+
+    /// ファイル情報
+    #[getset(get = "pub")]
+    file_info: FileInfo,
 }
 
 impl OpenFiles {
     /// 新しい OpenFiles を作成
     /// * `return` - OpenFiles のインスタンス
     pub fn new() -> Self {
-        Self { paths: vec![], extensions: vec![], selected_id: None }
+        Self {
+            paths: vec![],
+            extensions: vec![],
+            selected_id: None,
+            file_info: FileInfo::new(),
+        }
     }
 
     /// 選択されたファイルのパスを取得
@@ -49,6 +84,31 @@ impl OpenFiles {
         }
     }
 
+    /// ファイル情報を更新
+    pub fn update_file_length(&mut self) {
+        let mut standby_len = 0;
+        let mut optimizing_len = 0;
+        let mut optimized_len = 0;
+        let mut canceled_len = 0;
+        let mut error_len = 0;
+
+        for file in &self.paths {
+            match file.status() {
+                OptimizeStatus::Standby => standby_len += 1,
+                OptimizeStatus::Optimizing => optimizing_len += 1,
+                OptimizeStatus::Optimized => optimized_len += 1,
+                OptimizeStatus::Canceled => canceled_len += 1,
+                OptimizeStatus::Error(_) => error_len += 1,
+            }
+        }
+
+        self.file_info.standby_len = standby_len;
+        self.file_info.optimizing_len = optimizing_len;
+        self.file_info.optimized_len = optimized_len;
+        self.file_info.canceled_len = canceled_len;
+        self.file_info.error_len = error_len;
+    }
+
     /// ファイルの数を取得
     /// * `return` - ファイルの数
     pub fn len(&self) -> usize {
@@ -57,55 +117,61 @@ impl OpenFiles {
 
     /// 未処理のファイルの数を取得
     /// * `return` - 未処理のファイルの数
-    pub fn standby_len(&self) -> usize {
-        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Standby)).count()
+    pub fn standby_len(&self) -> u32 {
+        self.file_info.standby_len
     }
 
     /// 最適化中のファイルの数を取得
     /// * `return` - 最適化中のファイルの数
-    pub fn optimizing_len(&self) -> usize {
-        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Optimizing)).count()
+    pub fn optimizing_len(&self) -> u32 {
+        self.file_info.optimizing_len
     }
 
     /// 最適化済みのファイルの数を取得
     /// * `return` - 最適化済みのファイルの数
-    pub fn optimized_len(&self) -> usize {
-        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Optimized)).count()
+    pub fn optimized_len(&self) -> u32 {
+        self.file_info.optimized_len
     }
 
     /// エラーのファイルの数を取得
     /// * `return` - エラーのファイルの数
-    pub fn error_len(&self) -> usize {
-        self.paths.iter().filter(|p| matches!(p.status(), OptimizeStatus::Error(_))).count()
+    pub fn error_len(&self) -> u32 {
+        self.file_info.error_len
     }
 
-    /// 総サイズを取得
-    /// * `return` - 総サイズ
+    /// ファイルのサイズを計算
+    pub fn calc_size(&mut self) {
+        let mut total_size = 0;
+        let mut total_new_size = 0;
+
+        for file in &self.paths {
+            if matches!(file.status(), OptimizeStatus::Optimized) {
+                total_size += file.size();
+                total_new_size += file.new_size();
+            }
+        }
+
+        self.file_info.total_size = total_size;
+        self.file_info.total_new_size = total_new_size;
+    }
+
+    /// ファイルの総サイズを取得
+    /// * `return` - ファイルの総サイズ
     pub fn total_size(&self) -> u64 {
-        self.paths.iter().map(|p| {
-            if matches!(p.status(), OptimizeStatus::Optimized) {
-                p.size()
-            } else {
-                &0
-            }
-        }).sum()
+        self.file_info.total_size
     }
 
-    /// 総新サイズを取得
-    /// * `return` - 総新サイズ
+    /// ファイルの総新サイズを取得
+    /// * `return` - ファイルの総新サイズ
     pub fn total_new_size(&self) -> u64 {
-        self.paths.iter().map(|p| {
-            if matches!(p.status(), OptimizeStatus::Optimized) {
-                p.new_size()
-            } else {
-                &0
-            }
-        }).sum()
+        self.file_info.total_new_size
     }
 
-    /// 総節約率を取得
-    /// * `return` - 総節約率
-    pub fn total_saved_rate(&self) -> f32 {
+    /// ファイルの総節約率を取得
+    /// * `return` - ファイルの総節約率
+    pub fn total_saved_rate(&mut self) -> f32 {
+        self.calc_size();
+
         if self.total_new_size() == 0 {
             return 0.00;
         }
