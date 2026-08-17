@@ -1,6 +1,6 @@
 [package]
 name = "imgoptim"
-version = "0.2.19"
+version = "0.2.20"
 edition = "2024"
 description = "Image Optimization"
 authors = ["yoshitaka-k"]
@@ -30,19 +30,19 @@ OriginalFilename = "Img Optim.exe"
 
 [build-dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
+image = { version = "0.25.10", default-features = false, features = ["png"] }
 winresource = "0.1.31"
-image = "0.25.10"
 ico = "0.5"
 
 [dependencies]
 egui = "0.36.1"
-egui_extras = { version = "0.36.1", features = ["all_loaders"] }
+egui_extras = { version = "0.36.1", features = ["svg"] }
 eframe = { version = "0.36.1", features = ["persistence"] }
-log = "0.4.33"
-env_logger = "0.11.11"
-getset = "0.1.7"
-image = "0.25.10"
 rfd = "0.17.2"
-rayon = "1.12.0"
 serde = { version = "1.0.229", features = ["derive"] }
+image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
 oxipng = { version = "10.2.0", default-features = false, features = ["parallel"] }
+rayon = "1.12.0"
+getset = "0.1.7"
+env_logger = "0.11.11"
+log = "0.4.33"
