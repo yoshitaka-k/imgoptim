@@ -7,7 +7,8 @@ use crate::file::open_files;
 use crate::rendar::assets::{fonts, svg};
 use crate::rendar::layout::{top, list, bottom};
 use crate::rendar::setting as setting_window;
-use crate::event::{open, drop, optimize};
+use crate::event::{open, drop};
+use crate::optimize::OptimizeJob;
 
 /// レンダーを管理する構造体
 pub struct Rendar {
@@ -24,7 +25,7 @@ pub struct Rendar {
     settings_window_pos: Option<egui::Pos2>,
 
     // 最適化ジョブ
-    optimize_job: optimize::OptimizeJob,
+    optimize_job: OptimizeJob,
 }
 
 impl Rendar {
@@ -53,7 +54,7 @@ impl Rendar {
             open_dialog: false,
             settings_window_open: false,
             settings_window_pos: None,
-            optimize_job: optimize::OptimizeJob::new(cc.egui_ctx.clone()),
+            optimize_job: OptimizeJob::new(cc.egui_ctx.clone()),
         }
     }
 

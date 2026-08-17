@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use image::ImageReader;
 use image::codecs::jpeg::JpegEncoder;
-use crate::optim::OptimToken;
+use crate::optimize::OptimToken;
 
 /// JPEG 最適化を行う構造体
 pub struct Jpeg;

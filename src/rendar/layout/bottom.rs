@@ -1,5 +1,5 @@
 use crate::file::open_files;
-use crate::event::optimize;
+use crate::optimize::OptimizeJob;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
 
@@ -9,7 +9,7 @@ use crate::rendar::assets::{constants, fonts::text_color, svg};
 pub(crate) fn bottom_layout(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
-    optimize_job: &mut optimize::OptimizeJob,
+    optimize_job: &mut OptimizeJob,
 ) {
     // 未処理、最適化中、最適化済み、エラーのファイル数
     files.update_file_length();

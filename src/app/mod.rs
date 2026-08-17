@@ -2,7 +2,7 @@ use getset::{Getters, MutGetters};
 use serde::{Deserialize, Serialize};
 use oxipng::{Options, StripChunks};
 
-use crate::optim::options::PngPreset;
+use crate::optimize::options::PngPreset;
 
 /// 最適化数のデフォルト値
 const DEFAULT_OPTIMIZATION_NUM: u8 = 4;

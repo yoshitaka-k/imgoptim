@@ -3,7 +3,8 @@ use egui::{Color32, Sense};
 
 use crate::filesize_format;
 use crate::file::{open_files, optimize_status::OptimizeStatus};
-use crate::event::{click, key_up, optimize};
+use crate::event::{click, key_up};
+use crate::optimize::OptimizeJob;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
 
@@ -31,7 +32,7 @@ pub(crate) fn row_height(ui: &egui::Ui) -> f32 {
 pub(crate) fn file_list(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
-    optimize_job: &mut optimize::OptimizeJob,
+    optimize_job: &mut OptimizeJob,
     row_range: Range<usize>,
     row_height: f32
 ) -> bool {

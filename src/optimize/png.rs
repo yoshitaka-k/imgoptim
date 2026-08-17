@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use crate::optim::OptimToken;
+use crate::optimize::OptimToken;
 
 /// PNG 最適化を行う構造体
 pub struct Png;

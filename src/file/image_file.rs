@@ -6,7 +6,7 @@ use std::collections::HashSet;
 use getset::{Getters, Setters};
 
 use crate::app::App;
-use crate::optim::{Jpeg, Png, OptimToken};
+use crate::optimize::{Jpeg, Png, OptimToken};
 use crate::file::extension;
 use crate::file::optimize_status::OptimizeStatus;
 

@@ -1,8 +1,10 @@
 pub(crate) mod options;
+mod job;
 mod jpeg;
 mod png;
 pub use jpeg::Jpeg;
 pub use png::Png;
+pub(crate) use job::OptimizeJob;
 
 use std::sync::{Arc, Mutex};
 use std::collections::HashSet;

@@ -1,5 +1,5 @@
 use crate::app;
-use crate::optim::options::PngPreset;
+use crate::optimize::options::PngPreset;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, svg};
 
