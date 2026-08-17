@@ -32,6 +32,7 @@ fn main() -> eframe::Result {
     // ウィンドウのオプション
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
+            .with_title(format!("{} v{}", APP_NAME, VERSION))
             .with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
             .with_min_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
             .with_max_inner_size([MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT])
@@ -41,9 +42,8 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
 
-    let title = format!("{} v{}", APP_NAME, VERSION);
     eframe::run_native(
-        &title,
+        APP_NAME,
         options,
         Box::new(|cc| Ok(Box::new(Rendar::new(cc, app))))
     )
