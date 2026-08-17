@@ -6,6 +6,14 @@ description = "Image Optimization"
 authors = ["yoshitaka-k"]
 license = "Apache-2.0"
 
+[profile.release]
+# サイズ小さくしてパフォーマンスアップ狙う
+lto = true
+# 並列コード生成をやめる
+codegen-units = 1
+# デバッグシンボル・シンボルテーブルを削る
+strip = true
+
 [package.metadata.bundle]
 identifier = "jp.ktgwya.imgoptim"
 name = "Img Optim"
