@@ -4,22 +4,42 @@ use oxipng::{Options, StripChunks};
 
 use crate::optim::options::PngPreset;
 
+/// 最適化数のデフォルト値
+const DEFAULT_OPTIMIZATION_NUM: u8 = 4;
+
+/// JPEG 品質のデフォルト値
 const DEFAULT_JPEG_QUALITY: u8 = 80;
+
+/// PNG 最適化プリセットのデフォルト値
 const DEFAULT_PNG_PRESET: PngPreset = PngPreset::Best;
 
 /// アプリケーションを管理する構造体
 #[derive(Clone, Getters, MutGetters)]
 #[derive(Serialize, Deserialize)]
 pub struct App {
+    /// 読み込める拡張子
     #[getset(get = "pub")]
     #[serde(skip, default = "default_extensions")]
     extensions: Vec<&'static str>,
 
+    /// 実行する最適化数
+    #[getset(get = "pub", get_mut = "pub")]
+    #[serde(default = "default_optimization_num")]
+    optimization_num: u8,
+
+    /// JPEG 品質
     #[getset(get = "pub", get_mut = "pub")]
     jpeg_quality: u8,
 
+    /// PNG 最適化プリセット
     #[getset(get = "pub", get_mut = "pub")]
     png_preset: PngPreset,
+}
+
+/// 最適化数のデフォルト値
+/// * `return` - 最適化数のデフォルト値
+fn default_optimization_num() -> u8 {
+    DEFAULT_OPTIMIZATION_NUM
 }
 
 /// 読み込める拡張子
@@ -36,6 +56,7 @@ impl App {
     /// * `return` - App のインスタンス
     pub fn new() -> Self {
         Self {
+            optimization_num: default_optimization_num(),
             extensions: default_extensions(),
             jpeg_quality: DEFAULT_JPEG_QUALITY,
             png_preset: DEFAULT_PNG_PRESET,

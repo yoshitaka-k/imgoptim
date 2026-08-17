@@ -88,7 +88,7 @@ impl eframe::App for Rendar {
         // 最適化結果を反映
         self.optimize_job.result(&mut self.files);
 
-        // 前フレームで予約された最適化を実行
+        // 結果を反映後、まだ未処理があれば最適化を実行
         self.optimize();
 
         // スタイルを設定
@@ -115,6 +115,9 @@ impl eframe::App for Rendar {
                 &mut self.files,
             );
         });
+
+        // ファイル追加時に最適化を実行
+        self.optimize();
 
         // パネルの背景色を取得
         let panel_fill_color = assets::panel_fill_color(ui);

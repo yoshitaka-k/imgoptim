@@ -11,7 +11,8 @@ pub(crate) fn bottom_layout(
     files: &mut open_files::OpenFiles,
     optimize_job: &mut optimize::OptimizeJob,
 ) {
-    // 最適化中、最適化済み、エラーのファイル数
+    // 未処理、最適化中、最適化済み、エラーのファイル数
+    let standby_len = files.standby_len();
     let optimizing_len = files.optimizing_len();
     let optimized_len = files.optimized_len();
     let error_len = files.error_len();
@@ -47,16 +48,25 @@ pub(crate) fn bottom_layout(
             ui.add_space(2.0);
         }
 
+        // 未処理
+        ui.spacing_mut().item_spacing.x = 0.0;
+        ui.label(text_color(&format!("{}", standby_len), circle_color, None));
+        ui.spacing_mut().item_spacing.x = spacing;
+        ui.label(" standby,");
+
+        // 最適化中
         ui.spacing_mut().item_spacing.x = 0.0;
         ui.label(text_color(&format!("{}", optimizing_len), optimizing_color, None));
         ui.spacing_mut().item_spacing.x = spacing;
         ui.label(" optimizing,");
 
+        // 最適化済み
         ui.spacing_mut().item_spacing.x = 0.0;
         ui.label(text_color(&format!("{}", optimized_len), optimized_color, None));
         ui.spacing_mut().item_spacing.x = spacing;
         ui.label(" optimized,");
 
+        // エラー
         ui.spacing_mut().item_spacing.x = 0.0;
         ui.label(text_color(&format!("{}", error_len), error_color, None));
         ui.spacing_mut().item_spacing.x = spacing;
@@ -64,6 +74,7 @@ pub(crate) fn bottom_layout(
 
         ui.separator();
 
+        // 平均保存率
         ui.label("Avg saved rate:");
         ui.spacing_mut().item_spacing.x = 0.0;
         ui.label(text_color(&format!("{:+.2}%", files.total_saved_rate()), optimized_color, None));

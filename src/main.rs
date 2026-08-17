@@ -11,9 +11,9 @@ const APP_NAME: &str = "Img Optim";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// ウィンドウのサイズ
-const WINDOW_WIDTH: f32 = 540.0;
+const WINDOW_WIDTH: f32 = 580.0;
 const WINDOW_HEIGHT: f32 = 200.0;
-const MAX_WINDOW_WIDTH: f32 = 640.0;
+const MAX_WINDOW_WIDTH: f32 = 800.0;
 const MAX_WINDOW_HEIGHT: f32 = 1024.0;
 
 fn main() -> eframe::Result {

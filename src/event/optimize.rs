@@ -43,18 +43,24 @@ impl OptimizeJob {
     /// * `files` - ファイルリスト
     pub fn run(&self, app: &app::App, files: &mut open_files::OpenFiles) {
         // UI 側一覧にも Optimizing を立ててから clone する
-        files.mark_pending_as_optimizing();
+        files.mark_pending_as_optimizing(app);
 
         // 最適化を開始
         self.start_running();
 
         // クローンしておく
         let app = app.clone();
-        let mut files = files.paths().clone();
         let tx = self.result_tx.clone();
         let ctx = self.ctx.clone();
         let running = Arc::clone(&self.running);
         let canceled = Arc::clone(&self.canceled);
+
+        // 最適化中のファイルを取得
+        let mut files: Vec<_> = files.paths()
+            .iter()
+            .filter(|file| *file.status() == OptimizeStatus::Optimizing)
+            .cloned()
+            .collect();
 
         // 最適化を実行するスレッドを作成
         std::thread::spawn(move || {

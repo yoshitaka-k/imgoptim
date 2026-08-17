@@ -69,6 +69,9 @@ pub(crate) fn file_list(
             Sense::click(),
         );
 
+        // 丸アイコンの色
+        let circle_color = assets::circle_color(ui);
+
         // 最適化中アイコンの色
         let optimizing_color = assets::optimizing_color(ui);
         // 最適化済みアイコンの色
@@ -107,12 +110,13 @@ pub(crate) fn file_list(
             // 最適化ステータスに応じて表示
             match path.status() {
                 OptimizeStatus::Standby => {
+                    ui.add(egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color));
+                    ui.add_space(2.0);
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));
                 }
                 OptimizeStatus::Optimizing => {
                     ui.add(egui::Image::new(svg::HOURGLASS_BOTTOM).max_height(constants::HOURGLASS_ICON_SIZE).tint(optimizing_color));
-                    // ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color));
                     ui.add_space(4.0);
                     ui.label(path.file_name());
                     ui.label(format!("({}KB)", size));

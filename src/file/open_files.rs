@@ -2,6 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 use getset::{Getters, Setters};
 
+use crate::app::App;
 use crate::file::image_file;
 use crate::file::optimize_status::OptimizeStatus;
 
@@ -53,7 +54,7 @@ impl OpenFiles {
 
     /// 未処理のファイルの数を取得
     /// * `return` - 未処理のファイルの数
-    pub fn pending_len(&self) -> usize {
+    pub fn standby_len(&self) -> usize {
         self.paths.iter().filter(|p| *p.status() == OptimizeStatus::Standby).count()
     }
 
@@ -127,11 +128,22 @@ impl OpenFiles {
     }
 
     /// 未処理ファイルを最適化中ステータスへ変更
-    pub fn mark_pending_as_optimizing(&mut self) {
+    /// * `app` - アプリケーション
+    pub fn mark_pending_as_optimizing(&mut self, app: &App) {
+        let mut cnt = 0;
         for file in &mut self.paths {
-            if *file.status() == OptimizeStatus::Standby {
-                file.set_status(OptimizeStatus::Optimizing);
+            // 最適化中でなければスキップ
+            if *file.status() != OptimizeStatus::Standby {
+                continue;
             }
+
+            // 最適化数を超えていればスキップ
+            if cnt >= *app.optimization_num() {
+                break;
+            }
+
+            file.set_status(OptimizeStatus::Optimizing);
+            cnt += 1;
         }
     }
 

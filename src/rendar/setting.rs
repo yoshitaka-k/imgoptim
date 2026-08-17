@@ -6,7 +6,7 @@ const WINDOW_TITLE: &str = "Img Optim Settings";
 
 // ウィンドウのサイズ
 const WINDOW_WIDTH: f32 = 480.0;
-const WINDOW_HEIGHT: f32 = 160.0;
+const WINDOW_HEIGHT: f32 = 180.0;
 
 // JPEG の品質の最小値と最大値
 const JPEG_QUALITY_MIN: u8 = 50;
@@ -43,6 +43,22 @@ pub(crate) fn setting_window(
         egui::ViewportId::from_hash_of("setting_window"),
         options, |ctx, _class| {
             egui::CentralPanel::default().show(ctx, |ui| {
+                ui.label("Optimization Settings");
+
+                ui.separator();
+
+                // 並行処理数
+                ui.horizontal(|ui| {
+                    ui.add_space(LEFT_SPACE);
+                    ui.label("Concurrent files:");
+                    ui.scope(|ui| {
+                        ui.spacing_mut().slider_width = 282.0;
+                        ui.add(egui::Slider::new(app.optimization_num_mut(), 1..=6));
+                    });
+                });
+
+                ui.separator();
+
                 ui.label("Quality Settings");
 
                 ui.separator();
