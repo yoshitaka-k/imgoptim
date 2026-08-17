@@ -1,5 +1,7 @@
 use crate::app;
 use crate::optim::options::PngPreset;
+use crate::rendar::assets;
+use crate::rendar::assets::{constants, svg};
 
 /// ウィンドウのタイトル
 const WINDOW_TITLE: &str = "Img Optim Settings";
@@ -43,7 +45,18 @@ pub(crate) fn setting_window(
         egui::ViewportId::from_hash_of("setting_window"),
         options, |ctx, _class| {
             egui::CentralPanel::default().show(ctx, |ui| {
-                ui.label("Optimization Settings");
+                // デフォルトのスペースの幅を避けておく
+                let spacing = ui.spacing().item_spacing.x;
+
+                // ボタンの色を設定
+                let button_color = assets::button_icon_color(ui);
+
+                ui.horizontal(|ui| {
+                    ui.spacing_mut().item_spacing.x = 4.0;
+                    ui.add(egui::Image::new(svg::SETTINGS).max_height(constants::SETTINGS_ICON_SIZE).tint(button_color));
+                    ui.spacing_mut().item_spacing.x = spacing;
+                    ui.label("Optimization Settings");
+                });
 
                 ui.separator();
 
@@ -59,7 +72,12 @@ pub(crate) fn setting_window(
 
                 ui.separator();
 
-                ui.label("Quality Settings");
+                ui.horizontal(|ui| {
+                    ui.spacing_mut().item_spacing.x = 4.0;
+                    ui.add(egui::Image::new(svg::SETTINGS).max_height(constants::SETTINGS_ICON_SIZE).tint(button_color));
+                    ui.spacing_mut().item_spacing.x = spacing;
+                    ui.label("Quality Settings");
+                });
 
                 ui.separator();
 

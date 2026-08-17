@@ -1,6 +1,6 @@
 use crate::file::open_files;
 use crate::rendar::assets;
-use crate::rendar::assets::svg;
+use crate::rendar::assets::{constants, svg};
 
 /// 上部ボタンを表示
 /// * `ui` - UI
@@ -13,11 +13,14 @@ pub(crate) fn top_layout(
     settings_window_open: &mut bool,
     settings_window_pos: &mut Option<egui::Pos2>,
 ) {
-    ui.horizontal(|ui| {
-        ui.label("Files Drag & Drop");
+    // ボタンの色を設定
+    let button_color = assets::button_icon_color(ui);
 
-        // ボタンの色を設定
-        let button_color = assets::button_icon_color(ui);
+    ui.horizontal(|ui| {
+        ui.horizontal(|ui| {
+            ui.add(egui::Image::new(svg::UPLOAD_FILE).max_height(constants::UPLOAD_FILE_ICON_SIZE).tint(button_color));
+            ui.label("Files Drag & Drop");
+        });
 
         // 開くボタンとクリアボタンを右寄せ
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {

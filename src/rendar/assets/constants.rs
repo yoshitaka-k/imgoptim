@@ -3,11 +3,19 @@ pub(crate) const HOURGLASS_ICON_SIZE: f32 = 10.0;
 pub(crate) const CHECK_ICON_SIZE: f32 = 14.0;
 pub(crate) const ERROR_ICON_SIZE: f32 = 12.0;
 pub(crate) const CANCEL_ICON_SIZE: f32 = 12.0;
-pub(crate) const SEPARATOR_HEIGHT: f32 = 4.0;
-pub(crate) const SPINNER_SIZE: f32 = 8.0;
-
-// 丸アイコンのサイズ
 pub(crate) const CIRCLE_ICON_SIZE: f32 = 12.0;
+
+// アップロードファイルアイコンのサイズ
+pub(crate) const UPLOAD_FILE_ICON_SIZE: f32 = 14.0;
+
+// 設定アイコンのサイズ
+pub(crate) const SETTINGS_ICON_SIZE: f32 = 14.0;
+
+// セパレータの高さ
+pub(crate) const SEPARATOR_HEIGHT: f32 = 4.0;
+
+// スピナーのサイズ
+pub(crate) const SPINNER_SIZE: f32 = 8.0;
 
 // パネルの背景色
 pub(crate) const DARK_MODE_PANEL_COLOR: egui::Color32 = egui::Color32::from_rgb(35, 35, 35);
