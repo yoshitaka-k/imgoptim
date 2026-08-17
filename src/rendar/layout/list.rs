@@ -42,6 +42,17 @@ pub(crate) fn file_list(
     let row_spacing = ui.spacing().item_spacing.y;
     // let col_spacing = ui.spacing().item_spacing.x;
 
+    // 丸アイコンの色
+    let circle_color = assets::circle_color(ui);
+    // 最適化中アイコンの色
+    let optimizing_color = assets::optimizing_color(ui);
+    // 最適化済みアイコンの色
+    let optimized_color = assets::optimized_color(ui);
+    // エラーアイコンの色
+    let error_color = assets::error_color(ui);
+    // キャンセルアイコンの色
+    let canceled_color = assets::canceled_color(ui);
+
     // 削除キーが押されたら処理予約
     if ui.input(|input| input.key_released(egui::Key::Backspace)) {
         let path = files.selected_path().unwrap();
@@ -69,18 +80,6 @@ pub(crate) fn file_list(
             egui::vec2(width, row_height),
             Sense::click(),
         );
-
-        // 丸アイコンの色
-        let circle_color = assets::circle_color(ui);
-
-        // 最適化中アイコンの色
-        let optimizing_color = assets::optimizing_color(ui);
-        // 最適化済みアイコンの色
-        let optimized_color = assets::optimized_color(ui);
-        // エラーアイコンの色
-        let error_color = assets::error_color(ui);
-        // キャンセルアイコンの色
-        let canceled_color = assets::canceled_color(ui);
 
         // 交互に背景色
         if index % 2 == 0 {
