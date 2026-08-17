@@ -22,7 +22,7 @@ fn quicklook_command(path: &PathBuf) -> Result<(), std::io::Error> {
 /// * `path` - ファイルのパス
 /// * `return` - エラーが発生したかどうか
 #[cfg(target_os = "windows")]
-fn quicklook_command(path: &PathBuf) -> Result<(), std::io::Error> {
+fn quicklook_command(_path: &PathBuf) -> Result<(), std::io::Error> {
     Ok(())
 }
 
@@ -30,6 +30,6 @@ fn quicklook_command(path: &PathBuf) -> Result<(), std::io::Error> {
 /// * `path` - ファイルのパス
 /// * `return` - エラーが発生したかどうか
 #[cfg(target_os = "linux")]
-fn quicklook_command(path: &PathBuf) -> Result<(), std::io::Error> {
+fn quicklook_command(_path: &PathBuf) -> Result<(), std::io::Error> {
     Ok(())
 }
