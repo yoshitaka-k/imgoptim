@@ -104,7 +104,9 @@ jobs:
               ls -lh "dist/${name}.zip"
             done
         test "$(ls dist/*.zip | wc -l)" -ge 1
-        unzip -t dist/*.zip
+        for zip in dist/*.zip; do
+          unzip -t "$zip"
+        done
 
     - name: Create draft release
       uses: softprops/action-gh-release@v2
