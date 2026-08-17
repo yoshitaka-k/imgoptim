@@ -1,3 +1,4 @@
+use crate::duration_format;
 use crate::file::open_files;
 use crate::optimize::OptimizeJob;
 use crate::rendar::assets;
@@ -36,20 +37,24 @@ pub(crate) fn bottom_layout(
         if optimizing_len > 0 {
             // 最適化中
             ui.add_space(3.0);
-            ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color));
+            ui.add(egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color))
+                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
             ui.add_space(3.0);
         } else if optimizing_len == 0 && error_len > 0 {
             // エラー
             ui.add_space(1.0);
-            ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color));
+            ui.add(egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color))
+                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
             ui.add_space(1.0);
         } else if optimizing_len == 0 && optimized_len > 0 {
             // 最適化済み
-            ui.add(egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color));
+            ui.add(egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color))
+                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
         } else {
             // 初期状態（最適化中も最適化済みもエラーもない）
             ui.add_space(1.0);
-            ui.add(egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color));
+            ui.add(egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color))
+                .on_hover_text(format!("Total optimization duration: {}", duration_format!(files.total_duration())));
             ui.add_space(1.0);
         }
 

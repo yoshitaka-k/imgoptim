@@ -1,7 +1,7 @@
 use std::{ops::Range, path::PathBuf};
 use egui::{Color32, Sense};
 
-use crate::filesize_format;
+use crate::{filesize_format, duration_format};
 use crate::file::{open_files, optimize_status::OptimizeStatus};
 use crate::event::{click, key_up};
 use crate::optimize::OptimizeJob;
@@ -82,6 +82,9 @@ pub(crate) fn file_list(
         let size = filesize_format!(*path.size());
         let new_size = filesize_format!(*path.new_size());
 
+        // 最適化時間をフォーマット
+        let duration = duration_format!(*path.duration());
+
         // 高さがズレると赤くチラつくので予めサイズ確保
         // 行のクリックイベントを受け取るために Sense::click() を指定
         let (row_rect, response) = ui.allocate_exact_size(
@@ -138,6 +141,8 @@ pub(crate) fn file_list(
                     ui.label(format!("({} -> {})", size, new_size));
                     ui.separator();
                     ui.label(format!("{:+.2}%", path.percent()));
+                    ui.separator();
+                    ui.label(format!("{}", duration));
                 }
                 OptimizeStatus::Canceled => {
                     ui.add(egui::Image::new(svg::CANCEL).max_height(constants::CANCEL_ICON_SIZE).tint(canceled_color));

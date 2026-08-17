@@ -47,6 +47,10 @@ pub struct ImageFile {
     /// ファイルの最適化での節約率
     #[getset(get = "pub")]
     percent: f32,
+
+    /// 最適化時間（ミリ秒）
+    #[getset(get = "pub", set = "pub")]
+    duration: u64,
 }
 
 impl ImageFile {
@@ -69,6 +73,7 @@ impl ImageFile {
             size,
             new_size: 0,
             percent: 0.00f32,
+            duration: 0,
         }
     }
 
@@ -139,6 +144,9 @@ impl ImageFile {
             return Ok(());
         }
 
+        // 最適化開始時間を取得
+        let start_time = std::time::Instant::now();
+
         // 最適化トークンを作成
         let token = OptimToken {
             id: self.id,
@@ -170,8 +178,15 @@ impl ImageFile {
             )) as Box<dyn std::error::Error>),
         };
 
+        // 最適化結果を処理
         match result {
             Ok(()) => {
+                // 最適化終了時間を取得
+                let end_time = std::time::Instant::now();
+                // 最適化時間を計算
+                let duration = end_time.duration_since(start_time).as_millis();
+                self.duration = duration as u64;
+
                 // 最適化中止された場合は処理を中断
                 if token.is_canceled() & !matches!(self.status, OptimizeStatus::Optimized) {
                     self.status = OptimizeStatus::Canceled;

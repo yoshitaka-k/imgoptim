@@ -15,6 +15,7 @@ struct FileInfo {
     error_len: u32,
     total_size: u64,
     total_new_size: u64,
+    total_duration: u64,
 }
 
 impl FileInfo {
@@ -27,6 +28,7 @@ impl FileInfo {
             error_len: 0,
             total_size: 0,
             total_new_size: 0,
+            total_duration: 0,
         }
     }
 }
@@ -145,19 +147,22 @@ impl OpenFiles {
     }
 
     /// ファイルのサイズを計算
-    pub fn calc_size(&mut self) {
+    pub fn calc_total_info(&mut self) {
         let mut total_size = 0;
         let mut total_new_size = 0;
+        let mut total_duration = 0;
 
         for file in &self.paths {
             if matches!(file.status(), OptimizeStatus::Optimized) {
                 total_size += file.size();
                 total_new_size += file.new_size();
+                total_duration += file.duration();
             }
         }
 
         self.file_info.total_size = total_size;
         self.file_info.total_new_size = total_new_size;
+        self.file_info.total_duration = total_duration;
     }
 
     /// ファイルの総サイズを取得
@@ -172,10 +177,16 @@ impl OpenFiles {
         self.file_info.total_new_size
     }
 
+    /// ファイルの総最適化時間を取得
+    /// * `return` - ファイルの総最適化時間
+    pub fn total_duration(&self) -> u64 {
+        self.file_info.total_duration
+    }
+
     /// ファイルの総節約率を取得
     /// * `return` - ファイルの総節約率
     pub fn total_saved_rate(&mut self) -> f32 {
-        self.calc_size();
+        self.calc_total_info();
 
         if self.total_new_size() == 0 {
             return 0.00;

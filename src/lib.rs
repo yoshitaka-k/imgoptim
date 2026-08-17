@@ -26,3 +26,19 @@ macro_rules! filesize_format {
         }
     };
 }
+
+/// 最適化時間をフォーマットするマクロ
+#[macro_export]
+macro_rules! duration_format {
+    ($duration:expr) => {
+        if $duration < 1000 {
+            format!("{:.2} ms", $duration as f64)
+        } else if $duration < 60 * 1000 {
+            format!("{:.2} s", $duration as f64 / 1000.0)
+        } else if $duration < 60 * 60 * 1000 {
+            format!("{:.2} m", $duration as f64 / 60.0 / 1000.0)
+        } else {
+            format!("{:.2} h", $duration as f64 / 60.0 / 60.0 / 1000.0)
+        }
+    };
+}
