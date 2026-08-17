@@ -185,11 +185,11 @@ impl OpenFiles {
         false
     }
 
-    /// ファイルが最適化中かどうかを確認
+    /// ファイルが待機中か最適化中かどうかを確認
     /// * `path` - ファイルのパス
-    /// * `return` - 最適化中かどうか
-    fn is_optimizing(&self, path: &PathBuf) -> bool {
-        self.paths.iter().any(|f| f.path() == path && *f.status() == OptimizeStatus::Optimizing)
+    /// * `return` - 待機中か最適化中かどうか
+    fn is_standby_or_optimizing(&self, path: &PathBuf) -> bool {
+        self.paths.iter().any(|f| f.path() == path && matches!(f.status(), OptimizeStatus::Standby | OptimizeStatus::Optimizing))
     }
 
     /// ファイルを検索
@@ -199,11 +199,11 @@ impl OpenFiles {
         let metadata = path.metadata().expect("metadata call failed");
         if metadata.is_file() {
             if self.is_allowed_extension(&path) {
-                // 同じパスが最適化中なら、新規行をエラーで追加
-                if self.is_optimizing(&path) {
+                // 同じパスが待機中か最適化中なら、新規行をエラーで追加
+                if self.is_standby_or_optimizing(&path) {
                     let mut image_file = image_file::ImageFile::new(path);
                     image_file.set_status(OptimizeStatus::Error(
-                        "Already optimizing".to_string(),
+                        "Already in progress".to_string(),
                     ));
                     self.paths.push(image_file);
                     return;
