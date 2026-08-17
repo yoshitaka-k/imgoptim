@@ -59,13 +59,13 @@ impl Rendar {
 
     /// ファイルを最適化
     fn optimize(&mut self) {
-        // すでに別スレッドで最適化中なら、完了後に再開する
-        if self.files.has_optimizing() {
+        // 未処理がなければ何もしない
+        if !self.files.has_standby() {
             return;
         }
 
-        // 未処理がなければ何もしない
-        if !self.files.has_standby() {
+        // 前の最適化のスレッドが生きていれば待つ
+        if !self.optimize_job.is_running_count_zero() {
             return;
         }
 

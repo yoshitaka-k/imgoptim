@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use std::sync::{mpsc, Mutex};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::collections::HashSet;
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
@@ -19,6 +19,9 @@ pub struct OptimizeJob {
     /// 最適化実行フラグ
     running: Arc<AtomicBool>,
 
+    /// 最適化実行中のカウント
+    running_count: Arc<AtomicUsize>,
+
     /// キャンセルフラグ
     canceled: Arc<Mutex<HashSet<u64>>>,
 }
@@ -34,6 +37,7 @@ impl OptimizeJob {
             result_tx,
             result_rx,
             running: Arc::new(AtomicBool::new(true)),
+            running_count: Arc::new(AtomicUsize::new(0)),
             canceled: Arc::new(Mutex::new(HashSet::new())),
         }
     }
@@ -62,6 +66,12 @@ impl OptimizeJob {
             .cloned()
             .collect();
 
+        // 開始時にカウントを増やす（スレッド生存中は 1 以上）
+        self.running_count.fetch_add(1, Ordering::Relaxed);
+
+        // カウントをクローンしておく
+        let running_count = Arc::clone(&self.running_count);
+
         // 最適化を実行するスレッドを作成
         std::thread::spawn(move || {
             // 最適化を並列実行
@@ -84,6 +94,12 @@ impl OptimizeJob {
                 // 再描画を要求
                 ctx.request_repaint();
             });
+
+            // この最適化のスレッドが終わってからカウントを減らす
+            running_count.fetch_sub(1, Ordering::Relaxed);
+
+            // 再描画を要求
+            ctx.request_repaint();
         });
     }
 
@@ -105,6 +121,12 @@ impl OptimizeJob {
     /// 最適化をキャンセル
     pub fn stop_running(&self) {
         self.running.store(false, Ordering::Relaxed);
+    }
+
+    /// 最適化実行中かどうか
+    /// * `return` - 最適化実行中かどうか
+    pub fn is_running_count_zero(&self) -> bool {
+        self.running_count.load(Ordering::Relaxed) == 0
     }
 
     /// 最適化をキャンセル

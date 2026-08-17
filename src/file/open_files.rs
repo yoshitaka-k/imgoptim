@@ -164,10 +164,19 @@ impl OpenFiles {
     pub fn apply_result(&mut self, result: image_file::ImageFile) {
         // 既存のファイル一覧から ID が一致するファイルを検索
         if let Some(file) = self.paths.iter_mut().find(|f| f.id() == result.id()) {
-            // 最適化済みでなければ反映
-            if !matches!(file.status(), OptimizeStatus::Optimized) {
-                *file = result;
+            // 元のファイルが最適化済みであればスキップ
+            if matches!(file.status(), OptimizeStatus::Optimized) {
+                return;
             }
+
+            // 元のファイルがキャンセルされていて、最適化済みであれば反映
+            if matches!(file.status(), OptimizeStatus::Canceled) && matches!(result.status(), OptimizeStatus::Optimized) {
+                *file = result;
+                return;
+            }
+
+            // それ以外は反映
+            *file = result;
         }
     }
 
