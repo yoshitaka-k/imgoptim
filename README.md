@@ -21,7 +21,7 @@ Rust の勉強がてら、自分用に Image Optimization ってことで、Keig
 フォルダや画像をドロップすると、対応形式をその場で最適化します。元ファイルは上書きされます。
 
 <p align="center">
-  <img src="assets/readme/keiga-preview.png" alt="Keiga screenshot">
+  <img src="assets/readme/keiga-preview.png" alt="Keiga screenshot" width="640">
 </p>
 
 ## Supported formats
