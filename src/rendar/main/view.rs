@@ -2,7 +2,7 @@ use crate::app;
 use crate::file::open_files;
 use crate::rendar::assets::{self, fonts, svg};
 use crate::rendar::main::{top, list, bottom};
-use crate::rendar::setting as setting_window;
+use crate::rendar::setting::view as setting_window;
 use crate::event::{open, drop};
 use crate::optimize::OptimizeJob;
 
