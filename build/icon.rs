@@ -5,6 +5,11 @@ use std::{
 };
 
 /// アプリアイコンを生成する
+///
+/// `assets/icon.png` は macOS のアイコングリッドに合わせ、
+/// 1024px キャンバスの中央 824px に収めてある（四方 100px の透明余白）。
+/// キャンバスいっぱいに描くと Launchpad / Dock で他アプリより大きく見える。
+///
 /// * `manifest_path` - CARGO_MANIFEST_DIR
 /// * `out_dir` - OUT_DIR
 pub(crate) fn generate_icons(manifest_path: &Path, out_dir: &str) {
