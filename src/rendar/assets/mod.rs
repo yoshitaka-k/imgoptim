@@ -8,26 +8,11 @@ pub(crate) const APP_ICON: egui::ImageSource<'static> = svg::bytes_source(
     include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/icon.png")),
 );
 
-/// パネルの背景色
-/// * `ui` - UI
-/// * `return` - パネルの背景色
-pub(crate) fn panel_fill_color(ui: &egui::Ui) -> egui::Color32 {
-    if ui.ctx().global_style().visuals.dark_mode {
-        constants::DARK_MODE_PANEL_COLOR
-    } else {
-        constants::LIGHT_MODE_PANEL_COLOR
-    }
-}
-
-/// アイコンの色
+/// ラベルと同じ色を返す
 /// * `ui` - UI
 /// * `return` - アイコンの色
 pub(crate) fn icon_color(ui: &egui::Ui) -> egui::Color32 {
-    if ui.ctx().global_style().visuals.dark_mode {
-        constants::DARK_MODE_ICON_COLOR
-    } else {
-        constants::LIGHT_MODE_ICON_COLOR
-    }
+    ui.visuals().text_color()
 }
 
 /// ボタンアイコンの色
@@ -35,9 +20,9 @@ pub(crate) fn icon_color(ui: &egui::Ui) -> egui::Color32 {
 /// * `return` - ボタンアイコンの色
 pub(crate) fn button_icon_color(ui: &egui::Ui) -> egui::Color32 {
     if ui.ctx().global_style().visuals.dark_mode {
-        constants::DARK_MODE_BUTTON_COLOR
+        constants::DARK_MODE_BUTTON_ICON_COLOR
     } else {
-        constants::LIGHT_MODE_BUTTON_COLOR
+        constants::LIGHT_MODE_BUTTON_ICON_COLOR
     }
 }
 

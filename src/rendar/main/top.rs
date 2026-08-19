@@ -26,7 +26,7 @@ pub(crate) fn view(
         // 開くボタンとクリアボタンを右寄せ
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             // 設定ボタン
-            let settings_button = egui::Image::new(svg::SETTINGS).max_height(18.0).tint(button_color);
+            let settings_button = egui::Image::new(svg::SETTINGS).max_height(constants::BUTTON_SETTINGS_ICON_SIZE).tint(button_color);
             if ui.button(settings_button).on_hover_text("Settings").clicked() {
                 // 設定ダイアログを開く
                 *settings_window_open = true;
@@ -40,7 +40,7 @@ pub(crate) fn view(
             }
 
             // 開くボタン
-            let open_button = egui::Image::new(svg::FOLDER_OPEN).max_height(18.0).tint(button_color);
+            let open_button = egui::Image::new(svg::FOLDER_OPEN).max_height(constants::BUTTON_OPEN_ICON_SIZE).tint(button_color);
             if ui.button(open_button).on_hover_text("Files Open").clicked() {
                 // ファイルダイアログを開くタイミングをずらす
                 *open_dialog = true;

@@ -54,9 +54,19 @@ pub(crate) fn view(
             ui.horizontal(|ui| {
                 ui.add(egui::Image::new(svg::SETTINGS).max_height(assets_const::SETTINGS_ICON_SIZE).tint(icon_color));
 
+                // タブの選択時の背景色を保存
+                let selection_bg_fill = ui.style_mut().visuals.selection.bg_fill;
+
+                // タブの選択時の背景色を設定
+                ui.style_mut().visuals.selection.bg_fill = setting::tab_selected_color(ui);
+
+                // タブを表示
                 ui.selectable_value(setting_tab, SettingTab::Concurrent, SettingTab::Concurrent.to_string());
                 ui.selectable_value(setting_tab, SettingTab::Quality, SettingTab::Quality.to_string());
                 ui.selectable_value(setting_tab, SettingTab::About, SettingTab::About.to_string());
+
+                // タブの選択時の背景色をリセット
+                ui.style_mut().visuals.selection.bg_fill = selection_bg_fill;
             });
         });
 

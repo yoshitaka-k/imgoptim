@@ -13,6 +13,10 @@ pub(crate) const WINDOW_TITLE: &str = "Keiga Settings";
 pub(crate) const WINDOW_WIDTH: f32 = 480.0;
 pub(crate) const WINDOW_HEIGHT: f32 = 240.0;
 
+// タブの選択時の背景色
+pub(crate) const DARK_TAB_SELECTED_COLOR: egui::Color32 = egui::Color32::from_rgb(20, 120, 130);
+pub(crate) const LIGHT_TAB_SELECTED_COLOR: egui::Color32 = egui::Color32::from_rgb(130, 220, 210);
+
 /// スライダーの幅
 pub(crate) const CONCURRENT_SLIDER_WIDTH: f32 = 284.0;
 pub(crate) const QUALITY_SLIDER_WIDTH: f32 = 330.0;
@@ -27,3 +31,14 @@ pub(crate) const PNG_OPTIMIZATION_NUM_MAX: u8 = 3;
 // JPEG の品質の最小値と最大値
 pub(crate) const JPEG_QUALITY_MIN: u8 = 50;
 pub(crate) const JPEG_QUALITY_MAX: u8 = 99;
+
+/// タブの選択時の背景色を取得
+/// * `ui` - UI
+/// * `return` - タブの選択時の背景色
+pub(crate) fn tab_selected_color(ui: &egui::Ui) -> egui::Color32 {
+    if ui.ctx().global_style().visuals.dark_mode {
+        DARK_TAB_SELECTED_COLOR
+    } else {
+        LIGHT_TAB_SELECTED_COLOR
+    }
+}

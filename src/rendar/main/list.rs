@@ -1,5 +1,5 @@
 use std::{ops::Range, path::PathBuf};
-use egui::{Color32, Sense};
+use egui::Sense;
 
 use crate::{filesize_format, duration_format};
 use crate::file::{open_files, optimize_status::OptimizeStatus};
@@ -7,6 +7,7 @@ use crate::event::{click, key_up};
 use crate::optimize::OptimizeJob;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
+use crate::rendar::main;
 
 /// ファイル一覧のアクション
 enum FileListAction {
@@ -20,7 +21,7 @@ enum FileListAction {
 /// * `ui` - UI
 /// * `return` - 行高
 pub(crate) fn row_height(ui: &egui::Ui) -> f32 {
-    ui.text_style_height(&egui::TextStyle::Body).max(constants::CHECK_ICON_SIZE) + constants::SEPARATOR_HEIGHT
+    ui.text_style_height(&egui::TextStyle::Body).max(constants::CHECK_ICON_SIZE) + main::SEPARATOR_HEIGHT
 }
 
 /// アイコンとファイル名を表示
@@ -114,20 +115,12 @@ pub(crate) fn view(
 
         // 交互に背景色
         if index % 2 == 0 {
-            ui.painter().rect_filled(row_rect, 1.0, if ui.ctx().global_style().visuals.dark_mode {
-                Color32::from_rgba_unmultiplied(255, 255, 255, 5)
-            } else {
-                Color32::from_rgba_unmultiplied(0, 0, 0, 10)
-            });
+            ui.painter().rect_filled(row_rect, 1.0, main::alternate_background_color(ui));
         }
 
         // 選択されている場合は背景を表示
         if selected_id == Some(*path.id()) {
-            ui.painter().rect_filled(row_rect, 1.0, if ui.ctx().global_style().visuals.dark_mode {
-                Color32::from_rgba_unmultiplied(255, 255, 255, 50)
-            } else {
-                Color32::from_rgba_unmultiplied(0, 0, 0, 50)
-            });
+            ui.painter().rect_filled(row_rect, 1.0, main::selected_background_color(ui));
         }
 
         // コンテンツを表示
