@@ -6,9 +6,8 @@ use std::collections::HashSet;
 use getset::{Getters, Setters};
 
 use crate::app::App;
-use crate::optimize::{Jpeg, Png, OptimToken};
+use crate::optimize::{Jpeg, Png, OptimToken, OptimizeStatus};
 use crate::file::extension;
-use crate::file::optimize_status::OptimizeStatus;
 
 /// ImageFile の一意な ID を発行するカウンタ
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);

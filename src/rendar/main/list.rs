@@ -2,7 +2,8 @@ use std::{ops::Range, path::PathBuf};
 use egui::Sense;
 
 use crate::{filesize_format, duration_format};
-use crate::file::{open_files, optimize_status::OptimizeStatus};
+use crate::file::open_files;
+use crate::optimize::OptimizeStatus;
 use crate::event::{click, key_up};
 use crate::optimize::OptimizeJob;
 use crate::rendar::assets;

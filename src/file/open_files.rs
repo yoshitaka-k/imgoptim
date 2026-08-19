@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use getset::{Getters, Setters};
 
 use crate::file::image_file;
-use crate::file::optimize_status::OptimizeStatus;
+use crate::optimize::OptimizeStatus;
 
 /// ファイル情報を管理する構造体
 #[derive(Clone, PartialEq)]
