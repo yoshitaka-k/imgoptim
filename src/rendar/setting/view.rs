@@ -14,6 +14,8 @@ pub(crate) fn view(
     settings_window_open: &mut bool,
     window_pos: &mut Option<egui::Pos2>,
 ) {
+    let window_id = egui::ViewportId::from_hash_of(setting::SETTING_WINDOW_ID);
+
     // 設定ウィンドウのオプションを設定
     let mut options = egui::ViewportBuilder::default()
         .with_title(setting::WINDOW_TITLE)
@@ -22,14 +24,18 @@ pub(crate) fn view(
         .with_resizable(false);
 
     // ウィンドウの表示位置を指定
-    // take()で、取り出して None にする
+    // take()で、取り出して None にする（ボタン押下時だけ位置更新と前面化）
     if let Some(pos) = window_pos.take() {
         options = options.with_position(pos);
+
+        // ウィンドウの位置を更新して前面に出す
+        ctx.send_viewport_cmd_to(window_id, egui::ViewportCommand::OuterPosition(pos));
+        ctx.send_viewport_cmd_to(window_id, egui::ViewportCommand::Focus);
     }
 
     // 設定ウィンドウを表示
     ctx.show_viewport_immediate(
-        egui::ViewportId::from_hash_of("setting_window"),
+        window_id,
         options, |ctx, _class| {
             egui::CentralPanel::default().show(ctx, |ui| {
                 // デフォルトのスペースの幅を避けておく

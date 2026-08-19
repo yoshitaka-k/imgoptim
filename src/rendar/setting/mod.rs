@@ -2,6 +2,9 @@ pub(crate) mod view;
 pub(crate) mod concurrent;
 pub(crate) mod quality;
 
+// ウィンドウのID
+pub(crate) const SETTING_WINDOW_ID: &str = "setting_window";
+
 /// ウィンドウのタイトル
 pub(crate) const WINDOW_TITLE: &str = "Keiga Settings";
 
