@@ -1,34 +1,14 @@
 use crate::app;
-use crate::optimize::options::PngPreset;
 use crate::rendar::assets;
-use crate::rendar::assets::{constants, svg};
-
-/// ウィンドウのタイトル
-const WINDOW_TITLE: &str = "Keiga Settings";
-
-// ウィンドウのサイズ
-const WINDOW_WIDTH: f32 = 480.0;
-const WINDOW_HEIGHT: f32 = 240.0;
-
-// 並行処理数の最小値と最大値
-const OPTIMIZATION_NUM_MIN: u8 = 3;
-const OPTIMIZATION_NUM_MAX: u8 = 8;
-
-const PNG_OPTIMIZATION_NUM_MIN: u8 = 1;
-const PNG_OPTIMIZATION_NUM_MAX: u8 = 3;
-
-// JPEG の品質の最小値と最大値
-const JPEG_QUALITY_MIN: u8 = 50;
-const JPEG_QUALITY_MAX: u8 = 99;
-
-// 左のスペース
-const LEFT_SPACE: f32 = 15.0;
+use crate::rendar::assets::{constants as assets_const, svg};
+use crate::rendar::setting;
+use crate::rendar::setting::{concurrent, quality};
 
 /// 設定ウィンドウを表示
 /// * `ctx` - コンテキスト
 /// * `settings_window_open` - 設定ウィンドウを開いているかどうか
 /// * `window_pos` - ウィンドウの表示位置
-pub(crate) fn setting_window(
+pub(crate) fn view(
     ctx: &egui::Context,
     app: &mut app::App,
     settings_window_open: &mut bool,
@@ -36,8 +16,8 @@ pub(crate) fn setting_window(
 ) {
     // 設定ウィンドウのオプションを設定
     let mut options = egui::ViewportBuilder::default()
-        .with_title(WINDOW_TITLE)
-        .with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
+        .with_title(setting::WINDOW_TITLE)
+        .with_inner_size([setting::WINDOW_WIDTH, setting::WINDOW_HEIGHT])
         .with_maximize_button(false)
         .with_resizable(false);
 
@@ -60,78 +40,29 @@ pub(crate) fn setting_window(
 
                 ui.horizontal(|ui| {
                     ui.spacing_mut().item_spacing.x = 4.0;
-                    ui.add(egui::Image::new(svg::SETTINGS).max_height(constants::SETTINGS_ICON_SIZE).tint(button_color));
+                    ui.add(egui::Image::new(svg::CYCLE).max_height(assets_const::CYCLE_ICON_SIZE).tint(button_color));
                     ui.spacing_mut().item_spacing.x = spacing;
-                    ui.label("Optimization Settings");
+                    ui.label("Concurrent");
                 });
 
                 ui.separator();
 
-                // 並行処理数
-                ui.horizontal(|ui| {
-                    ui.add_space(LEFT_SPACE);
-                    ui.label("Concurrent All files:");
-                    ui.add_space(10.0);
-                    ui.scope(|ui| {
-                        ui.spacing_mut().slider_width = 254.0;
-                        ui.add(egui::Slider::new(app.optimization_num_mut(), OPTIMIZATION_NUM_MIN..=OPTIMIZATION_NUM_MAX));
-                    });
-                });
-
-                // 並行処理数
-                ui.horizontal(|ui| {
-                    ui.add_space(LEFT_SPACE);
-                    ui.label("Concurrent PNG files:");
-                    ui.scope(|ui| {
-                        ui.spacing_mut().slider_width = 254.0;
-                        ui.add(egui::Slider::new(app.png_optimization_num_mut(), PNG_OPTIMIZATION_NUM_MIN..=PNG_OPTIMIZATION_NUM_MAX));
-                    });
-                });
-
-                ui.horizontal(|ui| {
-                    ui.add_space(LEFT_SPACE * 2.0);
-                    ui.spacing_mut().item_spacing.x = 3.0;
-                    ui.add(egui::Image::new(svg::WARNING).max_height(constants::WARNING_ICON_SIZE).tint(assets::warning_color(ui)));
-                    ui.spacing_mut().item_spacing.x = spacing;
-                    ui.add(egui::Label::new(
-                        egui::RichText::new(format!("PNG is included in All. ({} / {})", app.png_optimization_num(), app.optimization_num())).weak(),
-                    ));
-                });
+                // 並行処理数を表示
+                concurrent::view(ui, app);
 
                 ui.separator();
 
                 ui.horizontal(|ui| {
                     ui.spacing_mut().item_spacing.x = 4.0;
-                    ui.add(egui::Image::new(svg::SETTINGS).max_height(constants::SETTINGS_ICON_SIZE).tint(button_color));
+                    ui.add(egui::Image::new(svg::COMPRESS).max_height(assets_const::COMPRESS_ICON_SIZE).tint(button_color));
                     ui.spacing_mut().item_spacing.x = spacing;
-                    ui.label("Quality Settings");
+                    ui.label("Quality");
                 });
 
                 ui.separator();
 
-                // JPEG のスライダーを表示
-                ui.horizontal(|ui| {
-                    ui.add_space(LEFT_SPACE);
-                    ui.label("JPEG Quality:");
-                    ui.scope(|ui| {
-                        ui.spacing_mut().slider_width = 300.0;
-                        ui.add(egui::Slider::new(app.jpeg_quality_mut(), JPEG_QUALITY_MIN..=JPEG_QUALITY_MAX));
-                    });
-                });
-
-                ui.separator();
-
-                // PNG のプリセットを表示
-                ui.horizontal(|ui| {
-                    ui.add_space(LEFT_SPACE);
-                    ui.label("PNG Preset:");
-                    ui.add_space(8.0);
-                    ui.radio_value(app.png_preset_mut(), PngPreset::Min, PngPreset::Min.to_string());
-                    ui.radio_value(app.png_preset_mut(), PngPreset::Fast, PngPreset::Fast.to_string());
-                    ui.radio_value(app.png_preset_mut(), PngPreset::Default, PngPreset::Default.to_string());
-                    ui.radio_value(app.png_preset_mut(), PngPreset::Best, PngPreset::Best.to_string());
-                    ui.radio_value(app.png_preset_mut(), PngPreset::Max, PngPreset::Max.to_string());
-                });
+                // 品質を表示
+                quality::view(ui, app);
 
                 ui.separator();
             });

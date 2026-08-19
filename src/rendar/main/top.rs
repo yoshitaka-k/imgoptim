@@ -6,7 +6,7 @@ use crate::rendar::assets::{constants, svg};
 /// * `ui` - UI
 /// * `files` - ドロップされたファイル
 /// * `open_dialog` - ファイルダイアログを開くタイミングをずらす
-pub(crate) fn top_layout(
+pub(crate) fn view(
     ui: &mut egui::Ui,
     _files: &mut open_files::OpenFiles,
     open_dialog: &mut bool,

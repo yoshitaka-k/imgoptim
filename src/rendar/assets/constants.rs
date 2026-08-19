@@ -5,8 +5,10 @@ pub(crate) const ERROR_ICON_SIZE: f32 = 14.0;
 pub(crate) const CANCEL_ICON_SIZE: f32 = 14.0;
 pub(crate) const CIRCLE_ICON_SIZE: f32 = 12.0;
 pub(crate) const UPLOAD_FILE_ICON_SIZE: f32 = 14.0;
-pub(crate) const SETTINGS_ICON_SIZE: f32 = 13.0;
-pub(crate) const WARNING_ICON_SIZE: f32 = 13.0;
+pub(crate) const _SETTINGS_ICON_SIZE: f32 = 14.0;
+pub(crate) const CYCLE_ICON_SIZE: f32 = 14.0;
+pub(crate) const COMPRESS_ICON_SIZE: f32 = 14.0;
+pub(crate) const WARNING_ICON_SIZE: f32 = 14.0;
 
 // セパレータの高さ
 pub(crate) const SEPARATOR_HEIGHT: f32 = 4.0;

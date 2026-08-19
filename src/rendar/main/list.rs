@@ -49,7 +49,7 @@ fn add_icon_and_name(ui: &mut egui::Ui, file_name: &str, pad: f32, widget: impl 
 /// * `row_range` - 表示する行の範囲
 /// * `row_height` - show_rows に渡したのと同じ値
 /// * `return` - いずれかの行がクリックされたかどうか
-pub(crate) fn file_list(
+pub(crate) fn view(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
     optimize_job: &mut OptimizeJob,

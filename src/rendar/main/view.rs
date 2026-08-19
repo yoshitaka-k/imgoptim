@@ -125,12 +125,12 @@ impl eframe::App for Rendar {
 
         // 上部ボタンを表示
         egui::Panel::top("top_taskbar").frame(panel_style).show(ui, |ui| {
-            top::top_layout(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
+            top::view(ui, &mut self.files, &mut self.open_dialog, &mut self.settings_window_open, &mut self.settings_window_pos);
         });
 
         // 状態とかボタンを表示するタスクバーを表示
         egui::Panel::bottom("bottom_taskbar").frame(panel_style).show(ui, |ui| {
-            bottom::bottom_layout(ui, &mut self.files, &mut self.optimize_job);
+            bottom::view(ui, &mut self.files, &mut self.optimize_job);
         });
 
         // 中央パネルを表示
@@ -148,7 +148,7 @@ impl eframe::App for Rendar {
                 // コンテナ内の表示
                 .show_rows(ui, row_height, total_rows, |ui, row_range| {
                     // ファイル一覧を表示
-                    list::file_list(ui, &mut self.files, &mut self.optimize_job, row_range, row_height)
+                    list::view(ui, &mut self.files, &mut self.optimize_job, row_range, row_height)
                 }).inner;
 
             // リスト行以外をクリックしたら選択解除
@@ -159,7 +159,7 @@ impl eframe::App for Rendar {
 
         // 設定ウィンドウを表示
         if self.settings_window_open {
-            setting_window::setting_window(ui.ctx(), &mut self.app, &mut self.settings_window_open, &mut self.settings_window_pos);
+            setting_window::view(ui.ctx(), &mut self.app, &mut self.settings_window_open, &mut self.settings_window_pos);
         }
     }
 }

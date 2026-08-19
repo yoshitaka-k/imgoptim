@@ -26,7 +26,7 @@ fn add_padded_icon(ui: &mut egui::Ui, pad: f32, widget: impl egui::Widget) -> eg
 /// 下部ボタンを表示
 /// * `ui` - UI
 /// * `files` - ドロップされたファイル
-pub(crate) fn bottom_layout(
+pub(crate) fn view(
     ui: &mut egui::Ui,
     files: &mut open_files::OpenFiles,
     optimize_job: &mut OptimizeJob,
