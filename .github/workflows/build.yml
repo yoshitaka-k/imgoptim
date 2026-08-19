@@ -20,8 +20,10 @@ jobs:
           - { os: ubuntu-latest, target: x86_64-pc-windows-gnu, artifact-name: windows }
           # Linux (Ubuntu上でネイティブビルド)
           - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, artifact-name: linux }
-          # macOS (macOS環境でネイティブビルド)
-          - { os: macos-latest,  target: x86_64-apple-darwin, artifact-name: macos }
+          # macOS (macOS Intel環境でネイティブビルド)
+          - { os: macos-latest,  target: x86_64-apple-darwin, artifact-name: macos-intel }
+          # macOS (macOS Apple Silicon環境でネイティブビルド)
+          - { os: macos-latest,  target: aarch64-apple-darwin, artifact-name: macos-apple-silicon }
 
     steps:
     - name: Checkout code
@@ -53,17 +55,17 @@ jobs:
       run: |
         case "${{ matrix.job.target }}" in
           x86_64-pc-windows-gnu)
-            cargo bundle --release --target x86_64-pc-windows-gnu -f exe
+            cargo bundle --release --target ${{ matrix.job.target }} -f exe
             # cargo-bundle 0.11.0 が .exe を二重付けするため修正
             for f in target/x86_64-pc-windows-gnu/release/bundle/exe/*.exe.exe; do
               mv "$f" "${f%.exe}"
             done
             ;;
           x86_64-unknown-linux-gnu)
-            cargo bundle --release --target x86_64-unknown-linux-gnu -f deb
+            cargo bundle --release --target ${{ matrix.job.target }} -f deb
             ;;
-          x86_64-apple-darwin)
-            cargo bundle --release --target x86_64-apple-darwin -f osx
+          x86_64-apple-darwin | aarch64-apple-darwin)
+            cargo bundle --release --target ${{ matrix.job.target }} -f osx
             ;;
         esac
 
