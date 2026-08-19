@@ -4,11 +4,11 @@ mod generated {
 
 pub use generated::*;
 
-/// 埋め込み SVG を egui の ImageSource にする
+/// 埋め込み画像を egui の ImageSource にする
 /// * `uri` - 画像の URI
 /// * `bytes` - 画像のバイト列
 /// * `return` - egui::ImageSource<'static>
-const fn bytes_source(uri: &'static str, bytes: &'static [u8]) -> egui::ImageSource<'static> {
+pub(crate) const fn bytes_source(uri: &'static str, bytes: &'static [u8]) -> egui::ImageSource<'static> {
     egui::ImageSource::Bytes {
         uri: std::borrow::Cow::Borrowed(uri),
         bytes: egui::load::Bytes::Static(bytes),

@@ -59,6 +59,7 @@ pub(crate) fn view(
             "Total optimization duration: {}",
             duration_format!(files.total_duration()),
         );
+
         // 優先度: 最適化中 > エラー > 最適化済み > 待機
         let response = if optimizing_len > 0 {
             add_padded_icon(ui, 3.0, egui::Spinner::new().size(constants::SPINNER_SIZE).color(optimizing_color))
@@ -69,6 +70,7 @@ pub(crate) fn view(
         } else {
             add_padded_icon(ui, 1.0, egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color))
         };
+
         response.on_hover_text(hover_text);
 
         ui.separator();

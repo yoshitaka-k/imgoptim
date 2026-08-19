@@ -1,8 +1,10 @@
 use crate::app;
+use crate::rendar;
+use crate::rendar::SettingTab;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants as assets_const, svg};
 use crate::rendar::setting;
-use crate::rendar::setting::{concurrent, quality};
+use crate::rendar::setting::{concurrent, quality, about};
 
 /// 設定ウィンドウを表示
 /// * `ctx` - コンテキスト
@@ -11,9 +13,11 @@ use crate::rendar::setting::{concurrent, quality};
 pub(crate) fn view(
     ctx: &egui::Context,
     app: &mut app::App,
+    setting_tab: &mut SettingTab,
     settings_window_open: &mut bool,
     window_pos: &mut Option<egui::Pos2>,
 ) {
+    // ウィンドウのIDを生成
     let window_id = egui::ViewportId::from_hash_of(setting::SETTING_WINDOW_ID);
 
     // 設定ウィンドウのオプションを設定
@@ -26,57 +30,48 @@ pub(crate) fn view(
     // ウィンドウの表示位置を指定
     // take()で、取り出して None にする（ボタン押下時だけ位置更新と前面化）
     if let Some(pos) = window_pos.take() {
+        // ウィンドウの位置を指定
         options = options.with_position(pos);
 
-        // ウィンドウの位置を更新して前面に出す
+        // タブを初期化
+        *setting_tab = SettingTab::Concurrent;
+
+        // 表示していたら、ウィンドウの位置を更新して前面に出す
         ctx.send_viewport_cmd_to(window_id, egui::ViewportCommand::OuterPosition(pos));
         ctx.send_viewport_cmd_to(window_id, egui::ViewportCommand::Focus);
     }
 
     // 設定ウィンドウを表示
-    ctx.show_viewport_immediate(
-        window_id,
-        options, |ctx, _class| {
-            egui::CentralPanel::default().show(ctx, |ui| {
-                // デフォルトのスペースの幅を避けておく
-                let spacing = ui.spacing().item_spacing.x;
+    ctx.show_viewport_immediate(window_id, options, |ctx, _class| {
+        // パネルのスタイルを設定
+        let panel_style = rendar::panel_style(ctx);
 
-                // ボタンの色を設定
-                let button_color = assets::button_icon_color(ui);
+        // アイコンの色を取得
+        let icon_color = assets::icon_color(ctx);
 
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 4.0;
-                    ui.add(egui::Image::new(svg::CYCLE).max_height(assets_const::CYCLE_ICON_SIZE).tint(button_color));
-                    ui.spacing_mut().item_spacing.x = spacing;
-                    ui.label("Concurrent");
-                });
+        // タブを表示
+        egui::Panel::top("setting_top_taskbar").frame(panel_style).show(ctx, |ui| {
+            ui.horizontal(|ui| {
+                ui.add(egui::Image::new(svg::SETTINGS).max_height(assets_const::SETTINGS_ICON_SIZE).tint(icon_color));
 
-                ui.separator();
-
-                // 並行処理数を表示
-                concurrent::view(ui, app);
-
-                ui.separator();
-
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 4.0;
-                    ui.add(egui::Image::new(svg::COMPRESS).max_height(assets_const::COMPRESS_ICON_SIZE).tint(button_color));
-                    ui.spacing_mut().item_spacing.x = spacing;
-                    ui.label("Quality");
-                });
-
-                ui.separator();
-
-                // 品質を表示
-                quality::view(ui, app);
-
-                ui.separator();
+                ui.selectable_value(setting_tab, SettingTab::Concurrent, SettingTab::Concurrent.to_string());
+                ui.selectable_value(setting_tab, SettingTab::Quality, SettingTab::Quality.to_string());
+                ui.selectable_value(setting_tab, SettingTab::About, SettingTab::About.to_string());
             });
+        });
 
-            // ウィンドウの閉じるボタンが押されたら閉じる
-            if ctx.input(|input| input.viewport().close_requested()) {
-                *settings_window_open = false;
+        egui::CentralPanel::default().show(ctx, |ui| {
+            // タブに応じて表示内容を切り替え
+            match setting_tab {
+                SettingTab::Concurrent => concurrent::view(ui, app),
+                SettingTab::Quality => quality::view(ui, app),
+                SettingTab::About => about::view(ui, app),
             }
-        },
-    );
+        });
+
+        // ウィンドウの閉じるボタンが押されたら閉じる
+        if ctx.input(|input| input.viewport().close_requested()) {
+            *settings_window_open = false;
+        }
+    });
 }

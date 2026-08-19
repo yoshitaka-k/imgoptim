@@ -1,10 +1,12 @@
 use crate::app;
 use crate::file::open_files;
-use crate::rendar::assets::{self, fonts, svg};
-use crate::rendar::main::{top, list, bottom};
-use crate::rendar::setting::view as setting_window;
 use crate::event::{open, drop};
 use crate::optimize::OptimizeJob;
+use crate::rendar;
+use crate::rendar::SettingTab;
+use crate::rendar::assets::{fonts, svg};
+use crate::rendar::main::{top, list, bottom};
+use crate::rendar::setting::view as setting_window;
 
 /// レンダーを管理する構造体
 pub struct Rendar {
@@ -19,6 +21,9 @@ pub struct Rendar {
 
     // 設定ウィンドウの表示位置
     settings_window_pos: Option<egui::Pos2>,
+
+    // 設定タブ
+    setting_tab: SettingTab,
 
     // 最適化ジョブ
     optimize_job: OptimizeJob,
@@ -50,6 +55,7 @@ impl Rendar {
             open_dialog: false,
             settings_window_open: false,
             settings_window_pos: None,
+            setting_tab: SettingTab::Concurrent,
             optimize_job: OptimizeJob::new(cc.egui_ctx.clone()),
         }
     }
@@ -110,18 +116,8 @@ impl eframe::App for Rendar {
         // ファイル追加時に最適化を実行
         self.optimize_run();
 
-        // パネルの背景色を取得
-        let panel_fill_color = assets::panel_fill_color(ui);
-
         // パネルのスタイルを設定
-        let panel_style = egui::Frame::default()
-            .fill(panel_fill_color)
-            .inner_margin(egui::Margin {
-                left: 10,
-                right: 10,
-                top: 2,
-                bottom: 3,
-            });
+        let panel_style = rendar::panel_style(ui);
 
         // 上部ボタンを表示
         egui::Panel::top("top_taskbar").frame(panel_style).show(ui, |ui| {
@@ -159,7 +155,7 @@ impl eframe::App for Rendar {
 
         // 設定ウィンドウを表示
         if self.settings_window_open {
-            setting_window::view(ui.ctx(), &mut self.app, &mut self.settings_window_open, &mut self.settings_window_pos);
+            setting_window::view(ui.ctx(), &mut self.app, &mut self.setting_tab, &mut self.settings_window_open, &mut self.settings_window_pos);
         }
     }
 }

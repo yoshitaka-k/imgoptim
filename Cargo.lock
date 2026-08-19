@@ -1032,6 +1032,7 @@ dependencies = [
  "ahash",
  "egui",
  "enum-map",
+ "image",
  "itertools",
  "log",
  "mime_guess2",
@@ -1895,7 +1896,7 @@ dependencies = [
 
 [[package]]
 name = "keiga"
-version = "0.3.4"
+version = "0.3.5"
 dependencies = [
  "eframe",
  "egui",

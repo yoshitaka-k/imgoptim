@@ -2,6 +2,12 @@ pub(crate) mod constants;
 pub(crate) mod fonts;
 pub(crate) mod svg;
 
+/// アプリアイコン
+pub(crate) const APP_ICON: egui::ImageSource<'static> = svg::bytes_source(
+    "bytes://assets/icon.png",
+    include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/icon.png")),
+);
+
 /// パネルの背景色
 /// * `ui` - UI
 /// * `return` - パネルの背景色
@@ -10,6 +16,17 @@ pub(crate) fn panel_fill_color(ui: &egui::Ui) -> egui::Color32 {
         constants::DARK_MODE_PANEL_COLOR
     } else {
         constants::LIGHT_MODE_PANEL_COLOR
+    }
+}
+
+/// アイコンの色
+/// * `ui` - UI
+/// * `return` - アイコンの色
+pub(crate) fn icon_color(ui: &egui::Ui) -> egui::Color32 {
+    if ui.ctx().global_style().visuals.dark_mode {
+        constants::DARK_MODE_ICON_COLOR
+    } else {
+        constants::LIGHT_MODE_ICON_COLOR
     }
 }
 

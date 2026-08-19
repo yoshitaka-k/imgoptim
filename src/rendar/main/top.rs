@@ -14,11 +14,12 @@ pub(crate) fn view(
     settings_window_pos: &mut Option<egui::Pos2>,
 ) {
     // ボタンの色を設定
+    let icon_color = assets::icon_color(ui);
     let button_color = assets::button_icon_color(ui);
 
     ui.horizontal(|ui| {
         ui.horizontal(|ui| {
-            ui.add(egui::Image::new(svg::UPLOAD_FILE).max_height(constants::UPLOAD_FILE_ICON_SIZE).tint(button_color));
+            ui.add(egui::Image::new(svg::UPLOAD_FILE).max_height(constants::UPLOAD_FILE_ICON_SIZE).tint(icon_color));
             ui.label("Folders or Files to Optimize Drag & Drop");
         });
 

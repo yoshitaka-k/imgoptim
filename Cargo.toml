@@ -1,9 +1,10 @@
 [package]
 name = "keiga"
-version = "0.3.4"
+version = "0.3.5"
 edition = "2024"
 description = "Lightweight image optimizer"
 authors = ["yoshitaka-k"]
+repository = "yoshitaka-k/keiga"
 license = "Apache-2.0"
 
 [profile.release]
@@ -44,11 +45,11 @@ ico = "0.5"
 
 [dependencies]
 egui = "0.36.1"
-egui_extras = { version = "0.36.1", features = ["svg"] }
+egui_extras = { version = "0.36.1", features = ["svg", "image"] }
 eframe = { version = "0.36.1", features = ["persistence"] }
 rfd = "0.17.2"
 serde = { version = "1.0.229", features = ["derive"] }
-image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
+image = { version = "0.25.10", default-features = false, features = ["jpeg", "png"] }
 oxipng = { version = "10.2.0", default-features = false, features = ["parallel"] }
 rayon = "1.12.0"
 getset = "0.1.7"
