@@ -75,13 +75,16 @@ pub(crate) fn view(
 
     // 削除キーが押されたら処理予約
     if ui.input(|input| input.key_released(egui::Key::Backspace)) {
-        let path = files.selected_path().unwrap();
-        pending_action.push(FileListAction::KeyUp { key: egui::Key::Backspace, path });
+        if let Some(path) = files.selected_path() {
+            pending_action.push(FileListAction::KeyUp { key: egui::Key::Backspace, path });
+        }
     }
+
     // スペースキーが押されたら処理予約
     if ui.input(|input| input.key_released(egui::Key::Space)) {
-        let path = files.selected_path().unwrap();
-        pending_action.push(FileListAction::KeyUp { key: egui::Key::Space, path });
+        if let Some(path) = files.selected_path() {
+            pending_action.push(FileListAction::KeyUp { key: egui::Key::Space, path });
+        }
     }
 
     // リスト表示の準備
