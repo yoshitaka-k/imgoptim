@@ -210,8 +210,10 @@ impl OpenFiles {
 
     /// パスを追加
     /// * `path` - ドロップされたファイルのパス
-    pub fn add_path(&mut self, path: PathBuf) {
-        self.find_file(path);
+    /// * `return` - 結果
+    pub fn add_path(&mut self, path: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+        self.find_file(path)?;
+        Ok(())
     }
 
     /// 最適化中のファイルがあるかどうか
@@ -271,27 +273,31 @@ impl OpenFiles {
     /// ファイルを検索
     /// * `path` - ドロップされたファイルのパス
     /// * `return` - ファイルのパス
-    fn find_file(&mut self, path: PathBuf) {
-        let metadata = path.metadata().expect("metadata call failed");
+    fn find_file(&mut self, path: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+        let metadata = path.metadata().map_err(|e| format!("{} \n\n{}", path.display(), e))?;
+
         if metadata.is_file() {
             if self.is_allowed_extension(&path) {
                 // 同じパスが待機中か最適化中なら、新規行をエラーで追加
                 if self.is_standby_or_optimizing(&path) {
-                    let mut image_file = image_file::ImageFile::new(path);
+                    let mut image_file = image_file::ImageFile::new(path)?;
                     image_file.set_status(OptimizeStatus::Error(
                         "Already in progress".to_string(),
                     ));
                     self.paths.push(image_file);
-                    return;
+                    return Ok(());
                 }
 
-                self.paths.push(image_file::ImageFile::new(path));
+                let image_file = image_file::ImageFile::new(path)?;
+                self.paths.push(image_file);
             }
         } else if metadata.is_dir() {
-            for entry in fs::read_dir(path).expect("read_dir call failed") {
-                let entry = entry.expect("entry call failed");
-                self.find_file(entry.path());
+            for entry in fs::read_dir(&path).map_err(|e| format!("{} \n\n{}", path.display(), e))? {
+                let entry = entry.map_err(|e| format!("{} \n\n{}", path.display(), e))?;
+                self.find_file(entry.path())?;
             }
         }
+
+        Ok(())
     }
 }

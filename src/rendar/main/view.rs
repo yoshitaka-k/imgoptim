@@ -5,7 +5,7 @@ use crate::optimize::OptimizeJob;
 use crate::rendar;
 use crate::rendar::SettingTab;
 use crate::rendar::assets::{fonts, svg};
-use crate::rendar::main::{top, list, bottom};
+use crate::rendar::main::{top, list, bottom, modal};
 use crate::rendar::setting::view as setting_window;
 
 /// レンダーを管理する構造体
@@ -27,6 +27,12 @@ pub struct Rendar {
 
     // 最適化ジョブ
     optimize_job: OptimizeJob,
+
+    // エラーモーダルを表示するかどうか
+    error_modal_open: bool,
+
+    // エラー
+    error: Option<Box<dyn std::error::Error>>,
 }
 
 impl Rendar {
@@ -57,6 +63,8 @@ impl Rendar {
             settings_window_pos: None,
             setting_tab: SettingTab::Concurrent,
             optimize_job: OptimizeJob::new(cc.egui_ctx.clone()),
+            error_modal_open: false,
+            error: None,
         }
     }
 
@@ -98,19 +106,27 @@ impl eframe::App for Rendar {
         // 開くボタンが押されてたらファイルダイアログを開く
         if self.open_dialog {
             self.open_dialog = false;
-            open::open_files(
+            if let Err(e) = open::open_files(
                 &self.app.extensions_to_string(),
                 &mut self.files,
-            );
+            ) {
+                eprintln!("Error opening files: {}", e);
+                self.error = Some(e);
+                self.error_modal_open = true;
+            }
         }
 
         // ドラッグ&ドロップされたファイルを処理
         ui.ctx().input(|input| {
             let files = input.raw.dropped_files.clone();
-            drop::drop_files(
+            if let Err(e) = drop::drop_files(
                 &files,
                 &mut self.files,
-            );
+            ) {
+                eprintln!("Error opening files: {}", e);
+                self.error = Some(e);
+                self.error_modal_open = true;
+            }
         });
 
         // ファイル追加時に最適化を実行
@@ -156,6 +172,11 @@ impl eframe::App for Rendar {
         // 設定ウィンドウを表示
         if self.settings_window_open {
             setting_window::view(ui.ctx(), &mut self.app, &mut self.setting_tab, &mut self.settings_window_open, &mut self.settings_window_pos);
+        }
+
+        // エラーモーダルを表示
+        if self.error_modal_open {
+            modal::error(&mut self.error_modal_open, ui.ctx(), &mut self.error);
         }
     }
 }

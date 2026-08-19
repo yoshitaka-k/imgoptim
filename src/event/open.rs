@@ -6,7 +6,7 @@ use crate::file::open_files;
 pub(crate) fn open_files(
     extensions: &Vec<String>,
     files: &mut open_files::OpenFiles,
-) {
+) -> Result<(), Box<dyn std::error::Error>> {
     // Macのみファイルとフォルダを同時選択できる
     #[cfg(target_os = "macos")]
     let paths = rfd::FileDialog::new()
@@ -22,7 +22,9 @@ pub(crate) fn open_files(
     // ファイルを追加
     if let Some(paths) = paths {
         for path in paths {
-            files.add_path(path);
+            files.add_path(path)?;
         }
     }
+
+    Ok(())
 }

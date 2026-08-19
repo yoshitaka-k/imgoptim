@@ -57,14 +57,30 @@ impl ImageFile {
     /// 新しい ImageFile を作成
     /// * `path` - ファイルのパス
     /// * `return` - ImageFile のインスタンス
-    pub fn new(path: PathBuf) -> Self {
+    pub fn new(path: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
+        // ファイルの一意な ID を発行
         let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
-        let file_name = path.file_name().unwrap().to_string_lossy().to_string();
-        let ext = path.extension().unwrap();
-        let extension = extension::Extension::from_str(ext);
-        let size = path.metadata().unwrap().len();
 
-        Self {
+        // ファイル名を取得
+        let file_name = if let Some(name) = path.file_name() {
+            name.to_string_lossy().to_string()
+        } else {
+            return Err(format!("{} \n\nFile name not found", path.display()).into());
+        };
+
+        // ファイル拡張子を取得
+        let extension = if let Some(ext) = path.extension() {
+            extension::Extension::from_str(ext)
+        } else {
+            return Err(format!("{} \n\nFile extension not found", path.display()).into());
+        };
+
+        // ファイルサイズを取得
+        let size = path.metadata()
+            .map_err(|e| format!("{} \n\n{}", path.display(), e))?
+            .len();
+
+        Ok(Self {
             id,
             path,
             file_name,
@@ -74,7 +90,7 @@ impl ImageFile {
             new_size: 0,
             percent: 0.00f32,
             duration: 0,
-        }
+        })
     }
 
     /// ファイルが PNG かどうか
