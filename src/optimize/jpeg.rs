@@ -13,6 +13,9 @@ impl Jpeg {
     /// * `token` - 最適化トークン
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, quality: u8, token: OptimToken) -> Result<OptimizeStatus, Box<dyn std::error::Error>> {
+        // ファイルサイズを取得
+        let size = path.metadata()?.len() as usize;
+
         // 先にファイルを読み込んでおく
         let file_image = ImageReader::open(&path)?.decode()?;
 
@@ -27,6 +30,14 @@ impl Jpeg {
             // JPEG エンコーダーを作成
             let mut encoder = JpegEncoder::new_with_quality(&mut buffer, quality);
             encoder.encode_image(&file_image)?;
+        }
+
+        // 最適化後のサイズを取得
+        let new_size = buffer.len() as usize;
+
+        // 最適化後のサイズが元のサイズより小さい場合は最適化しない
+        if new_size <= size {
+            return Ok(OptimizeStatus::Optimized);
         }
 
         // 最適化中止された場合は処理を中断
