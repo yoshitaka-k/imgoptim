@@ -20,5 +20,5 @@ fn main() {
     build::svg::generate_svg_generated(&svg_dir, &out_dir);
 
     // バンドル用アイコンと Windows の実行ファイルアイコンを生成する
-    build::icon::generate_icons(manifest_path, &out_dir);
+    build::appicon::generate_icons(manifest_path, &out_dir);
 }
