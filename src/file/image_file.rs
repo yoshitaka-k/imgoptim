@@ -122,47 +122,20 @@ impl ImageFile {
         }
     }
 
-    /// jpeg ファイルの最適化処理とファイルサイズの更新
-    /// * `app` - アプリケーションの設定
-    /// * `return` - 最適化の結果
-    fn jpeg_optimize(&mut self, app: &App, token: OptimToken) -> Result<(), Box<dyn std::error::Error>> {
-        // JPEG の品質を取得
-        let quality = *app.jpeg_quality();
-
-        // 最適化を実行
-        Jpeg::optimize(&self.path, quality, token)?;
-
-        // ファイルサイズを更新
-        self.update_file_size();
-
-        Ok(())
-    }
-
-    /// png ファイルの最適化処理とファイルサイズの更新
-    /// * `app` - アプリケーションの設定
-    /// * `return` - 最適化の結果
-    fn png_optimize(&mut self, app: &App, token: OptimToken) -> Result<(), Box<dyn std::error::Error>> {
-        // PNG のオプションを取得
-        let options = app.png_options();
-
-        // 最適化を実行
-        Png::optimize(&self.path, options, token)?;
-
-        // ファイルサイズを更新
-        self.update_file_size();
-
-        Ok(())
-    }
-
     /// 画像を最適化
     /// * `app` - アプリケーションの設定
     /// * `return` - 最適化の結果
-    pub fn optimize(&mut self, app: &App, running: Arc<AtomicBool>, canceled: Arc<Mutex<HashSet<u64>>>) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn optimize(
+        &mut self,
+        app: &App,
+        running: Arc<AtomicBool>,
+        canceled: Arc<Mutex<HashSet<u64>>>
+    ) -> Result<OptimizeStatus, Box<dyn std::error::Error>> {
         // 完了済み・キャンセル済み・エラー済みは再実行しない
         if matches!(self.status,
             OptimizeStatus::Optimized | OptimizeStatus::Canceled | OptimizeStatus::Error(_)
         ) {
-            return Ok(());
+            return Ok(self.status.clone());
         }
 
         // 最適化開始時間を取得
@@ -178,7 +151,7 @@ impl ImageFile {
         // 最適化を中止したかどうかを確認
         if token.is_canceled() {
             self.status = OptimizeStatus::Canceled;
-            return Ok(());
+            return Ok(OptimizeStatus::Canceled);
         }
 
         // 最適化中にする
@@ -187,37 +160,59 @@ impl ImageFile {
         // 最適化を実行
         let result = match self.extension {
             // jpeg ファイルの最適化
-            extension::Extension::Jpeg => self.jpeg_optimize(app, token.clone()),
+            extension::Extension::Jpeg => {
+                let quality = *app.jpeg_quality();
+                Jpeg::optimize(&self.path, quality, token)
+            }
 
             // png ファイルの最適化
-            extension::Extension::Png => self.png_optimize(app, token.clone()),
+            extension::Extension::Png => {
+                let options = app.png_options();
+                Png::optimize(&self.path, options, token)
+            }
 
             // サポートしていないファイル形式
-            _ => Err(Box::new(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "Unsupported extension",
-            )) as Box<dyn std::error::Error>),
+            _ => Err(format!("{} \n\nUnsupported extension", self.path.display()).into()),
         };
 
         // 最適化結果を処理
         match result {
-            Ok(()) => {
-                // 最適化終了時間を取得
-                let end_time = std::time::Instant::now();
-                // 最適化時間を計算
-                let duration = end_time.duration_since(start_time).as_millis();
-                self.duration = duration as u64;
+            Ok(status) => {
+                match status {
+                    OptimizeStatus::Standby => {
+                        Ok(self.status.clone())
+                    }
+                    OptimizeStatus::Optimizing => {
+                        Ok(self.status.clone())
+                    }
+                    OptimizeStatus::Optimized => {
+                        // 最適化終了時間を取得
+                        let end_time = std::time::Instant::now();
+                        // 最適化時間を計算
+                        let duration = end_time.duration_since(start_time).as_millis();
+                        self.duration = duration as u64;
 
-                // 最適化中止された場合は処理を中断
-                if token.is_canceled() & !matches!(self.status, OptimizeStatus::Optimized) {
-                    self.status = OptimizeStatus::Canceled;
-                    return Ok(());
+                        // ファイルサイズを更新
+                        self.update_file_size();
+
+                        // 最適化済みに設定
+                        self.status = OptimizeStatus::Optimized;
+                        Ok(OptimizeStatus::Optimized)
+                    }
+                    OptimizeStatus::Canceled => {
+                        // 最適化中止に設定
+                        self.status = OptimizeStatus::Canceled;
+                        Ok(OptimizeStatus::Canceled)
+                    }
+                    OptimizeStatus::Error(e) => {
+                        // 最適化エラーに設定
+                        self.status = OptimizeStatus::Error(e.clone());
+                        Err(e.to_string().clone().into())
+                    }
                 }
-
-                self.status = OptimizeStatus::Optimized;
-                Ok(())
             }
             Err(e) => {
+                // 最適化エラーに設定
                 self.status = OptimizeStatus::Error(e.to_string());
                 Err(e)
             }
