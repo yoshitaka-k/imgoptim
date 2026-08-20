@@ -38,7 +38,7 @@ impl Jpeg {
         let size = path.metadata()?.len() as usize;
         let new_size = buffer.len() as usize;
         if size <= new_size {
-            return Ok(OptimizeStatus::Optimized);
+            return Ok(OptimizeStatus::Unchanged);
         }
 
         // 一時ファイルを作成して最適化後のデータを保存

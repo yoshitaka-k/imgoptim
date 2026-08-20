@@ -11,6 +11,7 @@ struct FileInfo {
     standby_len: u32,
     optimizing_len: u32,
     optimized_len: u32,
+    unchanged_len: u32,
     canceled_len: u32,
     error_len: u32,
     total_size: u64,
@@ -24,6 +25,7 @@ impl FileInfo {
             standby_len: 0,
             optimizing_len: 0,
             optimized_len: 0,
+            unchanged_len: 0,
             canceled_len: 0,
             error_len: 0,
             total_size: 0,
@@ -87,7 +89,8 @@ impl OpenFiles {
     /// * `id` - キャンセルされたファイルの ID
     pub fn set_status_canceled(&mut self, id: u64) {
         if let Some(file) = self.paths.iter_mut().find(|f| *f.id() == id) {
-            if !matches!(file.status(), OptimizeStatus::Optimized) {
+            // 最適化済み・最適化不要はキャンセルできない
+            if !matches!(file.status(), OptimizeStatus::Optimized | OptimizeStatus::Unchanged) {
                 file.set_status(OptimizeStatus::Canceled);
             }
         }
@@ -98,6 +101,7 @@ impl OpenFiles {
         let mut standby_len = 0;
         let mut optimizing_len = 0;
         let mut optimized_len = 0;
+        let mut unchanged_len = 0;
         let mut canceled_len = 0;
         let mut error_len = 0;
 
@@ -106,6 +110,7 @@ impl OpenFiles {
                 OptimizeStatus::Standby => standby_len += 1,
                 OptimizeStatus::Optimizing => optimizing_len += 1,
                 OptimizeStatus::Optimized => optimized_len += 1,
+                OptimizeStatus::Unchanged => unchanged_len += 1,
                 OptimizeStatus::Canceled => canceled_len += 1,
                 OptimizeStatus::Error(_) => error_len += 1,
             }
@@ -114,6 +119,7 @@ impl OpenFiles {
         self.file_info.standby_len = standby_len;
         self.file_info.optimizing_len = optimizing_len;
         self.file_info.optimized_len = optimized_len;
+        self.file_info.unchanged_len = unchanged_len;
         self.file_info.canceled_len = canceled_len;
         self.file_info.error_len = error_len;
     }
@@ -140,6 +146,18 @@ impl OpenFiles {
     /// * `return` - 最適化済みのファイルの数
     pub fn optimized_len(&self) -> u32 {
         self.file_info.optimized_len
+    }
+
+    /// 最適化不要のファイルの数を取得
+    /// * `return` - 最適化不要のファイルの数
+    pub fn unchanged_len(&self) -> u32 {
+        self.file_info.unchanged_len
+    }
+
+    /// キャンセルされたファイルの数を取得
+    /// * `return` - キャンセルされたファイルの数
+    pub fn canceled_len(&self) -> u32 {
+        self.file_info.canceled_len
     }
 
     /// エラーのファイルの数を取得

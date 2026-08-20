@@ -24,6 +24,8 @@ pub enum OptimizeStatus {
     Optimizing,
     /// 最適化完了
     Optimized,
+    /// 最適化不要
+    Unchanged,
     /// 最適化エラー（メッセージ）
     Error(String),
     /// 最適化キャンセル

@@ -48,6 +48,17 @@ pub(crate) fn optimized_color(ui: &egui::Ui) -> egui::Color32 {
     }
 }
 
+/// 最適化不要アイコンの色
+/// * `ui` - UI
+/// * `return` - 最適化不要アイコンの色
+pub(crate) fn unchanged_color(ui: &egui::Ui) -> egui::Color32 {
+    if ui.ctx().global_style().visuals.dark_mode {
+        constants::DARK_MODE_UNCHANGED_COLOR
+    } else {
+        constants::LIGHT_MODE_UNCHANGED_COLOR
+    }
+}
+
 /// エラーアイコンの色
 /// * `ui` - UI
 /// * `return` - エラーアイコンの色

@@ -39,6 +39,7 @@ pub(crate) fn view(
     let standby_len = files.standby_len();
     let optimizing_len = files.optimizing_len();
     let optimized_len = files.optimized_len();
+    let unchanged_len = files.unchanged_len();
     let error_len = files.error_len();
 
     // デフォルトのスペースの幅を避けておく
@@ -50,6 +51,20 @@ pub(crate) fn view(
     let optimized_color = assets::optimized_color(ui);
     // エラーアイコンの色
     let error_color = assets::error_color(ui);
+    // 最適化不要アイコンの色
+    let unchanged_color = assets::unchanged_color(ui);
+
+    // 完了アイコンの色
+    // 最適化済みがあれば最適化済みの色
+    // 最適化済みがなくて最適化不要があれば最適化不要の色
+    // それ以外は最適化済みの色
+    let completed_color = if optimized_len > 0 {
+         optimized_color
+    } else if unchanged_len > 0 {
+        unchanged_color
+    } else {
+        optimized_color
+    };
 
     // 丸アイコンの色
     let circle_color = assets::circle_color(ui);
@@ -62,13 +77,13 @@ pub(crate) fn view(
             duration_format!(files.total_duration()),
         );
 
-        // 優先度: 最適化中 > エラー > 最適化済み > 待機
+        // 優先度: 最適化中 > エラー > 最適化済み・最適化不要 > 待機
         let response = if optimizing_len > 0 {
             add_padded_icon(ui, 3.0, egui::Spinner::new().size(main::SPINNER_SIZE).color(optimizing_color))
         } else if error_len > 0 {
             add_padded_icon(ui, 1.0, egui::Image::new(svg::ERROR).max_height(constants::ERROR_ICON_SIZE).tint(error_color))
-        } else if optimized_len > 0 {
-            add_padded_icon(ui, 0.0, egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(optimized_color))
+        } else if (optimized_len + unchanged_len) > 0 {
+            add_padded_icon(ui, 0.0, egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(completed_color))
         } else {
             add_padded_icon(ui, 1.0, egui::Image::new(svg::CIRCLE).max_height(constants::CIRCLE_ICON_SIZE).tint(circle_color))
         };
@@ -89,11 +104,26 @@ pub(crate) fn view(
         ui.spacing_mut().item_spacing.x = spacing;
         ui.label(" optimizing,");
 
-        // 最適化済み
-        ui.spacing_mut().item_spacing.x = 0.0;
-        ui.label(text_color(&format!("{}", optimized_len), optimized_color, None));
-        ui.spacing_mut().item_spacing.x = spacing;
-        ui.label(" optimized,");
+        // 完了
+        ui.scope(|ui| {
+            ui.spacing_mut().item_spacing.x = 0.0;
+            ui.label(text_color(&format!("{}", optimized_len + unchanged_len), completed_color, None));
+            ui.spacing_mut().item_spacing.x = spacing;
+            ui.label(" completed,");
+        }).response.on_hover_ui(|ui| {
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 0.0;
+                ui.label(text_color(&format!("{}", optimized_len), optimized_color, None));
+                ui.spacing_mut().item_spacing.x = spacing;
+                ui.label(" optimized.");
+            });
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 0.0;
+                ui.label(text_color(&format!("{}", unchanged_len), unchanged_color, None));
+                ui.spacing_mut().item_spacing.x = spacing;
+                ui.label(" no savings.");
+            });
+        });
 
         // エラー
         ui.spacing_mut().item_spacing.x = 0.0;

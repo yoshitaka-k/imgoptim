@@ -73,6 +73,7 @@ pub(crate) fn view(
     let optimized_color = assets::optimized_color(ui);
     let error_color = assets::error_color(ui);
     let canceled_color = assets::canceled_color(ui);
+    let unchanged_color = assets::unchanged_color(ui);
 
     // 削除キーが押されたら処理予約
     if ui.input(|input| input.key_released(egui::Key::Backspace)) {
@@ -152,6 +153,12 @@ pub(crate) fn view(
                     ui.label(format!("{:+.2}%", path.percent()));
                     ui.separator();
                     ui.label(format!("{}", duration));
+                }
+                OptimizeStatus::Unchanged => {
+                    add_icon_and_name(ui, path.file_name(), 0.0, egui::Image::new(svg::CHECK).max_height(constants::CHECK_ICON_SIZE).tint(unchanged_color));
+                    ui.label(format!("({})", size));
+                    ui.separator();
+                    ui.label(text_color("No savings", unchanged_color, Some(11.0)));
                 }
                 OptimizeStatus::Canceled => {
                     add_icon_and_name(ui, path.file_name(), 0.0, egui::Image::new(svg::CANCEL).max_height(constants::CANCEL_ICON_SIZE).tint(canceled_color));

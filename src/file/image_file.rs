@@ -131,9 +131,9 @@ impl ImageFile {
         running: Arc<AtomicBool>,
         canceled: Arc<Mutex<HashSet<u64>>>
     ) -> Result<OptimizeStatus, Box<dyn std::error::Error>> {
-        // 完了済み・キャンセル済み・エラー済みは再実行しない
+        // 完了済み・最適化不要・キャンセル済み・エラー済みは再実行しない
         if matches!(self.status,
-            OptimizeStatus::Optimized | OptimizeStatus::Canceled | OptimizeStatus::Error(_)
+            OptimizeStatus::Optimized| OptimizeStatus::Unchanged | OptimizeStatus::Canceled | OptimizeStatus::Error(_)
         ) {
             return Ok(self.status.clone());
         }
@@ -198,6 +198,11 @@ impl ImageFile {
                         // 最適化済みに設定
                         self.status = OptimizeStatus::Optimized;
                         Ok(OptimizeStatus::Optimized)
+                    }
+                    OptimizeStatus::Unchanged => {
+                        // 最適化不要に設定
+                        self.status = OptimizeStatus::Unchanged;
+                        Ok(OptimizeStatus::Unchanged)
                     }
                     OptimizeStatus::Canceled => {
                         // 最適化中止に設定

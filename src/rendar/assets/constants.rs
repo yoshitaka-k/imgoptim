@@ -33,6 +33,9 @@ pub(crate) const LIGHT_MODE_OPTIMIZING_COLOR: egui::Color32 = egui::Color32::fro
 // 最適化済み
 pub(crate) const DARK_MODE_OPTIMIZED_COLOR: egui::Color32 = egui::Color32::from_rgb(0, 210, 0);
 pub(crate) const LIGHT_MODE_OPTIMIZED_COLOR: egui::Color32 = egui::Color32::from_rgb(0, 190, 0);
+// 最適化不要
+pub(crate) const DARK_MODE_UNCHANGED_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 110, 0);
+pub(crate) const LIGHT_MODE_UNCHANGED_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 100, 0);
 // エラー
 pub(crate) const DARK_MODE_ERROR_COLOR: egui::Color32 = egui::Color32::from_rgb(210, 0, 0);
 pub(crate) const LIGHT_MODE_ERROR_COLOR: egui::Color32 = egui::Color32::from_rgb(200, 0, 0);
