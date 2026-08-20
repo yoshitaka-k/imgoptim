@@ -142,7 +142,7 @@ impl eframe::App for Rendar {
 
         // 状態とかボタンを表示するタスクバーを表示
         egui::Panel::bottom("bottom_taskbar").frame(panel_style).show(ui, |ui| {
-            bottom::view(ui, &mut self.files, &mut self.optimize_job);
+            bottom::view(ui, &mut self.files, &mut self.optimize_job, &mut self.error_modal_open, &mut self.error);
         });
 
         // 中央パネルを表示
@@ -160,7 +160,7 @@ impl eframe::App for Rendar {
                 // コンテナ内の表示
                 .show_rows(ui, row_height, total_rows, |ui, row_range| {
                     // ファイル一覧を表示
-                    list::view(ui, &mut self.files, &mut self.optimize_job, row_range, row_height)
+                    list::view(ui, &mut self.files, &mut self.optimize_job, row_range, row_height, &mut self.error_modal_open, &mut self.error)
                 }).inner;
 
             // リスト行以外をクリックしたら選択解除

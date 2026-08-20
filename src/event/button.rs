@@ -32,20 +32,33 @@ pub(crate) fn setting_open(ui: &mut egui::Ui, settings_window_open: &mut bool, s
 /// 最適化を停止（キャンセル）してファイル一覧をクリアする
 /// * `files` - ファイル一覧
 /// * `optimize_job` - 最適化ジョブ
-pub(crate) fn cancel_and_clear(files: &mut open_files::OpenFiles, optimize_job: &mut OptimizeJob) {
-    // ファイルをキャンセル
+pub(crate) fn cancel_and_clear(files: &mut open_files::OpenFiles, optimize_job: &mut OptimizeJob) -> Result<(), Box<dyn std::error::Error>> {
+    // 最適化を停止（全体キャンセル）
+    optimize_job.stop_running();
+
+    // エラーを初期化
+    let mut error = None;
+
+    // ファイルを1件ずつキャンセル
     for file in files.paths() {
         // 待機中か最適化中でない場合はスキップ
         if !matches!(file.status(), OptimizeStatus::Standby | OptimizeStatus::Optimizing) {
             continue;
         }
-        // キャンセル ID を追加
-        optimize_job.add_canceled_id(*file.id());
+        // キャンセル ID を追加してキャンセル状態にする
+        if let Err(e) = optimize_job.add_canceled_id(*file.id()) {
+            error = Some(e);
+            break;
+        }
     }
-
-    // 最適化を停止（キャンセル）
-    optimize_job.stop_running();
 
     // ファイル一覧をクリア
     files.clear();
+
+    // エラーがあれば返却
+    if let Some(error) = error {
+        return Err(error);
+    }
+
+    Ok(())
 }

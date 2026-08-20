@@ -43,8 +43,8 @@ pub struct OptimToken {
 impl OptimToken {
     /// 最適化が中止されたかどうかを返す
     /// * `return` - 最適化が中止されたかどうか
-    pub fn is_canceled(&self) -> bool {
-        !self.running.load(Ordering::Relaxed) || self.canceled.lock().unwrap().contains(&self.id)
+    pub fn is_canceled(&self) -> Result<bool, Box<dyn std::error::Error>> {
+        Ok(!self.running.load(Ordering::Relaxed) || self.canceled.lock().map_err(|e| format!("{}", e))?.contains(&self.id))
     }
 }
 

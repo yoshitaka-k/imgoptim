@@ -56,7 +56,9 @@ pub(crate) fn view(
     files: &mut open_files::OpenFiles,
     optimize_job: &mut OptimizeJob,
     row_range: Range<usize>,
-    row_height: f32
+    row_height: f32,
+    error_modal_open: &mut bool,
+    error: &mut Option<Box<dyn std::error::Error>>,
 ) -> bool {
     // UIの幅と行間隔
     let width = ui.available_width();
@@ -217,8 +219,16 @@ pub(crate) fn view(
             }
             FileListAction::KeyUp { key, path } => {
                 match key {
-                    egui::Key::Backspace => key_up::backspace_key(files, optimize_job),
-                    egui::Key::Space => key_up::space_key(&path),
+                    egui::Key::Backspace => if let Err(e) = key_up::backspace_key(files, optimize_job) {
+                        eprintln!("Error canceling file: {}", e);
+                        *error_modal_open = true;
+                        *error = Some(e);
+                    }
+                    egui::Key::Space => if let Err(e) = key_up::space_key(&path) {
+                        eprintln!("Error revealing file: {}", e);
+                        *error_modal_open = true;
+                        *error = Some(e);
+                    }
                     _ => (),
                 }
             },

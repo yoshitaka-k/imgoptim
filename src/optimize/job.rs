@@ -7,6 +7,8 @@ use crate::app;
 use crate::file::{open_files, image_file};
 use super::OptimizeStatus;
 
+const RUNNING_COUNT_NUM: usize = 1;
+
 /// 最適化ジョブを管理する構造体
 pub struct OptimizeJob {
     ctx: egui::Context,
@@ -75,10 +77,10 @@ impl OptimizeJob {
             let canceled = Arc::clone(&self.canceled);
 
             // 最適化カウントを増やす
-            self.running_count.fetch_add(1, Ordering::Relaxed);
+            self.running_count.fetch_add(RUNNING_COUNT_NUM, Ordering::Relaxed);
             let is_png = file.is_png();
             if is_png {
-                self.png_running_count.fetch_add(1, Ordering::Relaxed);
+                self.png_running_count.fetch_add(RUNNING_COUNT_NUM, Ordering::Relaxed);
             }
 
             // カウントをクローンしておく
@@ -89,26 +91,33 @@ impl OptimizeJob {
             std::thread::spawn(move || {
                 // クリアボタンを押されて最適化をキャンセルされていないか確認
                 // 1件キャンセルされていないか確認
-                if Self::is_canceled(&running, &canceled, &file) {
-                    // 最適化済みでなければキャンセル状態にする
-                    if !matches!(file.status(), OptimizeStatus::Optimized) {
-                        // キャンセル状態にする
-                        file.set_status(OptimizeStatus::Canceled);
+                match Self::is_canceled(&running, &canceled, &file) {
+                    Ok(true) => {
+                        // キャンセルされている場合は最適化を実行しない
+                        // 最適化済みでなければキャンセル状態にする
+                        if !matches!(file.status(), OptimizeStatus::Optimized) {
+                            // キャンセル状態にする
+                            file.set_status(OptimizeStatus::Canceled);
+                        }
                     }
-                } else {
-                    // 最適化を実行
-                    let _ = file.optimize(&app, Arc::clone(&running), Arc::clone(&canceled));
+                    Ok(false) => {
+                        // キャンセルされていない場合は最適化を実行
+                        let _ = file.optimize(&app, Arc::clone(&running), Arc::clone(&canceled));
+                    }
+                    Err(_) => {
+                        file.set_status(OptimizeStatus::Error("Canceled lock failed".into()));
+                    }
                 }
 
                 // 最適化結果を送信
                 let _ = tx.send(file.clone());
 
                 // この最適化のスレッドが終わってからカウントを減らす
-                running_count.fetch_sub(1, Ordering::Relaxed);
+                running_count.fetch_sub(RUNNING_COUNT_NUM, Ordering::Relaxed);
 
                 // PNG 最適化の場合は PNG 最適化カウントを減らす
                 if is_png {
-                    png_running_count.fetch_sub(1, Ordering::Relaxed);
+                    png_running_count.fetch_sub(RUNNING_COUNT_NUM, Ordering::Relaxed);
                 }
 
                 // 再描画を要求
@@ -153,8 +162,9 @@ impl OptimizeJob {
 
     /// 最適化をキャンセル
     /// * `id` - キャンセルするファイルの ID
-    pub fn add_canceled_id(&self, id: u64) {
-        self.canceled.lock().unwrap().insert(id);
+    pub fn add_canceled_id(&self, id: u64) -> Result<(), Box<dyn std::error::Error>> {
+        self.canceled.lock().map_err(|e| format!("{}", e))?.insert(id);
+        Ok(())
     }
 
     /// 全体停止、または指定ファイルが1件キャンセル済みか最適化済みかどうか
@@ -162,15 +172,15 @@ impl OptimizeJob {
     /// * `canceled` - 1件キャンセルされた ID の集合
     /// * `file` - 確認するファイル
     /// * `return` - キャンセルされているかどうか
-    fn is_canceled(running: &AtomicBool, canceled: &Mutex<HashSet<u64>>, file: &image_file::ImageFile) -> bool {
+    fn is_canceled(running: &AtomicBool, canceled: &Mutex<HashSet<u64>>, file: &image_file::ImageFile) -> Result<bool, Box<dyn std::error::Error>> {
         // 全体停止
         if !running.load(Ordering::Relaxed) {
-            return true;
+            return Ok(true);
         }
         // キャンセル済み
-        if canceled.lock().unwrap().contains(file.id()) {
-            return true;
+        if canceled.lock().map_err(|e| format!("{}", e))?.contains(file.id()) {
+            return Ok(true);
         }
-        false
+        Ok(false)
     }
 }

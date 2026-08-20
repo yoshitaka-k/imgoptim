@@ -14,7 +14,7 @@ impl Jpeg {
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, quality: u8, token: OptimToken) -> Result<OptimizeStatus, Box<dyn std::error::Error>> {
         // 最適化中止された場合は処理を中断
-        if token.is_canceled() {
+        if token.is_canceled()? {
             return Ok(OptimizeStatus::Canceled);
         }
 
@@ -30,7 +30,7 @@ impl Jpeg {
         }
 
         // 最適化中止された場合は処理を中断
-        if token.is_canceled() {
+        if token.is_canceled()? {
             return Ok(OptimizeStatus::Canceled);
         }
 
@@ -46,7 +46,7 @@ impl Jpeg {
         std::fs::write(&temp_path, &buffer)?;
 
         // 最適化中止された場合は処理を中断
-        if token.is_canceled() {
+        if token.is_canceled()? {
             std::fs::remove_file(&temp_path)?;
             return Ok(OptimizeStatus::Canceled);
         }

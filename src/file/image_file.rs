@@ -99,9 +99,9 @@ impl ImageFile {
     }
 
     /// ファイルサイズの更新
-    fn update_file_size(&mut self) {
+    fn update_file_size(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // 最適化後のファイル情報
-        let metadata = self.path.metadata().unwrap();
+        let metadata = self.path.metadata().map_err(|e| format!("{} \n\n{}", self.path.display(), e))?;
         self.new_size = metadata.len();
 
         if self.size > 0 {
@@ -120,6 +120,8 @@ impl ImageFile {
         } else {
             self.percent = 0.00f32;
         }
+
+        Ok(())
     }
 
     /// 画像を最適化
@@ -149,7 +151,7 @@ impl ImageFile {
         };
 
         // 最適化を中止したかどうかを確認
-        if token.is_canceled() {
+        if token.is_canceled()? {
             self.status = OptimizeStatus::Canceled;
             return Ok(OptimizeStatus::Canceled);
         }
@@ -193,7 +195,7 @@ impl ImageFile {
                         self.duration = duration as u64;
 
                         // ファイルサイズを更新
-                        self.update_file_size();
+                        self.update_file_size()?;
 
                         // 最適化済みに設定
                         self.status = OptimizeStatus::Optimized;

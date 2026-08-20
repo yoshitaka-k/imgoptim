@@ -5,19 +5,21 @@ use crate::file::open_files;
 /// バックスペースキーが押されたらファイルをキャンセルする
 /// * `files` - ファイル一覧
 /// * `optimize_job` - 最適化ジョブ
-pub fn backspace_key(files: &mut open_files::OpenFiles, optimize_job: &mut OptimizeJob) {
+pub fn backspace_key(files: &mut open_files::OpenFiles, optimize_job: &mut OptimizeJob) -> Result<(), Box<dyn std::error::Error>> {
     if let Some(id) = files.selected_id() {
-        optimize_job.add_canceled_id(*id);
+        optimize_job.add_canceled_id(*id)?;
         files.set_status_canceled(*id);
     }
+    Ok(())
 }
 
 /// スペースキーが押されたらファイルを選択表示する
 /// * `path` - ファイルのパス
-pub fn space_key(path: &PathBuf) {
+pub fn space_key(path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
     if let Err(err) = quicklook_command(path) {
-        eprintln!("Error revealing file: {}", err);
+        return Err(format!("Error revealing file by QuickLook: {}", err).into());
     }
+    Ok(())
 }
 
 /// QuickLook でファイルを表示する
