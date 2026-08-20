@@ -1,4 +1,5 @@
 use crate::file::open_files;
+use crate::event::button;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, svg};
 
@@ -28,24 +29,13 @@ pub(crate) fn view(
             // 設定ボタン
             let settings_button = egui::Image::new(svg::SETTINGS).max_height(constants::BUTTON_SETTINGS_ICON_SIZE).tint(button_color);
             if ui.button(settings_button).on_hover_text("Settings").clicked() {
-                // 設定ダイアログを開く
-                *settings_window_open = true;
-
-                // 設定ダイアログの表示位置を設定
-                *settings_window_pos = ui.ctx().input(|input| {
-                    input.viewport().outer_rect.map(|rect| rect.min)
-                });
-
-                ui.ctx().request_repaint();
+                button::setting_open(ui, settings_window_open, settings_window_pos);
             }
 
             // 開くボタン
             let open_button = egui::Image::new(svg::FOLDER_OPEN).max_height(constants::BUTTON_OPEN_ICON_SIZE).tint(button_color);
             if ui.button(open_button).on_hover_text("Files Open").clicked() {
-                // ファイルダイアログを開くタイミングをずらす
-                *open_dialog = true;
-
-                ui.ctx().request_repaint();
+                button::files_open(ui, open_dialog);
             }
         });
     });

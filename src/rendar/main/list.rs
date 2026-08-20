@@ -210,15 +210,11 @@ pub(crate) fn view(
             }
             FileListAction::KeyUp { key, path } => {
                 match key {
-                    egui::Key::Backspace => {
-                        key_up::backspace_key(files, optimize_job);
-                    }
-                    egui::Key::Space => {
-                        key_up::space_key(&path);
-                    }
-                    _ => {}
+                    egui::Key::Backspace => key_up::backspace_key(files, optimize_job),
+                    egui::Key::Space => key_up::space_key(&path),
+                    _ => (),
                 }
-            }
+            },
         }
     }
 

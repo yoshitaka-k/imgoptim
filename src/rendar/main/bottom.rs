@@ -1,5 +1,6 @@
 use crate::duration_format;
 use crate::file::open_files;
+use crate::event::button;
 use crate::optimize::OptimizeJob;
 use crate::rendar::assets;
 use crate::rendar::assets::{constants, fonts::text_color, svg};
@@ -116,10 +117,7 @@ pub(crate) fn view(
             // クリアボタン
             let clear_button = egui::Image::new(svg::CLEAR_ALL).max_height(constants::BUTTON_CLEAR_ICON_SIZE).tint(button_color);
             if ui.button(clear_button).on_hover_text("Cancel and Clear").clicked() {
-                // 最適化を停止（キャンセル）
-                optimize_job.stop_running();
-                // ファイル一覧をクリア
-                files.clear();
+                button::cancel_and_clear(files, optimize_job);
             }
         });
     });

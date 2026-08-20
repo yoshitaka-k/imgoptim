@@ -50,8 +50,10 @@ impl OptimizeJob {
     /// * `app` - アプリケーション
     /// * `files` - ファイルリスト
     pub fn run(&self, app: &app::App, files: &mut open_files::OpenFiles) {
-        // 最適化実行中フラグを立てる
-        self.start_running();
+        if files.has_standby() {
+            // 最適化実行中フラグを立てる
+            self.start_running();
+        }
 
         // 最適化実行の数が最大値に達していない場合はループを続ける
         while self.is_running_count(app) {
