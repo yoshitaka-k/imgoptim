@@ -32,6 +32,16 @@ pub(crate) fn view(ui: &mut egui::Ui, app: &mut app::App) {
         });
     });
 
+    // JPEG の品質の注意書きを表示
+    ui.horizontal(|ui| {
+        ui.spacing_mut().item_spacing.x = 3.0;
+        ui.add(egui::Image::new(svg::WARNING).max_height(assets_const::WARNING_ICON_SIZE).tint(assets::warning_color(ui)));
+        ui.spacing_mut().item_spacing.x = spacing;
+        ui.add(egui::Label::new(
+            egui::RichText::new(format!("JPEG is lossy compression.")).weak(),
+        ));
+    });
+
     ui.separator();
 
     // PNG のプリセットを表示
@@ -43,5 +53,15 @@ pub(crate) fn view(ui: &mut egui::Ui, app: &mut app::App) {
         ui.radio_value(app.png_preset_mut(), PngPreset::Default, PngPreset::Default.to_string());
         ui.radio_value(app.png_preset_mut(), PngPreset::Best, PngPreset::Best.to_string());
         ui.radio_value(app.png_preset_mut(), PngPreset::Max, PngPreset::Max.to_string());
+    });
+
+    // JPEG の品質の注意書きを表示
+    ui.horizontal(|ui| {
+        ui.spacing_mut().item_spacing.x = 3.0;
+        ui.add(egui::Image::new(svg::WARNING).max_height(assets_const::WARNING_ICON_SIZE).tint(assets::warning_color(ui)));
+        ui.spacing_mut().item_spacing.x = spacing;
+        ui.add(egui::Label::new(
+            egui::RichText::new(format!("PNG is lossless compression.")).weak(),
+        ));
     });
 }
