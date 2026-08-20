@@ -13,6 +13,7 @@ use std::sync::{Arc, Mutex};
 use std::collections::HashSet;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
+use std::path::PathBuf;
 
 /// 最適化ステータス
 #[derive(Clone, PartialEq)]
@@ -43,4 +44,38 @@ impl OptimToken {
     pub fn is_canceled(&self) -> bool {
         !self.running.load(Ordering::Relaxed) || self.canceled.lock().unwrap().contains(&self.id)
     }
+}
+
+/// 一時ファイルを元のファイルに上書き
+/// * `from` - 一時ファイルのパス
+/// * `to` - 元のファイルのパス
+/// * `return` - 一時ファイルを元のファイルに上書きしたかどうか
+pub(crate) fn replace_file(from: &PathBuf, to: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+    // Windows 以外の環境ではファイルを直接上書き
+    #[cfg(not(target_os = "windows"))]
+    {
+        std::fs::rename(from, to)?;
+    }
+
+    // Windows 環境では MoveFileExW を使用してファイルを上書き
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::ffi::OsStrExt;
+        use winapi::um::winbase::{MoveFileExW, MOVEFILE_WRITE_THROUGH, MOVEFILE_REPLACE_EXISTING};
+
+        // Windows の API に渡すためにパスを UTF-16 に変換
+        let from_win: Vec<u16> = from.as_os_str().encode_wide().chain(Some(0)).collect();
+        let to_win: Vec<u16> = to.as_os_str().encode_wide().chain(Some(0)).collect();
+
+        // MoveFileExW を呼び出してファイルを上書き
+        let result = unsafe {
+            MoveFileExW(from_win.as_ptr(), to_win.as_ptr(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)
+        };
+
+        // エラーが発生した場合はエラーを返す
+        if result == 0 {
+            return Err(std::io::Error::last_os_error().into());
+        }
+    }
+    Ok(())
 }

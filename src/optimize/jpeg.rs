@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use image::ImageReader;
 use image::codecs::jpeg::JpegEncoder;
-use crate::optimize::{OptimToken, OptimizeStatus, TEMP_EXTENSION};
+use crate::optimize::{replace_file, OptimToken, OptimizeStatus, TEMP_EXTENSION};
 
 /// JPEG 最適化を行う構造体
 pub struct Jpeg;
@@ -52,7 +52,7 @@ impl Jpeg {
         }
 
         // 一時ファイルを元のファイルに上書き
-        std::fs::rename(&temp_path, path)?;
+        replace_file(&temp_path, path)?;
 
         Ok(OptimizeStatus::Optimized)
     }
