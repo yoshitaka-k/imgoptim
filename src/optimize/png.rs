@@ -11,13 +11,13 @@ impl Png {
     /// * `token` - 最適化トークン
     /// * `return` - 最適化の結果
     pub fn optimize(path: &PathBuf, options: oxipng::Options, token: OptimToken) -> Result<OptimizeStatus, Box<dyn std::error::Error>> {
-        // 先にファイルを読み込んでおく
-        let input = std::fs::read(path)?;
-
         // 最適化中止された場合は処理を中断
         if token.is_canceled() {
             return Ok(OptimizeStatus::Canceled);
         }
+
+        // 先にファイルを読み込んでおく
+        let input = std::fs::read(path)?;
 
         // oxipng でロスレス最適化（パレット維持・ビット深度削減・再圧縮）
         let output = oxipng::optimize_from_memory(&input, &options)?;

@@ -50,8 +50,8 @@ impl OptimizeJob {
     /// * `app` - アプリケーション
     /// * `files` - ファイルリスト
     pub fn run(&self, app: &app::App, files: &mut open_files::OpenFiles) {
+        // 待機中のファイルがある場合は最適化実行中フラグを立てる
         if files.has_standby() {
-            // 最適化実行中フラグを立てる
             self.start_running();
         }
 
