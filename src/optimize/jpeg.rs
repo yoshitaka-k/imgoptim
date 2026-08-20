@@ -29,16 +29,16 @@ impl Jpeg {
             encoder.encode_image(&file_image)?;
         }
 
+        // 最適化中止された場合は処理を中断
+        if token.is_canceled() {
+            return Ok(OptimizeStatus::Canceled);
+        }
+
         // 最適化後のサイズが元のサイズより大きい場合は最適化しない
         let size = path.metadata()?.len() as usize;
         let new_size = buffer.len() as usize;
         if size <= new_size {
             return Ok(OptimizeStatus::Optimized);
-        }
-
-        // 最適化中止された場合は処理を中断
-        if token.is_canceled() {
-            return Ok(OptimizeStatus::Canceled);
         }
 
         // 一時ファイルを作成して最適化後のデータを保存
