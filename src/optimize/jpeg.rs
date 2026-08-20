@@ -30,9 +30,9 @@ impl Jpeg {
         }
 
         // 最適化後のサイズが元のサイズより小さい場合は最適化しない
-        if new_size <= size {
         let size = path.metadata()?.len() as usize;
         let new_size = buffer.len() as usize;
+        if size <= new_size {
             return Ok(OptimizeStatus::Optimized);
         }
 
