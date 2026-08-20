@@ -131,8 +131,14 @@ impl OptimizeJob {
     pub fn result(&self, files: &mut open_files::OpenFiles) {
         // 最適化結果を受信
         while let Ok(result) = self.result_rx.try_recv() {
+            // ファイル ID を控えておく
+            let id = *result.id();
+
             // 最適化結果を反映
             files.apply_result(result);
+
+            // ファイル ID を削除
+            let _ = self.remove_canceled_id(id);
         }
     }
 
@@ -182,5 +188,20 @@ impl OptimizeJob {
             return Ok(true);
         }
         Ok(false)
+    }
+
+    /// キャンセルに登録されているファイル ID を全てクリア
+    /// * `return` - 成功かどうか
+    pub fn clear_canceled(&self) -> Result<(), Box<dyn std::error::Error>> {
+        self.canceled.lock().map_err(|e| format!("{}", e))?.clear();
+        Ok(())
+    }
+
+    /// キャンセルに登録されているファイル ID を削除
+    /// * `id` - 削除するファイル ID
+    /// * `return` - 成功かどうか
+    pub fn remove_canceled_id(&self, id: u64) -> Result<(), Box<dyn std::error::Error>> {
+        self.canceled.lock().map_err(|e| format!("{}", e))?.remove(&id);
+        Ok(())
     }
 }

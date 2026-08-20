@@ -36,6 +36,9 @@ pub(crate) fn cancel_and_clear(files: &mut open_files::OpenFiles, optimize_job: 
     // 最適化を停止（全体キャンセル）
     optimize_job.stop_running();
 
+    // キャンセル ID の集合をクリア
+    optimize_job.clear_canceled()?;
+
     // エラーを初期化
     let mut error = None;
 
