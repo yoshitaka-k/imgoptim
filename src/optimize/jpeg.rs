@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use image::ImageReader;
 use image::codecs::jpeg::JpegEncoder;
-use crate::optimize::{OptimToken, OptimizeStatus};
+use crate::optimize::{OptimToken, OptimizeStatus, TEMP_EXTENSION};
 
 /// JPEG 最適化を行う構造体
 pub struct Jpeg;
@@ -29,7 +29,7 @@ impl Jpeg {
             encoder.encode_image(&file_image)?;
         }
 
-        // 最適化後のサイズが元のサイズより小さい場合は最適化しない
+        // 最適化後のサイズが元のサイズより大きい場合は最適化しない
         let size = path.metadata()?.len() as usize;
         let new_size = buffer.len() as usize;
         if size <= new_size {
@@ -41,8 +41,18 @@ impl Jpeg {
             return Ok(OptimizeStatus::Canceled);
         }
 
-        // ファイルを上書き保存
-        std::fs::write(path, &buffer)?;
+        // 一時ファイルを作成して最適化後のデータを保存
+        let temp_path = path.with_added_extension(TEMP_EXTENSION);
+        std::fs::write(&temp_path, &buffer)?;
+
+        // 最適化中止された場合は処理を中断
+        if token.is_canceled() {
+            std::fs::remove_file(&temp_path)?;
+            return Ok(OptimizeStatus::Canceled);
+        }
+
+        // 一時ファイルを元のファイルに上書き
+        std::fs::rename(&temp_path, path)?;
 
         Ok(OptimizeStatus::Optimized)
     }

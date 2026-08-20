@@ -6,6 +6,9 @@ pub use jpeg::Jpeg;
 pub use png::Png;
 pub(crate) use job::OptimizeJob;
 
+/// 一時ファイルの拡張子
+pub const TEMP_EXTENSION: &str = "keiga.temp";
+
 use std::sync::{Arc, Mutex};
 use std::collections::HashSet;
 use std::sync::atomic::AtomicBool;
