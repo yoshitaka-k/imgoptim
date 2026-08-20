@@ -1,4 +1,16 @@
 use std::path::PathBuf;
+use crate::optimize::OptimizeJob;
+use crate::file::open_files;
+
+/// バックスペースキーが押されたらファイルをキャンセルする
+/// * `files` - ファイル一覧
+/// * `optimize_job` - 最適化ジョブ
+pub fn backspace_key(files: &mut open_files::OpenFiles, optimize_job: &mut OptimizeJob) {
+    if let Some(id) = files.selected_id() {
+        optimize_job.add_canceled_id(*id);
+        files.set_status_canceled(*id);
+    }
+}
 
 /// スペースキーが押されたらファイルを選択表示する
 /// * `path` - ファイルのパス

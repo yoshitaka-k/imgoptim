@@ -211,10 +211,7 @@ pub(crate) fn view(
             FileListAction::KeyUp { key, path } => {
                 match key {
                     egui::Key::Backspace => {
-                        if let Some(id) = files.selected_id() {
-                            optimize_job.add_canceled_id(*id);
-                            files.set_status_canceled(*id);
-                        }
+                        key_up::backspace_key(files, optimize_job);
                     }
                     egui::Key::Space => {
                         key_up::space_key(&path);
